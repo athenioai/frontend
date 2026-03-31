@@ -100,7 +100,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
       <div className="hidden overflow-x-auto rounded-xl border border-border-default md:block">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border-default bg-bg-elevated/50">
+            <tr className="border-b border-border-default bg-surface-2/50">
               {[
                 { key: 'nome', label: 'Nome' },
                 { key: 'telefone', label: 'Telefone' },

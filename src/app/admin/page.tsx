@@ -16,7 +16,7 @@ export default async function AdminPage() {
       <div className="overflow-x-auto rounded-xl border border-border-default">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border-default bg-bg-elevated/50">
+            <tr className="border-b border-border-default bg-surface-2/50">
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">Empresa</th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">Health Score</th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.12em] text-text-subtle">ROAS Mês</th>
