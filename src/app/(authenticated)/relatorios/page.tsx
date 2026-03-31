@@ -60,10 +60,10 @@ export default function RelatoriosPage() {
         <div>
           <p className="mb-1 text-xs text-text-subtle">Mês</p>
           <Select value={mes} onValueChange={(v: string | null) => { if (v) setMes(v) }}>
-            <SelectTrigger className="w-40 border-border-default bg-bg-input text-text-muted">
+            <SelectTrigger className="w-40 border-border-default bg-surface-2 text-text-muted">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-border-default bg-[#0C1818]">
+            <SelectContent className="border-border-default bg-surface-2">
               {MESES.map((m) => (
                 <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
               ))}
@@ -73,10 +73,10 @@ export default function RelatoriosPage() {
         <div>
           <p className="mb-1 text-xs text-text-subtle">Ano</p>
           <Select value={ano} onValueChange={(v: string | null) => { if (v) setAno(v) }}>
-            <SelectTrigger className="w-28 border-border-default bg-bg-input text-text-muted">
+            <SelectTrigger className="w-28 border-border-default bg-surface-2 text-text-muted">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-border-default bg-[#0C1818]">
+            <SelectContent className="border-border-default bg-surface-2">
               <SelectItem value="2026">2026</SelectItem>
               <SelectItem value="2025">2025</SelectItem>
             </SelectContent>
@@ -85,7 +85,7 @@ export default function RelatoriosPage() {
         <Button
           onClick={handleDownload}
           disabled={loading}
-          className="rounded-full bg-accent px-6 font-semibold text-[#070C0C] shadow-[0_0_40px_rgba(79,209,197,0.3)] hover:bg-accent-light"
+          className="rounded-xl bg-accent px-6 font-semibold text-primary-foreground transition-all hover:brightness-110"
         >
           {loading ? (
             <>
@@ -106,13 +106,15 @@ export default function RelatoriosPage() {
         <p className="mb-3 text-sm text-text-muted">
           Preview — {mesLabel} {ano}
         </p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {previewSections.map((s) => (
-            <div key={s.title} className="glass-card">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-accent">{s.title}</p>
-              <p className="whitespace-pre-line text-sm text-text-muted">{s.content}</p>
-            </div>
-          ))}
+        <div className="card-elevated p-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {previewSections.map((s) => (
+              <div key={s.title} className="rounded-lg bg-surface-2 p-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-[0.05em] text-accent">{s.title}</p>
+                <p className="whitespace-pre-line text-sm text-text-muted">{s.content}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
