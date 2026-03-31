@@ -1,47 +1,48 @@
 export const COLORS = {
   accent: '#4FD1C5',
-  accentLight: '#81E6D9',
-  amber: '#FBBF24',
+  accentLight: '#6EE7D8',
+  gold: '#E8C872',
   violet: '#A78BFA',
-  bgBase: '#090F0F',
-  surface1: '#111919',
-  surface2: '#162020',
-  danger: '#E07070',
-  dangerBg: 'rgba(224, 112, 112, 0.12)',
-  warning: '#FBBF24',
-  success: '#4FD1C5',
-  textMuted: 'rgba(255, 255, 255, 0.6)',
-  textSubtle: 'rgba(255, 255, 255, 0.4)',
-  border: 'rgba(79, 209, 197, 0.08)',
-  borderHover: 'rgba(79, 209, 197, 0.20)',
+  emerald: '#34D399',
+  bgBase: '#08090A',
+  surface1: '#0F1114',
+  surface2: '#161A1E',
+  danger: '#F07070',
+  dangerBg: 'rgba(240, 112, 112, 0.08)',
+  warning: '#E8C872',
+  success: '#34D399',
+  textPrimary: '#F0EDE8',
+  textMuted: 'rgba(240, 237, 232, 0.55)',
+  textSubtle: 'rgba(240, 237, 232, 0.35)',
+  border: 'rgba(240, 237, 232, 0.06)',
+  borderHover: 'rgba(240, 237, 232, 0.12)',
 } as const
 
 export const CHART_COLORS = {
   primary: '#4FD1C5',
-  secondary: '#81E6D9',
-  tertiary: '#0F3D3E',
-  amber: '#FBBF24',
+  secondary: '#34D399',
+  tertiary: '#E8C872',
   violet: '#A78BFA',
-  grid: 'rgba(255, 255, 255, 0.05)',
-  tooltipBg: '#111919',
+  grid: 'rgba(240, 237, 232, 0.04)',
+  tooltipBg: '#0F1114',
 } as const
 
 export const AGENT_COLORS = {
   hermes: '#4FD1C5',
-  ares: '#FBBF24',
+  ares: '#E8C872',
   athena: '#A78BFA',
 } as const
 
 export const TEMPERATURA_COLORS = {
   frio: '#60A5FA',
-  morno: '#F6E05E',
-  quente: '#E07070',
+  morno: '#E8C872',
+  quente: '#F07070',
 } as const
 
 export const HEALTH_SCORE_COLORS = {
-  good: '#4FD1C5',
-  warning: '#F6E05E',
-  danger: '#E07070',
+  good: '#34D399',
+  warning: '#E8C872',
+  danger: '#F07070',
 } as const
 
 export function getHealthScoreColor(score: number): string {

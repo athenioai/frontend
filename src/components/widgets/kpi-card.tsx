@@ -39,23 +39,38 @@ export function KpiCard({
   const Icon = ICON_MAP[icon]
   return (
     <AnimateIn delay={delay}>
-      <div className="card-surface card-surface-interactive p-5">
-        <div className="mb-2 flex items-center gap-2">
+      <div className="card-surface card-surface-interactive group p-5">
+        {/* Icon + label row */}
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-subtle">
+            {label}
+          </span>
           <div
-            className="flex h-8 w-8 items-center justify-center rounded-lg"
-            style={{ backgroundColor: `color-mix(in srgb, ${accentColor} 12%, transparent)` }}
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
+            style={{ backgroundColor: `color-mix(in srgb, ${accentColor} 10%, transparent)` }}
           >
-            <Icon className="h-4 w-4" style={{ color: accentColor }} />
+            <Icon
+              className="h-[14px] w-[14px] transition-transform group-hover:scale-110"
+              style={{ color: accentColor }}
+            />
           </div>
-          <span className="text-xs font-medium uppercase tracking-[0.05em] text-text-subtle">{label}</span>
         </div>
-        <p className="font-title text-2xl font-bold text-text-primary">
+
+        {/* Value — serif for numbers */}
+        <p className="font-display text-[28px] leading-none text-text-primary">
           <CountUp value={value} prefix={prefix} suffix={suffix} decimals={decimals} />
         </p>
+
+        {/* Change badge */}
         {change !== undefined && (
-          <p className={`mt-1 text-xs font-medium ${change >= 0 ? 'text-success' : 'text-danger'}`}>
-            {change >= 0 ? '+' : ''}{change.toFixed(1)}%
-          </p>
+          <div className="mt-2.5 flex items-center gap-1">
+            <span
+              className={`inline-block h-1 w-1 rounded-full ${change >= 0 ? 'bg-emerald' : 'bg-danger'}`}
+            />
+            <span className={`text-[11px] font-medium ${change >= 0 ? 'text-emerald' : 'text-danger'}`}>
+              {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+            </span>
+          </div>
         )}
       </div>
     </AnimateIn>
