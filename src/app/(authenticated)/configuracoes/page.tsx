@@ -44,7 +44,7 @@ export default function ConfiguracoesPage() {
       </p>
 
       {/* Metas */}
-      <div className="glass-card space-y-4">
+      <div className="card-surface p-6 space-y-4">
         <h2 className="font-title text-lg font-bold">Metas</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -54,7 +54,7 @@ export default function ConfiguracoesPage() {
               step="0.1"
               value={config.roas_meta || ''}
               onChange={(e) => handleChange('roas_meta', parseFloat(e.target.value))}
-              className="border-border-default bg-bg-input text-text-primary focus:border-accent"
+              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
             />
           </div>
           <div className="space-y-2">
@@ -64,14 +64,14 @@ export default function ConfiguracoesPage() {
               step="0.50"
               value={config.cpl_alvo || ''}
               onChange={(e) => handleChange('cpl_alvo', parseFloat(e.target.value))}
-              className="border-border-default bg-bg-input text-text-primary focus:border-accent"
+              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
             />
           </div>
         </div>
       </div>
 
       {/* Orçamento */}
-      <div className="glass-card space-y-4">
+      <div className="card-surface p-6 space-y-4">
         <h2 className="font-title text-lg font-bold">Orçamento</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -80,7 +80,7 @@ export default function ConfiguracoesPage() {
               type="number"
               value={config.orcamento_diario || ''}
               onChange={(e) => handleChange('orcamento_diario', parseFloat(e.target.value))}
-              className="border-border-default bg-bg-input text-text-primary focus:border-accent"
+              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
             />
           </div>
           <div className="space-y-2">
@@ -89,7 +89,7 @@ export default function ConfiguracoesPage() {
               type="number"
               value={config.teto_cartao || ''}
               onChange={(e) => handleChange('teto_cartao', parseFloat(e.target.value))}
-              className="border-border-default bg-bg-input text-text-primary focus:border-accent"
+              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
             />
             <p className="text-xs text-danger">Nenhuma lógica de ROAS pode ultrapassar este valor</p>
           </div>
@@ -97,7 +97,7 @@ export default function ConfiguracoesPage() {
       </div>
 
       {/* Comunicação */}
-      <div className="glass-card space-y-4">
+      <div className="card-surface p-6 space-y-4">
         <h2 className="font-title text-lg font-bold">Comunicação</h2>
         <div className="space-y-4">
           <div className="space-y-2">
@@ -106,7 +106,7 @@ export default function ConfiguracoesPage() {
               value={config.tom_de_voz || ''}
               onChange={(e) => handleChange('tom_de_voz', e.target.value)}
               rows={3}
-              className="border-border-default bg-bg-input text-text-primary focus:border-accent"
+              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
               placeholder="Descreva como os agentes devem se comunicar..."
             />
           </div>
@@ -116,7 +116,7 @@ export default function ConfiguracoesPage() {
               type="tel"
               value={config.whatsapp_alertas || ''}
               onChange={(e) => handleChange('whatsapp_alertas', e.target.value)}
-              className="border-border-default bg-bg-input text-text-primary focus:border-accent"
+              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
               placeholder="+5511999887766"
             />
           </div>
@@ -124,21 +124,21 @@ export default function ConfiguracoesPage() {
       </div>
 
       {/* Empresa */}
-      <div className="glass-card space-y-4">
+      <div className="card-surface p-6 space-y-4">
         <h2 className="font-title text-lg font-bold">Empresa</h2>
         <div className="space-y-2">
           <Label className="text-text-muted">Nome da Empresa</Label>
           <Input
             value={config.nome || ''}
             onChange={(e) => handleChange('nome', e.target.value)}
-            className="border-border-default bg-bg-input text-text-primary focus:border-accent"
+            className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
           />
         </div>
       </div>
 
       <Button
         onClick={handleSave}
-        className="rounded-full bg-accent px-8 font-semibold text-[#070C0C] shadow-[0_0_40px_rgba(79,209,197,0.3)] hover:bg-accent-light"
+        className="rounded-xl bg-accent px-8 font-semibold text-primary-foreground transition-all hover:brightness-110"
       >
         {saved ? (
           <>

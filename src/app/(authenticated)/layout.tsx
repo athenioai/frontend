@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
-import { authService, analyticsService } from '@/lib/services'
-import { Sidebar } from '@/components/layout/sidebar'
-import { Topbar } from '@/components/layout/topbar'
+import { authService, analyticsService, alertService } from '@/lib/services'
+import { AuthShell } from '@/components/layout/auth-shell'
 import { HealthBanner } from '@/components/layout/health-banner'
 
 export default async function AuthenticatedLayout({
@@ -12,22 +11,25 @@ export default async function AuthenticatedLayout({
   const user = await authService.getSession()
   if (!user) redirect('/login')
 
-  const health = await analyticsService.getHealthScore(user.empresa_id)
+  const [health, alerts] = await Promise.all([
+    analyticsService.getHealthScore(user.empresa_id),
+    alertService.getRecentes(user.empresa_id),
+  ])
 
   return (
-    <div className="min-h-screen">
-      <Sidebar isAdmin={user.role === 'admin'} />
-      <div className="lg:pl-60">
-        <Topbar userName={user.nome} isAdmin={user.role === 'admin'} />
-        <HealthBanner
-          score={health.score}
-          motivo={health.motivo_alerta}
-          acao={health.acao_recomendada}
-        />
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {children}
-        </main>
-      </div>
-    </div>
+    <AuthShell
+      isAdmin={user.role === 'admin'}
+      userName={user.nome}
+      alertCount={alerts.length}
+    >
+      <HealthBanner
+        score={health.score}
+        motivo={health.motivo_alerta}
+        acao={health.acao_recomendada}
+      />
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {children}
+      </main>
+    </AuthShell>
   )
 }

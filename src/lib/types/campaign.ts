@@ -23,4 +23,5 @@ export interface RoiTotal {
   investido: number
   retorno: number
   roas: number
+  historico_7d: number[]
 }

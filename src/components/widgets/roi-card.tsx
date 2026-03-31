@@ -1,13 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { LineChart, Line, ResponsiveContainer } from 'recharts'
 import { formatCurrency } from '@/lib/utils/format'
+import { CountUp } from '@/components/ui/count-up'
+import { AnimateIn } from '@/components/ui/animate-in'
 import type { RoiTotal } from '@/lib/types'
 
 export function RoiCard({ initial }: { initial: RoiTotal }) {
   const [roi, setRoi] = useState(initial)
 
-  // Simulate real-time updates
   useEffect(() => {
     const interval = setInterval(() => {
       setRoi((prev) => ({
@@ -19,28 +21,49 @@ export function RoiCard({ initial }: { initial: RoiTotal }) {
     return () => clearInterval(interval)
   }, [])
 
+  const sparkData = roi.historico_7d.map((v, i) => ({ day: i, value: v }))
+
   return (
-    <div className="glass-card relative overflow-hidden">
-      <div className="glow-accent absolute inset-0" />
-      <div className="relative text-center">
-        <p className="mb-2 text-sm font-medium uppercase tracking-[0.12em] text-text-muted">
-          Retorno sobre investimento
-        </p>
-        <p className="font-title text-[clamp(34px,5.5vw,68px)] font-bold leading-none text-accent">
-          {roi.roas.toFixed(1)}x
-        </p>
-        <p className="mt-4 text-base text-text-muted">
-          Para cada{' '}
-          <span className="font-semibold text-text-primary">R$ 1,00</span>{' '}
-          investido em anúncio, a Athenio retornou{' '}
-          <span className="font-semibold text-accent">{formatCurrency(roi.roas)}</span>{' '}
-          em vendas
-        </p>
-        <div className="mt-4 flex justify-center gap-8 text-sm text-text-subtle">
-          <span>Investido: {formatCurrency(roi.investido)}</span>
-          <span>Retorno: {formatCurrency(roi.retorno)}</span>
+    <AnimateIn>
+      <div className="card-hero relative overflow-hidden p-8">
+        <div className="relative flex items-start justify-between">
+          <div className="flex-1 text-center lg:text-left">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.05em] text-text-muted">
+              Retorno sobre investimento
+            </p>
+            <p className="font-title text-[clamp(36px,5vw,56px)] font-bold leading-none text-accent">
+              <CountUp value={roi.roas} decimals={1} suffix="x" />
+            </p>
+            <p className="mt-4 text-base text-text-muted">
+              Para cada{' '}
+              <span className="font-semibold text-text-primary">R$ 1,00</span>{' '}
+              investido em anúncio, a Athenio retornou{' '}
+              <span className="font-semibold text-amber">{formatCurrency(roi.roas)}</span>{' '}
+              em vendas
+            </p>
+            <div className="mt-4 flex justify-center gap-8 text-sm text-text-subtle lg:justify-start">
+              <span>Investido: {formatCurrency(roi.investido)}</span>
+              <span>Retorno: <span className="text-amber">{formatCurrency(roi.retorno)}</span></span>
+            </div>
+          </div>
+
+          {/* Sparkline */}
+          <div className="hidden w-32 lg:block">
+            <p className="mb-1 text-right text-[10px] font-medium uppercase text-text-subtle">7 dias</p>
+            <ResponsiveContainer width="100%" height={60}>
+              <LineChart data={sparkData}>
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#4FD1C5"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
-    </div>
+    </AnimateIn>
   )
 }

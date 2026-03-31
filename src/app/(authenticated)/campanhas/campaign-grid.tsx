@@ -31,7 +31,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
           <div
             key={c.id}
             onClick={() => openDrawer(c)}
-            className={`glass-card glass-card-interactive cursor-pointer ${
+            className={`card-surface card-surface-interactive cursor-pointer ${
               c.status === 'pausada' ? 'opacity-60' : ''
             }`}
           >
@@ -76,11 +76,11 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
           {selected && (
             <div className="mt-6 space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div className="glass-card p-4">
+                <div className="card-surface p-4">
                   <p className="text-xs text-text-subtle">ROAS</p>
                   <p className="font-title text-2xl font-bold text-accent">{selected.roas.toFixed(1)}x</p>
                 </div>
-                <div className="glass-card p-4">
+                <div className="card-surface p-4">
                   <p className="text-xs text-text-subtle">Gasto Total</p>
                   <p className="font-title text-2xl font-bold">{formatCurrency(selected.gasto_total)}</p>
                 </div>

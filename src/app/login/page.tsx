@@ -10,22 +10,22 @@ export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
-      {/* Background grid */}
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 bg-bg-base">
+      {/* Subtle grid */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        className="pointer-events-none absolute inset-0 opacity-[0.02]"
         style={{
-          backgroundImage: 'linear-gradient(rgba(79,209,197,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(79,209,197,0.3) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+          backgroundImage: 'linear-gradient(rgba(79,209,197,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(79,209,197,0.4) 1px, transparent 1px)',
+          backgroundSize: '80px 80px',
         }}
       />
 
-      {/* Floating orbs */}
-      <div className="animate-float pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-accent/5 blur-3xl" />
-      <div className="animate-float pointer-events-none absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-accent/5 blur-3xl" style={{ animationDelay: '11s' }} />
+      {/* Gradient orbs */}
+      <div className="pointer-events-none absolute -left-40 -top-40 h-80 w-80 rounded-full bg-accent/5 blur-[100px]" />
+      <div className="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-violet/5 blur-[100px]" />
 
-      <div className="glass-card relative z-10 w-full max-w-md p-10">
-        {/* Logo text */}
+      <div className="card-surface relative z-10 w-full max-w-md p-10">
+        {/* Logo */}
         <div className="mb-8 flex justify-center">
           <span className="font-title text-3xl font-bold text-accent">Athenio.ai</span>
         </div>
@@ -39,7 +39,7 @@ export default function LoginPage() {
               type="email"
               placeholder="seu@email.com"
               required
-              className="border-border-default bg-bg-input text-text-primary placeholder:text-text-subtle focus:border-accent focus:bg-[rgba(79,209,197,0.05)]"
+              className="border-border-default bg-surface-2 text-text-primary placeholder:text-text-subtle focus:border-accent focus:ring-1 focus:ring-accent/30"
             />
           </div>
 
@@ -51,7 +51,7 @@ export default function LoginPage() {
               type="password"
               placeholder="••••••••"
               required
-              className="border-border-default bg-bg-input text-text-primary placeholder:text-text-subtle focus:border-accent focus:bg-[rgba(79,209,197,0.05)]"
+              className="border-border-default bg-surface-2 text-text-primary placeholder:text-text-subtle focus:border-accent focus:ring-1 focus:ring-accent/30"
             />
           </div>
 
@@ -62,7 +62,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full rounded-full bg-accent py-3 font-semibold text-[#070C0C] shadow-[0_0_40px_rgba(79,209,197,0.3)] transition-transform hover:-translate-y-0.5 hover:bg-accent-light disabled:opacity-50"
+            className="w-full rounded-xl bg-accent py-3 font-semibold text-primary-foreground transition-all hover:brightness-110 disabled:opacity-50"
           >
             {isPending ? 'Entrando...' : 'Entrar'}
           </Button>

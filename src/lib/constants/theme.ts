@@ -1,34 +1,35 @@
 export const COLORS = {
   accent: '#4FD1C5',
   accentLight: '#81E6D9',
-  bgBase: '#070C0C',
-  bgElevated: 'rgba(15, 61, 62, 0.2)',
+  amber: '#FBBF24',
+  violet: '#A78BFA',
+  bgBase: '#090F0F',
+  surface1: '#111919',
+  surface2: '#162020',
   danger: '#E07070',
-  dangerBg: 'rgba(161, 92, 92, 0.15)',
-  warning: '#F6E05E',
+  dangerBg: 'rgba(224, 112, 112, 0.12)',
+  warning: '#FBBF24',
   success: '#4FD1C5',
   textMuted: 'rgba(255, 255, 255, 0.6)',
   textSubtle: 'rgba(255, 255, 255, 0.4)',
-  border: 'rgba(79, 209, 197, 0.15)',
-  borderStrong: 'rgba(79, 209, 197, 0.3)',
-  gridSubtle: 'rgba(255, 255, 255, 0.05)',
+  border: 'rgba(79, 209, 197, 0.08)',
+  borderHover: 'rgba(79, 209, 197, 0.20)',
 } as const
 
 export const CHART_COLORS = {
   primary: '#4FD1C5',
   secondary: '#81E6D9',
   tertiary: '#0F3D3E',
+  amber: '#FBBF24',
+  violet: '#A78BFA',
   grid: 'rgba(255, 255, 255, 0.05)',
-  tooltipBg: '#0C1818',
+  tooltipBg: '#111919',
 } as const
 
-export const ALERT_ICONS: Record<string, string> = {
-  venda: 'DollarSign',
-  campanha_pausada: 'Pause',
-  campanha_escalada: 'TrendingUp',
-  baleia: 'Star',
-  humano_solicitado: 'User',
-  anomalia: 'Shield',
+export const AGENT_COLORS = {
+  hermes: '#4FD1C5',
+  ares: '#FBBF24',
+  athena: '#A78BFA',
 } as const
 
 export const TEMPERATURA_COLORS = {
