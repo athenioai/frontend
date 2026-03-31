@@ -10,63 +10,85 @@ export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 bg-bg-base">
-      {/* Subtle grid */}
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+      {/* Deep atmospheric gradient */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0a0f12] via-[#08090A] to-[#0d0a12]" />
+
+      {/* Large ambient glow — teal top-left */}
+      <div className="pointer-events-none absolute -left-[20%] -top-[30%] h-[70vh] w-[70vh] rounded-full bg-[#4FD1C5]/[0.04] blur-[150px]" />
+      {/* Violet bottom-right */}
+      <div className="pointer-events-none absolute -bottom-[20%] -right-[15%] h-[60vh] w-[60vh] rounded-full bg-[#A78BFA]/[0.03] blur-[130px]" />
+      {/* Warm center glow */}
+      <div className="pointer-events-none absolute left-1/2 top-1/3 h-[40vh] w-[40vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8C872]/[0.02] blur-[120px]" />
+
+      {/* Fine dot grid */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.02]"
+        className="pointer-events-none absolute inset-0 opacity-[0.03]"
         style={{
-          backgroundImage: 'linear-gradient(rgba(79,209,197,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(79,209,197,0.4) 1px, transparent 1px)',
-          backgroundSize: '80px 80px',
+          backgroundImage: 'radial-gradient(circle, rgba(240,237,232,0.6) 0.5px, transparent 0.5px)',
+          backgroundSize: '32px 32px',
         }}
       />
 
-      {/* Gradient orbs */}
-      <div className="pointer-events-none absolute -left-40 -top-40 h-80 w-80 rounded-full bg-accent/5 blur-[100px]" />
-      <div className="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-violet/5 blur-[100px]" />
-
-      <div className="card-surface relative z-10 w-full max-w-md p-10">
+      <div className="card-glass relative z-10 w-full max-w-[420px] p-12">
         {/* Logo */}
-        <div className="mb-8 flex justify-center">
-          <span className="font-title text-3xl font-bold text-accent">Athenio.ai</span>
+        <div className="mb-10 text-center">
+          <h1 className="text-[28px] tracking-tight text-text-primary">
+            <span className="font-display text-[34px] text-accent">Athenio</span>
+            <span className="ml-0.5 text-text-subtle">.ai</span>
+          </h1>
+          <p className="mt-2 text-[13px] text-text-subtle">
+            Painel de controle inteligente
+          </p>
         </div>
 
-        <form action={formAction} className="space-y-5">
+        <form action={formAction} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm text-text-muted">E-mail</Label>
+            <Label htmlFor="email" className="text-[13px] font-medium text-text-muted">
+              E-mail
+            </Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="seu@email.com"
+              placeholder="seu@empresa.com"
               required
-              className="border-border-default bg-surface-2 text-text-primary placeholder:text-text-subtle focus:border-accent focus:ring-1 focus:ring-accent/30"
+              autoComplete="email"
+              className="h-11 rounded-xl border-border-default bg-[rgba(255,255,255,0.03)] text-text-primary placeholder:text-text-subtle/60 transition-all focus:border-accent/40 focus:bg-[rgba(79,209,197,0.03)] focus:ring-1 focus:ring-accent/20"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm text-text-muted">Senha</Label>
+            <Label htmlFor="password" className="text-[13px] font-medium text-text-muted">
+              Senha
+            </Label>
             <Input
               id="password"
               name="password"
               type="password"
               placeholder="••••••••"
               required
-              className="border-border-default bg-surface-2 text-text-primary placeholder:text-text-subtle focus:border-accent focus:ring-1 focus:ring-accent/30"
+              autoComplete="current-password"
+              className="h-11 rounded-xl border-border-default bg-[rgba(255,255,255,0.03)] text-text-primary placeholder:text-text-subtle/60 transition-all focus:border-accent/40 focus:bg-[rgba(79,209,197,0.03)] focus:ring-1 focus:ring-accent/20"
             />
           </div>
 
           {state?.error && (
-            <p className="text-sm text-danger">{state.error}</p>
+            <p className="text-[13px] text-danger">{state.error}</p>
           )}
 
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full rounded-xl bg-accent py-3 font-semibold text-primary-foreground transition-all hover:brightness-110 disabled:opacity-50"
+            className="h-11 w-full rounded-xl bg-accent font-semibold text-primary-foreground shadow-[0_0_24px_rgba(79,209,197,0.15)] transition-all hover:brightness-110 hover:shadow-[0_0_32px_rgba(79,209,197,0.25)] disabled:opacity-50"
           >
-            {isPending ? 'Entrando...' : 'Entrar'}
+            {isPending ? 'Entrando...' : 'Acessar painel'}
           </Button>
         </form>
+
+        <p className="mt-8 text-center text-[11px] text-text-subtle/50">
+          Acesso restrito a clientes Athenio.ai
+        </p>
       </div>
     </div>
   )

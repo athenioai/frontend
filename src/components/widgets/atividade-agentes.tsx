@@ -47,37 +47,53 @@ export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       {agents.map((agent, i) => (
-        <AnimateIn key={agent.nome} delay={i * 0.06}>
-          <div
-            className="card-surface p-5"
-            style={{ borderLeft: `3px solid ${agent.color}` }}
-          >
-            <div className="mb-3 flex items-center gap-2">
+        <AnimateIn key={agent.nome} delay={i * 0.08}>
+          <div className="card-surface group relative overflow-hidden p-5">
+            {/* Subtle top accent line */}
+            <div
+              className="absolute left-0 right-0 top-0 h-[1px]"
+              style={{ background: `linear-gradient(90deg, transparent, ${agent.color}30, transparent)` }}
+            />
+
+            <div className="mb-4 flex items-center gap-3">
               <div
-                className="flex h-7 w-7 items-center justify-center rounded-full"
-                style={{ backgroundColor: `color-mix(in srgb, ${agent.color} 15%, transparent)` }}
+                className="flex h-9 w-9 items-center justify-center rounded-xl"
+                style={{ background: `linear-gradient(135deg, ${agent.color}18, ${agent.color}08)` }}
               >
-                <agent.icon className="h-3.5 w-3.5" style={{ color: agent.color }} />
+                <agent.icon className="h-4 w-4" style={{ color: agent.color }} />
               </div>
-              <span className="font-title text-sm font-bold">{agent.nome}</span>
-              <span className="text-xs text-text-subtle">({agent.subtitulo})</span>
-              <span className="ml-auto inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-title text-[14px] font-bold text-text-primary">
+                    {agent.nome}
+                  </span>
+                  <span className="text-[11px] text-text-subtle">
+                    {agent.subtitulo}
+                  </span>
+                </div>
+              </div>
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
                 style={{
-                  backgroundColor: `color-mix(in srgb, ${agent.color} 10%, transparent)`,
+                  backgroundColor: `${agent.color}0D`,
                   color: agent.color,
                 }}
               >
-                <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: agent.color }} />
+                <span
+                  className="h-1.5 w-1.5 rounded-full animate-pulse"
+                  style={{ backgroundColor: agent.color }}
+                />
                 ativo
               </span>
             </div>
-            <div className="space-y-2">
+
+            <div className="space-y-2.5">
               {agent.metricas.map(({ label, value }) => (
-                <div key={label} className="flex justify-between gap-2">
-                  <span className="text-xs text-text-subtle">{label}</span>
-                  <span className="text-right text-xs font-medium text-text-primary">
-                    {typeof value === 'string' && value.length > 35
-                      ? value.slice(0, 35) + '...'
+                <div key={label} className="flex items-center justify-between gap-3">
+                  <span className="text-[12px] text-text-subtle">{label}</span>
+                  <span className="text-right text-[12px] font-medium text-text-primary">
+                    {typeof value === 'string' && value.length > 30
+                      ? value.slice(0, 30) + '…'
                       : value}
                   </span>
                 </div>

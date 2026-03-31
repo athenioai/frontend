@@ -38,7 +38,7 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-default bg-surface-1/80 px-4 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-default bg-bg-base/70 px-4 backdrop-blur-xl">
       {/* Mobile menu */}
       <div className="flex items-center gap-3">
         <Sheet open={open} onOpenChange={setOpen}>
@@ -51,10 +51,13 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
         </Sheet>
 
         {/* Logo for mobile */}
-        <span className="font-title text-lg font-bold text-accent lg:hidden">Athenio.ai</span>
+        <span className="text-[15px] tracking-tight lg:hidden">
+          <span className="font-display text-lg text-accent">Athenio</span>
+          <span className="text-text-subtle">.ai</span>
+        </span>
 
         {/* Breadcrumb for desktop */}
-        <span className="hidden text-sm font-medium text-text-muted lg:block">{breadcrumb}</span>
+        <span className="hidden text-[13px] font-medium text-text-muted lg:block">{breadcrumb}</span>
       </div>
 
       {/* Right actions */}

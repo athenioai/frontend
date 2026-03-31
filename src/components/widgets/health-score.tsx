@@ -3,7 +3,6 @@
 import { GaugeChart } from '@/components/charts/gauge-chart'
 import { Activity, TrendingUp, Zap } from 'lucide-react'
 import { formatPercent } from '@/lib/utils/format'
-import { CountUp } from '@/components/ui/count-up'
 import { AnimateIn } from '@/components/ui/animate-in'
 import type { HealthScoreData } from '@/lib/types'
 
@@ -11,7 +10,7 @@ export function HealthScoreWidget({ data }: { data: HealthScoreData }) {
   const indicators = [
     {
       icon: Activity,
-      label: 'Volume msgs',
+      label: 'Mensagens',
       value: `${data.volume_mensagens.atual}`,
       change: `${data.volume_mensagens.variacao_percent > 0 ? '+' : ''}${data.volume_mensagens.variacao_percent.toFixed(1)}%`,
       positive: data.volume_mensagens.variacao_percent > 0,
@@ -35,18 +34,22 @@ export function HealthScoreWidget({ data }: { data: HealthScoreData }) {
   return (
     <AnimateIn>
       <div className="card-elevated flex h-full flex-col items-center p-6">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.05em] text-text-muted">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
           Health Score
         </p>
+
         <GaugeChart value={data.score} />
-        <div className="mt-4 grid w-full grid-cols-3 gap-3">
+
+        <div className="mt-5 grid w-full grid-cols-3 gap-2">
           {indicators.map(({ icon: Icon, label, value, change, positive }) => (
-            <div key={label} className="rounded-lg bg-surface-2 p-2 text-center">
-              <Icon className="mx-auto mb-1 h-3.5 w-3.5 text-text-subtle" />
-              <p className="text-[10px] uppercase text-text-subtle">{label}</p>
-              <p className="font-title text-sm font-bold text-text-primary">{value}</p>
+            <div key={label} className="rounded-lg border border-border-default bg-[rgba(255,255,255,0.02)] p-2.5 text-center">
+              <Icon className="mx-auto mb-1.5 h-3.5 w-3.5 text-text-subtle" />
+              <p className="text-[10px] font-medium uppercase tracking-wider text-text-subtle">{label}</p>
+              <p className="mt-0.5 font-display text-[15px] text-text-primary">{value}</p>
               {change && (
-                <p className={`text-[10px] font-medium ${positive ? 'text-success' : 'text-danger'}`}>{change}</p>
+                <p className={`mt-0.5 text-[10px] font-medium ${positive ? 'text-emerald' : 'text-danger'}`}>
+                  {change}
+                </p>
               )}
             </div>
           ))}

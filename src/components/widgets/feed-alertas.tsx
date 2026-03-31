@@ -13,39 +13,39 @@ const ALERT_ICON_MAP: Record<AlertTipo, typeof DollarSign> = {
 }
 
 const ALERT_COLOR_MAP: Record<AlertTipo, string> = {
-  venda: '#4FD1C5',
-  campanha_pausada: '#FBBF24',
+  venda: '#34D399',
+  campanha_pausada: '#E8C872',
   campanha_escalada: '#4FD1C5',
   baleia: '#A78BFA',
-  humano_solicitado: '#FBBF24',
-  anomalia: '#E07070',
+  humano_solicitado: '#E8C872',
+  anomalia: '#F07070',
 }
 
 export function FeedAlertasWidget({ alerts }: { alerts: Alert[] }) {
   return (
     <AnimateIn>
       <div className="card-surface p-6">
-        <p className="mb-4 text-sm font-semibold uppercase tracking-[0.05em] text-text-muted">
+        <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
           Feed de Alertas
         </p>
-        <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
+        <div className="max-h-72 space-y-1 overflow-y-auto pr-1">
           {alerts.map((alert) => {
             const Icon = ALERT_ICON_MAP[alert.tipo] ?? Shield
             const color = ALERT_COLOR_MAP[alert.tipo] ?? '#4FD1C5'
             return (
               <div
                 key={alert.id}
-                className="flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-surface-2"
+                className="group flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
                 <div
-                  className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
-                  style={{ backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)` }}
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105"
+                  style={{ background: `linear-gradient(135deg, ${color}15, ${color}08)` }}
                 >
                   <Icon className="h-3.5 w-3.5" style={{ color }} />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-text-primary">{alert.descricao}</p>
-                  <p className="text-xs text-text-subtle">
+                <div className="min-w-0 flex-1 py-0.5">
+                  <p className="text-[13px] leading-snug text-text-primary">{alert.descricao}</p>
+                  <p className="mt-1 text-[11px] text-text-subtle">
                     {formatRelativeTime(alert.created_at)}
                   </p>
                 </div>
