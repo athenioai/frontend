@@ -146,6 +146,12 @@ export const mockConversations: Conversation[] = [
   { id: 'conv-005', empresa_id: 'emp-001', lead_id: 'lead-006', mensagens_count: 28, duracao_minutos: 45, agente: 'ares', created_at: '2026-03-31T11:00:00Z' },
 ]
 
+export const mockRoiTotal = {
+  investido: 5201.30,
+  retorno: 18467.00,
+  historico_7d: [2.8, 3.1, 2.9, 3.4, 3.2, 3.5, 3.55],
+}
+
 export const mockAlerts: Alert[] = [
   { id: 'alt-001', empresa_id: 'emp-001', tipo: 'venda', descricao: 'Venda confirmada: Fernanda Costa — Plano Premium Anual (R$ 2.970)', created_at: '2026-03-31T10:30:00Z' },
   { id: 'alt-002', empresa_id: 'emp-001', tipo: 'baleia', descricao: 'Lead de alto valor detectado: Carlos Silva (score 88)', created_at: '2026-03-31T10:15:00Z' },

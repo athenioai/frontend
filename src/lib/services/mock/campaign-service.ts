@@ -1,6 +1,6 @@
 import type { ICampaignService } from '../interfaces/campaign-service'
 import type { Campaign, CampaignPerformance, RoiTotal } from '@/lib/types'
-import { mockCampaigns } from './data'
+import { mockCampaigns, mockRoiTotal } from './data'
 
 export class MockCampaignService implements ICampaignService {
   async getAll(empresaId: string): Promise<Campaign[]> {
@@ -8,9 +8,8 @@ export class MockCampaignService implements ICampaignService {
   }
 
   async getRoiTotal(_empresaId: string): Promise<RoiTotal> {
-    const investido = 5201.30
-    const retorno = 18467.00
-    return { investido, retorno, roas: retorno / investido }
+    const { investido, retorno, historico_7d } = mockRoiTotal
+    return { investido, retorno, roas: retorno / investido, historico_7d }
   }
 
   async getPerformance(_campaignId: string): Promise<CampaignPerformance[]> {
