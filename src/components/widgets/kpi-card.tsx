@@ -1,8 +1,17 @@
 'use client'
 
-import { type LucideIcon } from 'lucide-react'
+import { DollarSign, TrendingUp, BarChart3, Clock } from 'lucide-react'
 import { CountUp } from '@/components/ui/count-up'
 import { AnimateIn } from '@/components/ui/animate-in'
+
+const ICON_MAP = {
+  DollarSign,
+  TrendingUp,
+  BarChart3,
+  Clock,
+} as const
+
+type IconName = keyof typeof ICON_MAP
 
 interface KpiCardProps {
   label: string
@@ -11,7 +20,7 @@ interface KpiCardProps {
   suffix?: string
   decimals?: number
   change?: number
-  icon: LucideIcon
+  icon: IconName
   accentColor?: string
   delay?: number
 }
@@ -23,10 +32,11 @@ export function KpiCard({
   suffix = '',
   decimals = 0,
   change,
-  icon: Icon,
+  icon,
   accentColor = 'var(--color-accent)',
   delay = 0,
 }: KpiCardProps) {
+  const Icon = ICON_MAP[icon]
   return (
     <AnimateIn delay={delay}>
       <div className="card-surface card-surface-interactive p-5">

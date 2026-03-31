@@ -1,6 +1,5 @@
 import { authService, campaignService, analyticsService, leadService, alertService } from '@/lib/services'
 import { redirect } from 'next/navigation'
-import { DollarSign, TrendingUp, BarChart3, Clock } from 'lucide-react'
 import { RoiCard } from '@/components/widgets/roi-card'
 import { HealthScoreWidget } from '@/components/widgets/health-score'
 import { KpiCard } from '@/components/widgets/kpi-card'
@@ -43,7 +42,7 @@ export default async function DashboardPage() {
           value={roi.retorno}
           prefix="R$ "
           decimals={0}
-          icon={DollarSign}
+          icon="DollarSign"
           accentColor="#FBBF24"
           delay={0}
         />
@@ -52,7 +51,7 @@ export default async function DashboardPage() {
           value={health.taxa_conversao * 100}
           suffix="%"
           decimals={1}
-          icon={TrendingUp}
+          icon="TrendingUp"
           accentColor="#4FD1C5"
           delay={0.06}
         />
@@ -61,7 +60,7 @@ export default async function DashboardPage() {
           value={ltvCac.ltv / ltvCac.cac}
           suffix="x"
           decimals={1}
-          icon={BarChart3}
+          icon="BarChart3"
           accentColor="#A78BFA"
           delay={0.12}
         />
@@ -70,7 +69,7 @@ export default async function DashboardPage() {
           value={economia.horas}
           suffix="h"
           decimals={0}
-          icon={Clock}
+          icon="Clock"
           accentColor="#4FD1C5"
           delay={0.18}
         />
