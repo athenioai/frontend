@@ -11,82 +11,148 @@ export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
-      {/* Deep atmospheric gradient */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#0a0f12] via-[#08090A] to-[#0d0a12]" />
+    <div className="flex min-h-screen">
+      {/* ─── Left panel: brand showcase ─── */}
+      <div className="relative hidden w-[55%] flex-col items-center justify-center overflow-hidden lg:flex">
+        {/* Layered gradient background */}
+        <div className="absolute inset-0 bg-[#060809]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/[0.07] via-transparent to-[#A78BFA]/[0.05]" />
 
-      {/* Large ambient glow — teal top-left */}
-      <div className="pointer-events-none absolute -left-[20%] -top-[30%] h-[70vh] w-[70vh] rounded-full bg-[#4FD1C5]/[0.04] blur-[150px]" />
-      {/* Violet bottom-right */}
-      <div className="pointer-events-none absolute -bottom-[20%] -right-[15%] h-[60vh] w-[60vh] rounded-full bg-[#A78BFA]/[0.03] blur-[130px]" />
-      {/* Warm center glow */}
-      <div className="pointer-events-none absolute left-1/2 top-1/3 h-[40vh] w-[40vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8C872]/[0.02] blur-[120px]" />
-
-      {/* Fine dot grid */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(240,237,232,0.6) 0.5px, transparent 0.5px)',
-          backgroundSize: '32px 32px',
-        }}
-      />
-
-      <div className="card-glass relative z-10 w-full max-w-[420px] p-12">
-        {/* Logo */}
-        <div className="mb-10 flex flex-col items-center">
-          <Logo width={180} height={45} />
-          <p className="mt-3 text-[13px] text-text-subtle">
-            Painel de controle inteligente
-          </p>
+        {/* Animated gradient orb */}
+        <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute inset-0 animate-[spin_25s_linear_infinite] rounded-full bg-gradient-conic from-[#4FD1C5]/10 via-transparent via-40% to-[#A78BFA]/8 blur-[80px]" />
         </div>
 
-        <form action={formAction} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-[13px] font-medium text-text-muted">
-              E-mail
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="seu@empresa.com"
-              required
-              autoComplete="email"
-              className="h-11 rounded-xl border-border-default bg-[rgba(255,255,255,0.03)] text-text-primary placeholder:text-text-subtle/60 transition-all focus:border-accent/40 focus:bg-[rgba(79,209,197,0.03)] focus:ring-1 focus:ring-accent/20"
-            />
+        {/* Orbital rings */}
+        <div className="absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#4FD1C5]/[0.06] animate-[spin_40s_linear_infinite]" />
+        <div className="absolute left-1/2 top-1/2 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#A78BFA]/[0.04] animate-[spin_60s_linear_infinite_reverse]" />
+
+        {/* Fine grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(240,237,232,0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(240,237,232,0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: '64px 64px',
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center px-12 text-center">
+          <Logo width={200} height={50} />
+
+          <p className="mt-6 max-w-[320px] text-[15px] leading-relaxed text-text-muted">
+            Seus agentes de IA trabalhando 24/7.
+            <br />
+            Acompanhe tudo em tempo real.
+          </p>
+
+          {/* Subtle stats */}
+          <div className="mt-12 flex gap-10">
+            {[
+              { value: '3', label: 'Agentes IA' },
+              { value: '24/7', label: 'Operação' },
+              { value: '3.5×', label: 'ROAS médio' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="font-title text-[22px] font-bold text-text-primary">{stat.value}</p>
+                <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.1em] text-text-subtle">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#060809] to-transparent" />
+      </div>
+
+      {/* ─── Right panel: login form ─── */}
+      <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-12 lg:px-16">
+        {/* Background */}
+        <div className="absolute inset-0 bg-bg-base" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#4FD1C5]/[0.02] to-transparent" />
+
+        {/* Mobile logo */}
+        <div className="relative z-10 mb-12 lg:hidden">
+          <Logo width={160} height={40} />
+        </div>
+
+        <div className="relative z-10 w-full max-w-[380px]">
+          <div className="mb-8">
+            <h2 className="font-title text-[24px] font-bold text-text-primary">
+              Bem-vindo de volta
+            </h2>
+            <p className="mt-1.5 text-[14px] text-text-muted">
+              Acesse o painel da sua operação
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-[13px] font-medium text-text-muted">
-              Senha
-            </Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              required
-              autoComplete="current-password"
-              className="h-11 rounded-xl border-border-default bg-[rgba(255,255,255,0.03)] text-text-primary placeholder:text-text-subtle/60 transition-all focus:border-accent/40 focus:bg-[rgba(79,209,197,0.03)] focus:ring-1 focus:ring-accent/20"
-            />
-          </div>
+          <form action={formAction} className="space-y-5">
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-[13px] font-medium text-text-muted">
+                E-mail
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="seu@empresa.com"
+                required
+                autoComplete="email"
+                className="h-12 rounded-xl border-border-default bg-surface-1 text-text-primary placeholder:text-text-subtle/50 transition-all duration-200 focus:border-accent/30 focus:bg-surface-2 focus:ring-2 focus:ring-accent/10"
+              />
+            </div>
 
-          {state?.error && (
-            <p className="text-[13px] text-danger">{state.error}</p>
-          )}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-[13px] font-medium text-text-muted">
+                  Senha
+                </Label>
+                <button type="button" className="text-[12px] text-accent/70 transition-colors hover:text-accent">
+                  Esqueceu?
+                </button>
+              </div>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+                className="h-12 rounded-xl border-border-default bg-surface-1 text-text-primary placeholder:text-text-subtle/50 transition-all duration-200 focus:border-accent/30 focus:bg-surface-2 focus:ring-2 focus:ring-accent/10"
+              />
+            </div>
 
-          <Button
-            type="submit"
-            disabled={isPending}
-            className="h-11 w-full rounded-xl bg-accent font-semibold text-primary-foreground shadow-[0_0_24px_rgba(79,209,197,0.15)] transition-all hover:brightness-110 hover:shadow-[0_0_32px_rgba(79,209,197,0.25)] disabled:opacity-50"
-          >
-            {isPending ? 'Entrando...' : 'Acessar painel'}
-          </Button>
-        </form>
+            {state?.error && (
+              <div className="rounded-lg bg-danger/8 px-3 py-2.5">
+                <p className="text-[13px] text-danger">{state.error}</p>
+              </div>
+            )}
 
-        <p className="mt-8 text-center text-[11px] text-text-subtle/50">
-          Acesso restrito a clientes Athenio.ai
-        </p>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(79,209,197,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(79,209,197,0.18)] active:scale-[0.99] disabled:opacity-50"
+            >
+              {isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                  Entrando...
+                </span>
+              ) : (
+                'Acessar painel'
+              )}
+            </Button>
+          </form>
+
+          <p className="mt-10 text-center text-[12px] text-text-subtle/40">
+            Acesso restrito a clientes Athenio.ai
+          </p>
+        </div>
       </div>
     </div>
   )

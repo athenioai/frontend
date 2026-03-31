@@ -355,3 +355,8 @@ body::after {
 .glow-gold {
   box-shadow: 0 0 30px rgba(232,200,114,0.08), 0 0 60px rgba(232,200,114,0.04);
 }
+
+/* ─── Conic gradient for login orb ─── */
+.bg-gradient-conic {
+  background-image: conic-gradient(var(--tw-gradient-stops));
+}
