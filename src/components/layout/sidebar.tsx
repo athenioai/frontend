@@ -95,10 +95,10 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
       {/* Logo */}
       <div className="flex h-16 items-center px-5">
         {collapsed ? (
-          <span className="font-display text-xl text-accent">A</span>
+          <span className="font-title text-xl font-bold text-accent">A</span>
         ) : (
           <span className="text-[15px] tracking-tight text-text-primary">
-            <span className="font-display text-lg text-accent">Athenio</span>
+            <span className="font-title text-lg font-bold text-accent">Athenio</span>
             <span className="text-text-subtle">.ai</span>
           </span>
         )}

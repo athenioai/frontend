@@ -35,10 +35,10 @@ export function RoiCard({ initial }: { initial: RoiTotal }) {
 
             {/* The hero number — serif italic, editorial */}
             <div className="flex items-baseline gap-2">
-              <span className="font-display text-[clamp(48px,7vw,80px)] leading-[0.9] text-text-primary">
+              <span className="font-title text-[clamp(48px,7vw,80px)] font-bold leading-[0.9] text-text-primary">
                 <CountUp value={roi.roas} decimals={1} />
               </span>
-              <span className="font-display text-[clamp(24px,3vw,36px)] text-accent/60">×</span>
+              <span className="font-title text-[clamp(24px,3vw,36px)] font-bold text-accent/60">×</span>
             </div>
 
             <p className="mt-4 max-w-md text-[14px] leading-relaxed text-text-muted">

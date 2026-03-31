@@ -34,7 +34,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="mb-10 text-center">
           <h1 className="text-[28px] tracking-tight text-text-primary">
-            <span className="font-display text-[34px] text-accent">Athenio</span>
+            <span className="font-title text-[34px] font-bold text-accent">Athenio</span>
             <span className="ml-0.5 text-text-subtle">.ai</span>
           </h1>
           <p className="mt-2 text-[13px] text-text-subtle">

@@ -52,7 +52,7 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
 
         {/* Logo for mobile */}
         <span className="text-[15px] tracking-tight lg:hidden">
-          <span className="font-display text-lg text-accent">Athenio</span>
+          <span className="font-title text-lg font-bold text-accent">Athenio</span>
           <span className="text-text-subtle">.ai</span>
         </span>
 

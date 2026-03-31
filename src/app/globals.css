@@ -5,7 +5,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: 'Instrument Serif', serif;
   --font-title: 'Space Grotesk', sans-serif;
   --font-body: 'Sora', sans-serif;
   --font-sans: var(--font-body);
@@ -344,9 +343,8 @@ body::after {
 
 /* ─── Utility: display font for hero numbers ─── */
 .font-display {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-style: italic;
+  font-family: var(--font-title);
+  font-weight: 700;
 }
 
 /* ─── Glow effects ─── */

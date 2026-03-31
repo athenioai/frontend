@@ -45,7 +45,7 @@ export function HealthScoreWidget({ data }: { data: HealthScoreData }) {
             <div key={label} className="rounded-lg border border-border-default bg-[rgba(255,255,255,0.02)] p-2.5 text-center">
               <Icon className="mx-auto mb-1.5 h-3.5 w-3.5 text-text-subtle" />
               <p className="text-[10px] font-medium uppercase tracking-wider text-text-subtle">{label}</p>
-              <p className="mt-0.5 font-display text-[15px] text-text-primary">{value}</p>
+              <p className="mt-0.5 font-title text-[15px] font-bold text-text-primary">{value}</p>
               {change && (
                 <p className={`mt-0.5 text-[10px] font-medium ${positive ? 'text-emerald' : 'text-danger'}`}>
                   {change}

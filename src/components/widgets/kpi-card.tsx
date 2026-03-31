@@ -57,7 +57,7 @@ export function KpiCard({
         </div>
 
         {/* Value — serif for numbers */}
-        <p className="font-display text-[28px] leading-none text-text-primary">
+        <p className="font-title text-[28px] font-bold leading-none text-text-primary">
           <CountUp value={value} prefix={prefix} suffix={suffix} decimals={decimals} />
         </p>
 
