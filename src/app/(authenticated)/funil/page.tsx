@@ -26,7 +26,11 @@ export default function FunilPage() {
     })
   }, [periodo])
 
-  if (!stats) return <div className="text-text-muted">Carregando funil...</div>
+  if (!stats) return (
+    <div className="flex items-center justify-center py-20 text-text-muted">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+    </div>
+  )
 
   const stages = [
     { key: 'captados', label: 'Leads Captados', filter: 'captado' },
@@ -45,14 +49,14 @@ export default function FunilPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-title text-2xl font-bold">Funil de Vendas</h1>
-        <div className="flex gap-1 rounded-lg border border-border-default p-1">
+        <div className="flex gap-1 rounded-xl bg-surface-2 p-1">
           {(['1d', '7d', '30d'] as Periodo[]).map((p) => (
             <button
               key={p}
               onClick={() => setPeriodo(p)}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 periodo === p
-                  ? 'bg-accent text-[#070C0C]'
+                  ? 'bg-accent text-primary-foreground shadow-sm'
                   : 'text-text-muted hover:text-text-primary'
               }`}
             >
@@ -62,7 +66,7 @@ export default function FunilPage() {
         </div>
       </div>
 
-      <div className="glass-card">
+      <div className="card-surface p-6">
         <FunilChart stats={stats} />
       </div>
 
@@ -73,7 +77,7 @@ export default function FunilPage() {
           const isOpen = expandido === stage.key
 
           return (
-            <div key={stage.key} className="glass-card cursor-pointer" onClick={() => setExpandido(isOpen ? null : stage.key)}>
+            <div key={stage.key} className="card-surface p-6 cursor-pointer" onClick={() => setExpandido(isOpen ? null : stage.key)}>
               <div className="flex items-center justify-between">
                 <span className="font-medium">{stage.label}</span>
                 <div className="flex items-center gap-3">

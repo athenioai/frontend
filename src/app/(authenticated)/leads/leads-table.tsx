@@ -67,14 +67,14 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
             placeholder="Buscar por nome ou telefone..."
             value={busca}
             onChange={(e) => { setBusca(e.target.value); setPage(1) }}
-            className="border-border-default bg-bg-input pl-9 text-text-primary placeholder:text-text-subtle focus:border-accent"
+            className="border-border-default bg-surface-2 pl-9 text-text-primary placeholder:text-text-subtle focus:border-accent"
           />
         </div>
         <Select value={tempFilter} onValueChange={(v: string | null) => { if (v) { setTempFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-36 border-border-default bg-bg-input text-text-muted">
+          <SelectTrigger className="w-36 border-border-default bg-surface-2 text-text-muted">
             <SelectValue placeholder="Temperatura" />
           </SelectTrigger>
-          <SelectContent className="border-border-default bg-[#0C1818]">
+          <SelectContent className="border-border-default bg-surface-2">
             <SelectItem value="all">Todas</SelectItem>
             <SelectItem value="frio">Frio</SelectItem>
             <SelectItem value="morno">Morno</SelectItem>
@@ -82,10 +82,10 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           </SelectContent>
         </Select>
         <Select value={estagioFilter} onValueChange={(v: string | null) => { if (v) { setEstagioFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-40 border-border-default bg-bg-input text-text-muted">
+          <SelectTrigger className="w-40 border-border-default bg-surface-2 text-text-muted">
             <SelectValue placeholder="Estágio" />
           </SelectTrigger>
-          <SelectContent className="border-border-default bg-[#0C1818]">
+          <SelectContent className="border-border-default bg-surface-2">
             <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="captado">Captado</SelectItem>
             <SelectItem value="qualificado">Qualificado</SelectItem>
@@ -149,7 +149,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
       {/* Mobile cards */}
       <div className="space-y-3 md:hidden">
         {paginated.map((lead) => (
-          <div key={lead.id} className="glass-card space-y-2 p-4">
+          <div key={lead.id} className="card-surface space-y-2 p-4">
             <div className="flex items-center justify-between">
               <span className="font-medium">{lead.nome}</span>
               <Badge
@@ -170,10 +170,10 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
         <div className="flex items-center gap-2">
           <span>Mostrar</span>
           <Select value={String(perPage)} onValueChange={(v: string | null) => { if (v) { setPerPage(Number(v)); setPage(1) } }}>
-            <SelectTrigger className="w-20 border-border-default bg-bg-input text-text-muted">
+            <SelectTrigger className="w-20 border-border-default bg-surface-2 text-text-muted">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-border-default bg-[#0C1818]">
+            <SelectContent className="border-border-default bg-surface-2">
               {PER_PAGE_OPTIONS.map((n) => (
                 <SelectItem key={n} value={String(n)}>{n}</SelectItem>
               ))}
