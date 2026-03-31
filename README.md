@@ -18,11 +18,14 @@ Tambem inclui um **painel admin interno** para a equipe da Athenio monitorar tod
 
 | Tecnologia | Uso |
 |---|---|
-| **Next.js 14+** (App Router) | Framework principal, SSR/SSG |
+| **Next.js 16** (App Router) | Framework principal, SSR/SSG |
+| **React 19** | UI library |
 | **TypeScript** | Tipagem estatica em todo o projeto |
 | **Tailwind CSS v4** | Estilizacao utility-first |
 | **shadcn/ui** | Componentes base (Button, Card, Input, Select, Sheet, etc.) |
-| **Recharts** | Graficos (gauge, barras, linhas, funil) |
+| **Motion (Framer Motion v11+)** | Animacoes — sidebar collapse, viewport entry, count-up |
+| **Recharts** | Graficos (gauge, barras, linhas, funil, sparklines) |
+| **next-themes** | Toggle dark/light mode com persistencia |
 | **@react-pdf/renderer** | Geracao de PDF server-side |
 | **Lucide React** | Icones |
 | **Vitest** | Testes unitarios |
@@ -45,14 +48,14 @@ Para trocar de mock para Supabase, basta alterar os imports em `src/lib/services
 ```
 src/
 ├── app/
-│   ├── layout.tsx                    # Root layout (dark theme, fontes)
+│   ├── layout.tsx                    # Root layout (ThemeProvider, fontes)
 │   ├── page.tsx                      # Redirect → /dashboard
 │   ├── login/
-│   │   ├── page.tsx                  # Pagina de login (glassmorphism)
+│   │   ├── page.tsx                  # Pagina de login
 │   │   └── actions.ts                # Server action de autenticacao
 │   ├── (authenticated)/              # Route group — requer sessao
-│   │   ├── layout.tsx                # Sidebar + Topbar + Health Banner
-│   │   ├── dashboard/page.tsx        # Dashboard com 8 widgets
+│   │   ├── layout.tsx                # AuthShell + Health Banner
+│   │   ├── dashboard/page.tsx        # Dashboard bento grid
 │   │   ├── funil/page.tsx            # Funil de vendas expandivel
 │   │   ├── leads/                    # Tabela de leads com filtros
 │   │   ├── campanhas/                # Grid de campanhas + drawer
@@ -67,46 +70,38 @@ src/
 │       ├── campanhas/[id]/performance/route.ts
 │       └── relatorios/pdf/route.ts
 ├── components/
-│   ├── ui/                           # shadcn/ui (auto-gerados)
+│   ├── ui/                           # shadcn/ui + componentes customizados
+│   │   ├── count-up.tsx              # Animacao de numeros (0 → valor)
+│   │   ├── animate-in.tsx            # Fade-in-up na viewport
+│   │   └── skeleton-block.tsx        # Bloco de skeleton loader
 │   ├── charts/                       # Wrappers Recharts customizados
 │   │   ├── gauge-chart.tsx           # Gauge semicircular (Health Score)
 │   │   ├── funil-chart.tsx           # Funil vertical com taxas
 │   │   ├── bar-chart-horizontal.tsx  # Barras horizontais (objecoes)
 │   │   └── line-chart-simple.tsx     # Linha temporal (performance)
 │   ├── widgets/                      # Widgets do dashboard
-│   │   ├── roi-card.tsx              # ROI em tempo real (animado)
+│   │   ├── roi-card.tsx              # ROI hero com sparkline + count-up
 │   │   ├── health-score.tsx          # Gauge + indicadores
+│   │   ├── kpi-card.tsx              # Card generico de KPI
 │   │   ├── funil-widget.tsx          # Mini funil
-│   │   ├── ltv-cac.tsx              # LTV/CAC + bar chart
 │   │   ├── top-objecoes.tsx          # Objecoes mais frequentes
-│   │   ├── economia-tempo.tsx        # Horas economizadas
 │   │   ├── atividade-agentes.tsx     # Status Hermes/Ares/Athena
-│   │   └── feed-alertas.tsx          # Feed cronologico
+│   │   └── feed-alertas.tsx          # Feed cronologico colorido
+│   ├── skeletons/
+│   │   └── dashboard-skeleton.tsx    # Skeleton do bento grid
 │   └── layout/
-│       ├── sidebar.tsx               # Navegacao lateral
-│       ├── topbar.tsx                # Barra superior + mobile menu
+│       ├── auth-shell.tsx            # Shell client — sidebar + topbar + cmd palette
+│       ├── sidebar.tsx               # Navegacao lateral colapsavel
+│       ├── topbar.tsx                # Breadcrumb, busca, tema, notificacoes
+│       ├── theme-toggle.tsx          # Toggle dark/light
+│       ├── command-palette.tsx       # ⌘K — busca de paginas e acoes
 │       └── health-banner.tsx         # Banner de alerta (score < 60)
 ├── lib/
+│   ├── motion.ts                     # Constantes de animacao compartilhadas
 │   ├── types/                        # Tipos do dominio
-│   │   ├── lead.ts
-│   │   ├── campaign.ts
-│   │   ├── payment.ts
-│   │   ├── conversation.ts
-│   │   ├── alert.ts
-│   │   ├── empresa.ts
-│   │   ├── analytics.ts
-│   │   └── index.ts                  # Barrel export
 │   ├── services/
 │   │   ├── interfaces/               # Contratos TypeScript
 │   │   ├── mock/                     # Implementacoes com dados ficticios
-│   │   │   ├── data.ts              # Dados mock realistas
-│   │   │   ├── lead-service.ts
-│   │   │   ├── campaign-service.ts
-│   │   │   ├── analytics-service.ts
-│   │   │   ├── alert-service.ts
-│   │   │   ├── empresa-service.ts
-│   │   │   ├── admin-service.ts
-│   │   │   └── auth-service.ts
 │   │   └── index.ts                  # Provider ativo (swap aqui)
 │   ├── utils/
 │   │   ├── format.ts                 # Formatacao BR (moeda, data, %)
@@ -115,66 +110,79 @@ src/
 │       └── theme.ts                  # Cores, helpers de tema
 ├── middleware.ts                      # Auth check + role guard
 └── styles/
-    └── globals.css                   # Tailwind + variaveis Athenio
+    └── globals.css                   # Tailwind + design tokens + card classes
 ```
 
-## Identidade Visual
+## Design System
 
-Dark mode exclusivo, inspirado no site athenio.ai:
+Design premium SaaS moderno inspirado em Linear, Vercel e Stripe. Suporte a dark mode (padrao) e light mode.
+
+### Paleta de Cores
+
+**Dark mode (padrao):**
 
 | Token | Cor | Uso |
 |---|---|---|
-| `accent` | `#4FD1C5` | CTAs, valores destaque, links, bordas ativas |
-| `accent-light` | `#81E6D9` | Gradientes, hover states |
-| `bg-base` | `#070C0C` | Background da pagina |
-| `bg-elevated` | `rgba(15,61,62,0.2)` | Cards, surfaces |
+| `bg-base` | `#090F0F` | Background da pagina |
+| `surface-1` | `#111919` | Cards padrao |
+| `surface-2` | `#162020` | Cards elevados, dropdowns |
+| `accent` | `#4FD1C5` | CTAs, valores destaque, links |
+| `amber` | `#FBBF24` | Destaques financeiros (ROI, revenue) |
+| `violet` | `#A78BFA` | Dados comparativos, accent terciario |
 | `danger` | `#E07070` | Erros, Health Score baixo |
-| `warning` | `#F6E05E` | Health Score medio |
-| `success` | `#4FD1C5` | Health Score bom, vendas |
 
-**Tipografia:**
-- **Titulos:** Space Grotesk (weight 700)
+**Light mode:** backgrounds claros (`#FAFBFC`, `#FFFFFF`, `#F4F7F7`), teal primary escurece para `#0D9488` (contraste WCAG AA), cards usam shadow em vez de border.
+
+### Tipografia
+
+- **Titulos:** Space Grotesk (weight 400-700)
 - **Body:** Sora (weight 400-600)
-- **Valores destaque:** `clamp(34px, 5.5vw, 68px)`, cor accent
+- **Hero numbers:** `clamp(36px, 5vw, 56px)`, weight 700
+- **Section titles:** 14px, weight 600, uppercase, letter-spacing 0.05em
+
+### Animacoes
+
+Sistema de animacoes com Motion (Framer Motion):
+- **Hover:** cards com `translateY(-2px)`, botoes com `scale(1.02)` — 150ms
+- **Count-up:** numeros KPI animam de 0 ao valor na viewport — 400ms
+- **Viewport entry:** widgets com fade-in-up escalonado (60ms stagger) — 400ms
+- **Layout:** sidebar collapse/expand com transicao suave — 250ms
+- **Respeita `prefers-reduced-motion`**
 
 ## Paginas
 
 ### `/login`
-Login com glassmorphism, grid sutil e orbs flutuantes. Qualquer email/senha autentica (mock). Emails com "admin" ou "athenio" ganham role admin.
+Card clean com grid sutil e orbs de gradiente (teal + violet). Qualquer email/senha autentica (mock). Emails com "admin" ou "athenio" ganham role admin.
 
 ### `/dashboard`
-8 widgets em grid responsivo:
-1. **ROI em Tempo Real** — Valor animado a cada 8s, tipografia display
-2. **Health Score** — Gauge semicircular 0-100 com 3 indicadores
-3. **Funil de Vendas** — 4 etapas com taxas de conversao
-4. **LTV / CAC** — Valores + bar chart individual
-5. **Top Objecoes** — Barras horizontais ordenadas
-6. **Economia de Tempo** — Horas economizadas no mes
-7. **Atividade dos Agentes** — Cards Hermes, Ares, Athena
-8. **Feed de Alertas** — Timeline cronologica scrollavel
+Bento grid de 12 colunas com 5 zonas:
+
+1. **Hero Zone** — ROI (8 cols, gradiente, sparkline 7 dias, count-up) + Health Score (4 cols, gauge)
+2. **KPI Strip** — 4 cards: Revenue (amber), Conversao (teal), LTV/CAC (violet), Horas Salvas (teal)
+3. **Analise** — Funil de Vendas (8 cols) + Top Objecoes (4 cols)
+4. **Agentes** — 3 cards com cores distintas: Hermes (teal), Ares (amber), Athena (violet)
+5. **Alertas** — Feed cronologico com icones coloridos por tipo
 
 ### `/funil`
-Funil full-width com filtro de periodo (Hoje / 7d / 30d). Cada etapa e expandivel para mostrar os leads naquele estagio.
+Funil full-width com toggle de periodo (Hoje / 7d / 30d). Cada etapa e expandivel para mostrar os leads naquele estagio.
 
 ### `/leads`
-Tabela completa com:
-- Busca por nome/telefone
-- Filtros por temperatura e estagio
-- Ordenacao clicavel nos headers
-- Paginacao (10/25/50 por pagina)
-- Mobile: vira cards empilhados
+Tabela completa com busca, filtros por temperatura/estagio, ordenacao, paginacao. Mobile: cards empilhados.
 
 ### `/campanhas`
-Grid de cards (ativas no topo, pausadas com opacidade reduzida). Click abre drawer lateral com grafico de performance temporal.
+Grid de cards com hover interativo. Click abre drawer lateral com grafico de performance temporal.
 
 ### `/relatorios`
-Selecao de mes/ano, preview em cards e botao "Baixar PDF". O PDF e gerado server-side com `@react-pdf/renderer` com layout dark e cores da marca.
+Selecao de mes/ano, preview em card elevado e botao "Baixar PDF". PDF gerado server-side com `@react-pdf/renderer`.
 
 ### `/configuracoes`
-Formulario em secoes (Metas, Orcamento, Comunicacao, Empresa). Persiste em localStorage (tipado para Supabase futuro).
+Formulario em secoes (Metas, Orcamento, Comunicacao, Empresa). Persiste em localStorage.
 
 ### `/admin`
-Tabela de empresas ordenada por Health Score (piores primeiro). Clientes com score < 60 ganham fundo vermelho. Click abre dashboard completo read-only da empresa.
+Tabela de empresas ordenada por Health Score. Clientes com score < 60 ganham fundo vermelho. Click abre dashboard read-only da empresa.
+
+### Command Palette (`⌘K`)
+Modal de busca rapida por paginas e acoes. Navegacao por teclado (arrows + enter + esc).
 
 ## Autenticacao
 
@@ -256,10 +264,14 @@ npm run build
 | Decisao | Motivacao |
 |---|---|
 | **Server Components por padrao** | Dados mock sao instantaneos; quando trocar para Supabase, fetch ja sera server-side |
-| **Client Components so para interatividade** | Charts (Recharts exige DOM), formularios, animacoes |
-| **Route group `(authenticated)`** | Aplica sidebar/topbar/health banner sem repetir em cada pagina |
+| **Client Components so para interatividade** | Charts (Recharts exige DOM), formularios, animacoes (Motion) |
+| **Route group `(authenticated)`** | Aplica AuthShell (sidebar/topbar/command palette) sem repetir em cada pagina |
 | **Service Layer com interfaces** | Swap de data source sem tocar UI — crucial para migracao futura |
 | **Mock auth via cookie** | Simula fluxo real completo (middleware, role check) sem dependencia externa |
-| **CSS custom properties + Tailwind** | Permite tematizacao consistente e uso tanto em classes quanto em JS (charts) |
+| **CSS custom properties + Tailwind** | Permite tematizacao dark/light consistente e uso tanto em classes quanto em JS (charts) |
+| **Motion para animacoes** | Viewport entry, count-up e layout animations suaves com performance |
+| **next-themes para tema** | Persistencia automatica, SSR-safe, toggle sem flash |
+| **Bento grid 12 colunas** | Hierarquia visual clara — ROI como hero, KPIs como strip, secoes tematicas |
+| **Sidebar colapsavel** | Mais espaco para conteudo, estado persiste em localStorage |
+| **Command Palette** | Navegacao rapida por teclado, padrao premium SaaS |
 | **`@react-pdf/renderer` server-side** | Zero dependencia de browser para gerar PDF — funciona em serverless |
-| **Dark mode exclusivo** | Alinhado com identidade visual da Athenio, sem necessidade de toggle |
