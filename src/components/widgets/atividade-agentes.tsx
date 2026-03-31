@@ -1,5 +1,7 @@
 import { Megaphone, MessageSquare, Brain } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils/format'
+import { AnimateIn } from '@/components/ui/animate-in'
+import { AGENT_COLORS } from '@/lib/constants/theme'
 import type { AgentesAtividade } from '@/lib/types'
 
 export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
@@ -8,7 +10,7 @@ export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
       nome: 'Hermes',
       subtitulo: 'Marketing',
       icon: Megaphone,
-      status: 'ativo',
+      color: AGENT_COLORS.hermes,
       metricas: [
         { label: 'Campanhas ativas', value: data.hermes.campanhas_ativas },
         { label: 'Leads em nutrição', value: data.hermes.leads_nutricao },
@@ -20,7 +22,7 @@ export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
       nome: 'Ares',
       subtitulo: 'Comercial',
       icon: MessageSquare,
-      status: 'ativo',
+      color: AGENT_COLORS.ares,
       metricas: [
         { label: 'Conversas ativas', value: data.ares.conversas_ativas },
         { label: 'Vendas hoje', value: data.ares.vendas_hoje },
@@ -32,7 +34,7 @@ export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
       nome: 'Athena',
       subtitulo: 'Orquestrador',
       icon: Brain,
-      status: 'ativo',
+      color: AGENT_COLORS.athena,
       metricas: [
         { label: 'Último ciclo', value: formatRelativeTime(data.athena.ultimo_ciclo) },
         { label: 'Resumo', value: data.athena.ultimo_ciclo_resumo },
@@ -44,30 +46,45 @@ export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
-      {agents.map((agent) => (
-        <div key={agent.nome} className="glass-card border-l-[3px] border-l-accent">
-          <div className="mb-3 flex items-center gap-2">
-            <agent.icon className="h-4 w-4 text-accent" />
-            <span className="font-title text-sm font-bold">{agent.nome}</span>
-            <span className="text-xs text-text-subtle">({agent.subtitulo})</span>
-            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              {agent.status}
-            </span>
-          </div>
-          <div className="space-y-2">
-            {agent.metricas.map(({ label, value }) => (
-              <div key={label} className="flex justify-between gap-2">
-                <span className="text-xs text-text-subtle">{label}</span>
-                <span className="text-right text-xs font-medium text-text-primary">
-                  {typeof value === 'string' && value.length > 35
-                    ? value.slice(0, 35) + '...'
-                    : value}
-                </span>
+      {agents.map((agent, i) => (
+        <AnimateIn key={agent.nome} delay={i * 0.06}>
+          <div
+            className="card-surface p-5"
+            style={{ borderLeft: `3px solid ${agent.color}` }}
+          >
+            <div className="mb-3 flex items-center gap-2">
+              <div
+                className="flex h-7 w-7 items-center justify-center rounded-full"
+                style={{ backgroundColor: `color-mix(in srgb, ${agent.color} 15%, transparent)` }}
+              >
+                <agent.icon className="h-3.5 w-3.5" style={{ color: agent.color }} />
               </div>
-            ))}
+              <span className="font-title text-sm font-bold">{agent.nome}</span>
+              <span className="text-xs text-text-subtle">({agent.subtitulo})</span>
+              <span className="ml-auto inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${agent.color} 10%, transparent)`,
+                  color: agent.color,
+                }}
+              >
+                <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: agent.color }} />
+                ativo
+              </span>
+            </div>
+            <div className="space-y-2">
+              {agent.metricas.map(({ label, value }) => (
+                <div key={label} className="flex justify-between gap-2">
+                  <span className="text-xs text-text-subtle">{label}</span>
+                  <span className="text-right text-xs font-medium text-text-primary">
+                    {typeof value === 'string' && value.length > 35
+                      ? value.slice(0, 35) + '...'
+                      : value}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </AnimateIn>
       ))}
     </div>
   )
