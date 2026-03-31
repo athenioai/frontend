@@ -14,24 +14,24 @@ export default function LoginPage() {
     <div className="flex min-h-screen">
       {/* ─── Left panel: brand showcase ─── */}
       <div className="relative hidden w-[55%] flex-col items-center justify-center overflow-hidden lg:flex">
-        {/* Deep dark base */}
-        <div className="absolute inset-0 bg-[#050607]" />
+        {/* Base */}
+        <div className="absolute inset-0 bg-[#080A0E]" />
 
-        {/* Teal gradient wash — more visible */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/[0.10] via-[#4FD1C5]/[0.03] to-[#A78BFA]/[0.06]" />
+        {/* Strong teal gradient wash */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/[0.14] via-[#4FD1C5]/[0.04] to-[#A78BFA]/[0.08]" />
 
-        {/* Animated gradient orb — brighter */}
+        {/* Animated gradient orb */}
         <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2">
-          <div className="absolute inset-0 animate-[spin_25s_linear_infinite] rounded-full bg-gradient-conic from-[#4FD1C5]/15 via-transparent via-40% to-[#A78BFA]/10 blur-[80px]" />
+          <div className="absolute inset-0 animate-[spin_25s_linear_infinite] rounded-full bg-gradient-conic from-[#4FD1C5]/20 via-transparent via-40% to-[#A78BFA]/15 blur-[80px]" />
         </div>
 
-        {/* Orbital rings — more visible */}
-        <div className="absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#4FD1C5]/[0.10] animate-[spin_40s_linear_infinite]" />
-        <div className="absolute left-1/2 top-1/2 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#A78BFA]/[0.07] animate-[spin_60s_linear_infinite_reverse]" />
+        {/* Orbital rings */}
+        <div className="absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#4FD1C5]/[0.15] animate-[spin_40s_linear_infinite]" />
+        <div className="absolute left-1/2 top-1/2 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#A78BFA]/[0.10] animate-[spin_60s_linear_infinite_reverse]" />
 
-        {/* Grid pattern — more visible */}
+        {/* Grid pattern */}
         <div
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage: `
               linear-gradient(rgba(240,237,232,0.4) 1px, transparent 1px),
@@ -69,19 +69,19 @@ export default function LoginPage() {
         </div>
 
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#050607] to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#080A0E] to-transparent" />
 
         {/* Right edge glow divider */}
-        <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[#4FD1C5]/20 to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-[80px] bg-gradient-to-l from-[#4FD1C5]/[0.03] to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[#4FD1C5]/30 to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-[60px] bg-gradient-to-l from-[#4FD1C5]/[0.04] to-transparent" />
       </div>
 
       {/* ─── Right panel: login form — noticeably lighter ─── */}
       <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-12 lg:px-16">
-        {/* Lighter background — clear contrast with left */}
-        <div className="absolute inset-0 bg-[#0D0F12]" />
-        {/* Subtle top glow */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#4FD1C5]/[0.03] via-transparent to-transparent" />
+        {/* Noticeably lighter background */}
+        <div className="absolute inset-0 bg-[#141820]" />
+        {/* Soft top glow */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#4FD1C5]/[0.04] via-transparent to-transparent" />
 
         {/* Mobile logo */}
         <div className="relative z-10 mb-12 lg:hidden">
@@ -110,7 +110,7 @@ export default function LoginPage() {
                 placeholder="seu@empresa.com"
                 required
                 autoComplete="email"
-                className="h-12 rounded-xl border-[rgba(240,237,232,0.08)] bg-[rgba(240,237,232,0.04)] text-text-primary placeholder:text-text-subtle/50 transition-all duration-200 focus:border-accent/30 focus:bg-[rgba(79,209,197,0.04)] focus:ring-2 focus:ring-accent/10"
+                className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
               />
             </div>
 
@@ -130,7 +130,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 required
                 autoComplete="current-password"
-                className="h-12 rounded-xl border-[rgba(240,237,232,0.08)] bg-[rgba(240,237,232,0.04)] text-text-primary placeholder:text-text-subtle/50 transition-all duration-200 focus:border-accent/30 focus:bg-[rgba(79,209,197,0.04)] focus:ring-2 focus:ring-accent/10"
+                className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
               />
             </div>
 
