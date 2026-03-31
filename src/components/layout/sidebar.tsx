@@ -16,6 +16,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { MOTION } from '@/lib/motion'
+import { Logo, LogoMark } from '@/components/ui/logo'
 
 const NAV_MAIN = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -93,14 +94,11 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
       className="fixed left-0 top-0 z-40 hidden h-screen flex-col border-r border-border-default bg-bg-base/80 backdrop-blur-xl lg:flex"
     >
       {/* Logo */}
-      <div className="flex h-16 items-center px-5">
+      <div className="flex h-16 items-center px-4">
         {collapsed ? (
-          <span className="font-title text-xl font-bold text-accent">A</span>
+          <LogoMark size={28} />
         ) : (
-          <span className="text-[15px] tracking-tight text-text-primary">
-            <span className="font-title text-lg font-bold text-accent">Athenio</span>
-            <span className="text-text-subtle">.ai</span>
-          </span>
+          <Logo width={120} height={30} />
         )}
       </div>
 

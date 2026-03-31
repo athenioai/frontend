@@ -5,6 +5,7 @@ import { loginAction } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Logo } from '@/components/ui/logo'
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
@@ -32,12 +33,9 @@ export default function LoginPage() {
 
       <div className="card-glass relative z-10 w-full max-w-[420px] p-12">
         {/* Logo */}
-        <div className="mb-10 text-center">
-          <h1 className="text-[28px] tracking-tight text-text-primary">
-            <span className="font-title text-[34px] font-bold text-accent">Athenio</span>
-            <span className="ml-0.5 text-text-subtle">.ai</span>
-          </h1>
-          <p className="mt-2 text-[13px] text-text-subtle">
+        <div className="mb-10 flex flex-col items-center">
+          <Logo width={180} height={45} />
+          <p className="mt-3 text-[13px] text-text-subtle">
             Painel de controle inteligente
           </p>
         </div>

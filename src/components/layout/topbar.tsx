@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Sidebar } from './sidebar'
 import { ThemeToggle } from './theme-toggle'
+import { Logo } from '@/components/ui/logo'
 
 const BREADCRUMB_MAP: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -51,10 +52,7 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
         </Sheet>
 
         {/* Logo for mobile */}
-        <span className="text-[15px] tracking-tight lg:hidden">
-          <span className="font-title text-lg font-bold text-accent">Athenio</span>
-          <span className="text-text-subtle">.ai</span>
-        </span>
+        <Logo width={110} height={28} className="lg:hidden" />
 
         {/* Breadcrumb for desktop */}
         <span className="hidden text-[13px] font-medium text-text-muted lg:block">{breadcrumb}</span>
