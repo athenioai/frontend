@@ -10,16 +10,17 @@ interface FunilChartProps {
 }
 
 const STAGES = [
-  { key: 'captados', label: 'Leads Captados' },
-  { key: 'qualificados', label: 'Qualificados' },
-  { key: 'negociacao', label: 'Em Negociação' },
-  { key: 'convertidos', label: 'Convertidos' },
+  { key: 'captados', label: 'Captados', icon: '◉' },
+  { key: 'qualificados', label: 'Qualificados', icon: '◈' },
+  { key: 'negociacao', label: 'Negociação', icon: '◆' },
+  { key: 'convertidos', label: 'Convertidos', icon: '★' },
 ] as const
 
 const STAGE_COLORS = [COLORS.accent, '#3BBEB2', COLORS.emerald, COLORS.gold]
 
 export function FunilChart({ stats, compact = false }: FunilChartProps) {
   const max = stats.captados || 1
+  const totalConversion = stats.captados > 0 ? stats.convertidos / stats.captados : 0
   const taxas = [
     stats.taxas.captado_qualificado,
     stats.taxas.qualificado_negociacao,
@@ -27,38 +28,66 @@ export function FunilChart({ stats, compact = false }: FunilChartProps) {
   ]
 
   return (
-    <div className="space-y-3">
-      {STAGES.map((stage, i) => {
-        const value = stats[stage.key]
-        const width = Math.max((value / max) * 100, 15)
+    <div>
+      {/* Conversion highlight */}
+      <div className="mb-5 flex items-baseline gap-3">
+        <span className="font-title text-[28px] font-bold text-text-primary">
+          {formatPercent(totalConversion)}
+        </span>
+        <span className="text-[12px] text-text-subtle">taxa de conversão total</span>
+      </div>
 
-        return (
-          <div key={stage.key}>
-            <div className="mb-1.5 flex items-baseline justify-between">
-              <span className={`font-medium text-text-muted ${compact ? 'text-[12px]' : 'text-[13px]'}`}>
-                {stage.label}
-              </span>
-              <span className={`font-title font-bold text-text-primary ${compact ? 'text-[14px]' : 'text-[17px]'}`}>
-                {formatNumber(value)}
-              </span>
+      {/* Stages */}
+      <div className="space-y-4">
+        {STAGES.map((stage, i) => {
+          const value = stats[stage.key]
+          const width = Math.max((value / max) * 100, 12)
+          const color = STAGE_COLORS[i]
+
+          return (
+            <div key={stage.key}>
+              <div className="mb-1.5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="flex h-5 w-5 items-center justify-center rounded-md text-[10px]"
+                    style={{ backgroundColor: `${color}18`, color }}
+                  >
+                    {stage.icon}
+                  </span>
+                  <span className={`font-medium text-text-muted ${compact ? 'text-[12px]' : 'text-[13px]'}`}>
+                    {stage.label}
+                  </span>
+                </div>
+                <span className={`font-title font-bold text-text-primary ${compact ? 'text-[14px]' : 'text-[17px]'}`}>
+                  {formatNumber(value)}
+                </span>
+              </div>
+
+              {/* Bar */}
+              <div className="h-7 overflow-hidden rounded-lg bg-[rgba(240,237,232,0.04)]">
+                <div
+                  className="flex h-full items-center rounded-lg transition-all duration-700 ease-out"
+                  style={{
+                    width: `${width}%`,
+                    background: `linear-gradient(90deg, ${color}, ${color}60)`,
+                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.1)`,
+                  }}
+                />
+              </div>
+
+              {/* Conversion connector */}
+              {i < taxas.length && (
+                <div className="ml-2 mt-1 flex items-center gap-1.5">
+                  <div className="h-3 w-[1px] bg-border-default" />
+                  <span className="text-[10px] font-medium text-text-subtle">
+                    ↓ {formatPercent(taxas[i])}
+                  </span>
+                </div>
+              )}
             </div>
-            <div className="h-8 overflow-hidden rounded-lg bg-[rgba(240,237,232,0.04)]">
-              <div
-                className="flex h-full items-center rounded-lg px-3 transition-all duration-700 ease-out"
-                style={{
-                  width: `${width}%`,
-                  background: `linear-gradient(90deg, ${STAGE_COLORS[i]}, ${STAGE_COLORS[i]}90)`,
-                }}
-              />
-            </div>
-            {i < taxas.length && (
-              <p className="mt-1 text-right text-[11px] text-text-subtle">
-                {formatPercent(taxas[i])} para próxima etapa
-              </p>
-            )}
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
     </div>
   )
 }
