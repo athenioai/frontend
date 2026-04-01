@@ -30,7 +30,9 @@ export default function FunilPage() {
   const [stats, setStats] = useState<FunilStats | null>(null)
   const [leads, setLeads] = useState<Lead[]>([])
   const [expandido, setExpandido] = useState<string | null>(null)
+  const [showAll, setShowAll] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const LEADS_PREVIEW = 8
 
   useEffect(() => {
     startTransition(async () => {
@@ -98,7 +100,7 @@ export default function FunilPage() {
       </div>
 
       {/* KPI Strip */}
-      <div className="grid gap-5 grid-cols-2 lg:grid-cols-4">
+      <div className={`grid gap-5 grid-cols-2 lg:grid-cols-4 transition-opacity duration-200 ${isPending ? 'opacity-50' : ''}`}>
         {[
           { label: 'Total de Leads', value: formatNumber(stats.captados), color: COLORS.accent },
           { label: 'Taxa Conversão', value: formatPercent(totalConversion), color: COLORS.emerald },
@@ -114,20 +116,12 @@ export default function FunilPage() {
         ))}
       </div>
 
-      {/* Funil Chart */}
-      <div className="card-surface p-6 lg:p-8">
-        <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
-          Visão geral do funil
-        </p>
-        <FunilChart stats={stats} />
-      </div>
-
       {/* Expandable Stages */}
       <div>
         <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
           Detalhamento por etapa
         </p>
-        <div className="space-y-3">
+        <div className={`space-y-3 transition-opacity duration-200 ${isPending ? 'opacity-50 pointer-events-none' : ''}`}>
           {STAGE_CONFIG.map((stage, i) => {
             const stageLeads = leads.filter((l) => l.estagio_funil === stage.filter)
             const isOpen = expandido === stage.key
@@ -181,7 +175,7 @@ export default function FunilPage() {
                       className="overflow-hidden"
                     >
                       <div className="ml-4 mt-1 space-y-1 border-l border-border-default pl-4 pt-2 pb-1">
-                        {stageLeads.map((lead) => {
+                        {(showAll === stage.key ? stageLeads : stageLeads.slice(0, LEADS_PREVIEW)).map((lead) => {
                           const temp = TEMP_CONFIG[lead.temperatura]
                           const TempIcon = temp.icon
                           return (
@@ -211,6 +205,14 @@ export default function FunilPage() {
                             </div>
                           )
                         })}
+                        {stageLeads.length > LEADS_PREVIEW && showAll !== stage.key && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setShowAll(stage.key) }}
+                            className="mt-2 w-full rounded-lg py-2 text-center text-[12px] font-medium text-accent transition-colors hover:bg-[rgba(79,209,197,0.05)]"
+                          >
+                            Ver todos os {stageLeads.length} leads
+                          </button>
+                        )}
                       </div>
                     </motion.div>
                   )}
