@@ -1,13 +1,114 @@
 'use client'
 
 import { useState } from 'react'
+import {
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+} from 'recharts'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
-import { LineChartSimple } from '@/components/charts/line-chart-simple'
 import { formatCurrency } from '@/lib/utils/format'
 import { AnimateIn } from '@/components/ui/animate-in'
 import { COLORS } from '@/lib/constants/theme'
 import { TrendingUp, DollarSign, Users, ShoppingCart, Target, Percent, Calendar } from 'lucide-react'
 import type { Campaign, CampaignPerformance } from '@/lib/types'
+
+type Metric = { key: string; label: string; color: string; format: (v: number) => string }
+
+const METRICS: Metric[] = [
+  { key: 'roas', label: 'ROAS', color: COLORS.accent, format: (v: number) => `${v.toFixed(1)}×` },
+  { key: 'leads', label: 'Leads', color: COLORS.violet, format: (v: number) => String(v) },
+  { key: 'vendas', label: 'Vendas', color: COLORS.emerald, format: (v: number) => String(v) },
+  { key: 'gasto', label: 'Gasto', color: COLORS.gold, format: (v: number) => formatCurrency(v) },
+]
+
+function CampaignChart({ data, loading }: { data: CampaignPerformance[]; loading: boolean }) {
+  const [activeMetric, setActiveMetric] = useState<Metric>(METRICS[0])
+  const chartData = data.map((d) => ({ ...d, data: d.data.slice(5) }))
+
+  return (
+    <div className="px-6 py-6">
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
+          Performance ao longo do tempo
+        </p>
+        {/* Metric toggle */}
+        {data.length > 0 && (
+          <div className="flex gap-1 rounded-lg bg-[rgba(240,237,232,0.04)] p-0.5">
+            {METRICS.map((m) => (
+              <button
+                key={m.key}
+                onClick={() => setActiveMetric(m)}
+                className={`rounded-md px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider transition-all duration-200 ${
+                  activeMetric.key === m.key
+                    ? 'bg-[rgba(240,237,232,0.08)] text-text-primary'
+                    : 'text-text-subtle hover:text-text-muted'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        </div>
+      ) : data.length > 0 ? (
+        <div className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={chartData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+              <defs>
+                <linearGradient id={`gradient-${activeMetric.key}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={activeMetric.color} stopOpacity={0.2} />
+                  <stop offset="100%" stopColor={activeMetric.color} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="rgba(240,237,232,0.04)" strokeDasharray="3 3" />
+              <XAxis
+                dataKey="data"
+                tick={{ fill: COLORS.textSubtle, fontSize: 10 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fill: COLORS.textSubtle, fontSize: 10 }}
+                axisLine={false}
+                tickLine={false}
+                width={40}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: COLORS.surface2,
+                  border: `1px solid ${COLORS.border}`,
+                  borderRadius: 10,
+                  padding: '8px 12px',
+                  fontSize: 12,
+                }}
+                labelStyle={{ color: COLORS.textSubtle, fontSize: 10, marginBottom: 4 }}
+                formatter={(value) => [activeMetric.format(Number(value)), activeMetric.label]}
+              />
+              <Area
+                type="monotone"
+                dataKey={activeMetric.key}
+                stroke={activeMetric.color}
+                strokeWidth={2}
+                fill={`url(#gradient-${activeMetric.key})`}
+                dot={false}
+                activeDot={{ r: 4, fill: activeMetric.color, stroke: COLORS.surface1, strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <TrendingUp className="mb-2 h-5 w-5 text-text-subtle/40" />
+          <p className="text-[13px] text-text-subtle">Sem dados de performance ainda</p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
   const [selected, setSelected] = useState<Campaign | null>(null)
@@ -223,30 +324,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
                 <div className="mx-6 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
 
                 {/* Performance chart */}
-                <div className="px-6 py-6">
-                  <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
-                    Performance ao longo do tempo
-                  </p>
-                  {loading ? (
-                    <div className="flex items-center justify-center py-16">
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-                    </div>
-                  ) : perfData.length > 0 ? (
-                    <div className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
-                      <LineChartSimple
-                        data={perfData.map((d) => ({ ...d, data: d.data.slice(5) }))}
-                        xKey="data"
-                        yKey="roas"
-                        height={200}
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                      <TrendingUp className="mb-2 h-5 w-5 text-text-subtle/40" />
-                      <p className="text-[13px] text-text-subtle">Sem dados de performance ainda</p>
-                    </div>
-                  )}
-                </div>
+                <CampaignChart data={perfData} loading={loading} />
               </div>
             )
           })()}
