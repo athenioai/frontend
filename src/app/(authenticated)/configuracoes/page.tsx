@@ -13,6 +13,30 @@ import type { Empresa } from '@/lib/types'
 
 const INPUT_CLASS = "h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/30 focus:ring-2 focus:ring-accent/10"
 
+function formatCurrencyInput(value: number | undefined): string {
+  if (value === undefined || isNaN(value)) return ''
+  return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+function parseCurrencyInput(raw: string): number {
+  const clean = raw.replace(/\./g, '').replace(',', '.')
+  const num = parseFloat(clean)
+  return isNaN(num) ? 0 : num
+}
+
+function formatPhoneInput(value: string): string {
+  const digits = value.replace(/\D/g, '')
+  if (digits.length <= 2) return digits
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+  if (digits.length <= 13) return `+${digits.slice(0, 2)} (${digits.slice(2, 4)}) ${digits.slice(4, 9)}-${digits.slice(9)}`
+  return value
+}
+
+function parsePhoneInput(raw: string): string {
+  return raw.replace(/\D/g, '')
+}
+
 export default function ConfiguracoesPage() {
   const [config, setConfig] = useState<Partial<Empresa>>({})
   const [saved, setSaved] = useState(false)
@@ -128,12 +152,12 @@ export default function ConfiguracoesPage() {
             <div className="space-y-1.5">
               <Label className="text-[12px] font-medium text-text-muted">CPL Alvo (R$)</Label>
               <Input
-                type="number"
-                step="0.50"
-                value={config.cpl_alvo || ''}
-                onChange={(e) => handleChange('cpl_alvo', parseFloat(e.target.value))}
+                type="text"
+                inputMode="decimal"
+                value={formatCurrencyInput(config.cpl_alvo)}
+                onChange={(e) => handleChange('cpl_alvo', parseCurrencyInput(e.target.value))}
                 className={INPUT_CLASS}
-                placeholder="15.00"
+                placeholder="15,00"
               />
             </div>
           </div>
@@ -160,21 +184,23 @@ export default function ConfiguracoesPage() {
             <div className="space-y-1.5">
               <Label className="text-[12px] font-medium text-text-muted">Limite Diário (R$)</Label>
               <Input
-                type="number"
-                value={config.orcamento_diario || ''}
-                onChange={(e) => handleChange('orcamento_diario', parseFloat(e.target.value))}
+                type="text"
+                inputMode="decimal"
+                value={formatCurrencyInput(config.orcamento_diario)}
+                onChange={(e) => handleChange('orcamento_diario', parseCurrencyInput(e.target.value))}
                 className={INPUT_CLASS}
-                placeholder="500"
+                placeholder="500,00"
               />
             </div>
             <div className="space-y-1.5">
               <Label className="text-[12px] font-medium text-text-muted">Teto Absoluto do Cartão (R$)</Label>
               <Input
-                type="number"
-                value={config.teto_cartao || ''}
-                onChange={(e) => handleChange('teto_cartao', parseFloat(e.target.value))}
+                type="text"
+                inputMode="decimal"
+                value={formatCurrencyInput(config.teto_cartao)}
+                onChange={(e) => handleChange('teto_cartao', parseCurrencyInput(e.target.value))}
                 className={INPUT_CLASS}
-                placeholder="10000"
+                placeholder="10.000,00"
               />
               <p className="flex items-center gap-1 text-[11px] text-danger">
                 <AlertTriangle className="h-3 w-3" />
@@ -216,10 +242,10 @@ export default function ConfiguracoesPage() {
               <Label className="text-[12px] font-medium text-text-muted">WhatsApp para Alertas</Label>
               <Input
                 type="tel"
-                value={config.whatsapp_alertas || ''}
-                onChange={(e) => handleChange('whatsapp_alertas', e.target.value)}
+                value={formatPhoneInput(config.whatsapp_alertas || '')}
+                onChange={(e) => handleChange('whatsapp_alertas', parsePhoneInput(e.target.value))}
                 className={INPUT_CLASS}
-                placeholder="+55 11 99988-7766"
+                placeholder="(11) 99988-7766"
               />
             </div>
           </div>
