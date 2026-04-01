@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TEMPERATURA_COLORS, COLORS } from '@/lib/constants/theme'
 import { formatPhone } from '@/lib/utils/format'
+import { LeadDetailDrawer } from '@/components/leads/lead-detail-drawer'
 import type { Lead } from '@/lib/types'
 
 const PER_PAGE_OPTIONS = [10, 25, 50]
@@ -55,6 +56,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     let result = [...initialLeads]
@@ -178,7 +180,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
               const SentIcon = sentimento.icon
 
               return (
-                <tr key={lead.id} className="group border-b border-border-default/50 transition-colors hover:bg-[rgba(255,255,255,0.02)]">
+                <tr key={lead.id} onClick={() => setSelectedLeadId(lead.id)} className="group cursor-pointer border-b border-border-default/50 transition-colors hover:bg-[rgba(255,255,255,0.02)]">
                   {/* Lead — avatar + name + phone + product */}
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-3">
@@ -272,7 +274,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           const estagio = ESTAGIO_CONFIG[lead.estagio_funil]
 
           return (
-            <div key={lead.id} className="card-surface p-4">
+            <div key={lead.id} onClick={() => setSelectedLeadId(lead.id)} className="card-surface cursor-pointer p-4 transition-colors hover:border-border-hover">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgba(240,237,232,0.05)] text-[10px] font-bold text-text-subtle">
@@ -364,6 +366,8 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           </div>
         </div>
       )}
+
+      <LeadDetailDrawer leadId={selectedLeadId} onClose={() => setSelectedLeadId(null)} />
     </div>
   )
 }
