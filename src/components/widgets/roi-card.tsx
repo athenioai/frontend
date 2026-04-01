@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { LineChart, Line, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts'
 import { formatCurrency } from '@/lib/utils/format'
 import { CountUp } from '@/components/ui/count-up'
 import { AnimateIn } from '@/components/ui/animate-in'
@@ -67,23 +67,41 @@ export function RoiCard({ initial }: { initial: RoiTotal }) {
             </div>
           </div>
 
-          {/* Sparkline */}
-          <div className="hidden w-44 lg:block">
+          {/* Sparkline — ROAS trend */}
+          <div className="hidden w-48 lg:block">
             <p className="mb-2 text-right text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">
-              Últimos 7 dias
+              ROAS — últimos 7 dias
             </p>
-            <div className="rounded-xl bg-[rgba(255,255,255,0.03)] p-3">
+            <div className="rounded-xl bg-[rgba(255,255,255,0.03)] px-3 pt-3 pb-1">
               <ResponsiveContainer width="100%" height={56}>
                 <LineChart data={sparkData}>
+                  <Tooltip
+                    contentStyle={{
+                      background: '#161A1E',
+                      border: '1px solid rgba(240,237,232,0.08)',
+                      borderRadius: 8,
+                      fontSize: 11,
+                      color: '#F0EDE8',
+                      padding: '4px 8px',
+                    }}
+                    formatter={(v) => [`${Number(v).toFixed(1)}×`, 'ROAS']}
+                    labelFormatter={(i) => `Dia ${Number(i) + 1}`}
+                  />
                   <Line
                     type="monotone"
                     dataKey="value"
                     stroke="#4FD1C5"
                     strokeWidth={2}
                     dot={false}
+                    activeDot={{ r: 3, fill: '#4FD1C5', stroke: '#0E1012', strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
+              {/* Min / Max labels */}
+              <div className="flex justify-between px-1 text-[9px] text-text-subtle">
+                <span>{Math.min(...roi.historico_7d).toFixed(1)}×</span>
+                <span>{Math.max(...roi.historico_7d).toFixed(1)}×</span>
+              </div>
             </div>
           </div>
         </div>
