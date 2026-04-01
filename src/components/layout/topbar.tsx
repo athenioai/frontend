@@ -1,14 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { motion } from 'motion/react'
 import {
-  Menu, LogOut, Search, Bell,
+  Menu, Search, Bell,
   LayoutDashboard, GitBranch, Users, Megaphone,
   FileText, Settings, Shield,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Sidebar } from './sidebar'
 import { ThemeToggle } from './theme-toggle'
@@ -25,15 +24,6 @@ const BREADCRUMB_MAP: Record<string, { label: string; icon: typeof LayoutDashboa
   '/admin': { label: 'Admin', icon: Shield },
 }
 
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
-}
-
 interface TopbarProps {
   userName: string
   isAdmin: boolean
@@ -42,7 +32,6 @@ interface TopbarProps {
 }
 
 export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: TopbarProps) {
-  const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -56,11 +45,6 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
     icon: LayoutDashboard,
   }
   const BreadcrumbIcon = breadcrumb.icon
-
-  async function handleLogout() {
-    await fetch('/api/auth/logout', { method: 'POST' })
-    router.push('/login')
-  }
 
   return (
     <motion.header
@@ -124,24 +108,6 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
           )}
         </button>
 
-        {/* Separator */}
-        <div className="mx-0.5 h-5 w-[1px] bg-gradient-to-b from-transparent via-border-default to-transparent" />
-
-        {/* User — avatar + name + logout */}
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/5 text-[10px] font-bold text-accent ring-1 ring-accent/10">
-            {getInitials(userName)}
-          </div>
-          <span className="hidden text-[13px] text-text-muted lg:block">{userName}</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLogout}
-            className="h-9 w-9 rounded-xl text-text-muted transition-all duration-200 hover:bg-[rgba(240,112,112,0.08)] hover:text-danger"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
       </div>
     </motion.header>
   )

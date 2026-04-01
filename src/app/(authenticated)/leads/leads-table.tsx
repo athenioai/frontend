@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TEMPERATURA_COLORS, COLORS } from '@/lib/constants/theme'
+import { formatPhone } from '@/lib/utils/format'
 import type { Lead } from '@/lib/types'
 
 const PER_PAGE_OPTIONS = [10, 25, 50]
@@ -186,7 +187,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
                       </div>
                       <div>
                         <p className="font-medium text-text-primary">{lead.nome}</p>
-                        <p className="text-[11px] text-text-subtle">{lead.telefone} · {lead.produto_interesse}</p>
+                        <p className="text-[11px] text-text-subtle">{formatPhone(lead.telefone)} · {lead.produto_interesse}</p>
                       </div>
                     </div>
                   </td>
@@ -279,7 +280,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
                   </div>
                   <div>
                     <p className="text-[14px] font-semibold text-text-primary">{lead.nome}</p>
-                    <p className="text-[11px] text-text-subtle">{lead.telefone}</p>
+                    <p className="text-[11px] text-text-subtle">{formatPhone(lead.telefone)}</p>
                   </div>
                 </div>
                 <span
