@@ -78,8 +78,23 @@ export default function LoginPage() {
 
       {/* ─── Right panel: login form — noticeably lighter ─── */}
       <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-12 lg:px-16">
-        {/* Noticeably lighter background */}
+        {/* Lighter background */}
         <div className="absolute inset-0 bg-[#141820]" />
+
+        {/* Floating ambient orbs — slow drift animation */}
+        <div className="pointer-events-none absolute -right-[15%] top-[10%] h-[400px] w-[400px] rounded-full bg-[#4FD1C5]/[0.04] blur-[120px] animate-[float-slow_20s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute -left-[10%] bottom-[5%] h-[350px] w-[350px] rounded-full bg-[#A78BFA]/[0.04] blur-[100px] animate-[float-slow_25s_ease-in-out_infinite_reverse]" />
+        <div className="pointer-events-none absolute right-[20%] bottom-[20%] h-[200px] w-[200px] rounded-full bg-[#E8C872]/[0.025] blur-[80px] animate-[float-slow_18s_ease-in-out_infinite_2s]" />
+
+        {/* Dot grid — matches left panel style */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(240,237,232,0.5) 0.5px, transparent 0.5px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+
         {/* Soft top glow */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#4FD1C5]/[0.04] via-transparent to-transparent" />
 
