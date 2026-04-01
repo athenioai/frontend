@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -12,9 +13,12 @@ const SENTIMENTO_EMOJI = { positivo: '+', neutro: '~', negativo: '-' } as const
 const PER_PAGE_OPTIONS = [10, 25, 50]
 
 export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
+  const searchParams = useSearchParams()
+  const initialEstagio = searchParams.get('estagio') || 'all'
+
   const [busca, setBusca] = useState('')
   const [tempFilter, setTempFilter] = useState<string>('all')
-  const [estagioFilter, setEstagioFilter] = useState<string>('all')
+  const [estagioFilter, setEstagioFilter] = useState<string>(initialEstagio)
   const [sortBy, setSortBy] = useState<keyof Lead>('updated_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [page, setPage] = useState(1)

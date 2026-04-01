@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { GitBranch, Users, ArrowDown, ChevronDown, Flame, Thermometer, Snowflake } from 'lucide-react'
+import Link from 'next/link'
+import { GitBranch, Users, ArrowDown, ChevronDown, Flame, Thermometer, Snowflake, ArrowRight } from 'lucide-react'
 import { FunilChart } from '@/components/charts/funil-chart'
 import { formatPercent, formatNumber } from '@/lib/utils/format'
 import { getFunilData } from './actions'
@@ -30,7 +31,6 @@ export default function FunilPage() {
   const [stats, setStats] = useState<FunilStats | null>(null)
   const [leads, setLeads] = useState<Lead[]>([])
   const [expandido, setExpandido] = useState<string | null>(null)
-  const [showAll, setShowAll] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const LEADS_PREVIEW = 8
 
@@ -175,7 +175,7 @@ export default function FunilPage() {
                       className="overflow-hidden"
                     >
                       <div className="ml-4 mt-1 space-y-1 border-l border-border-default pl-4 pt-2 pb-1">
-                        {(showAll === stage.key ? stageLeads : stageLeads.slice(0, LEADS_PREVIEW)).map((lead) => {
+                        {stageLeads.slice(0, LEADS_PREVIEW).map((lead) => {
                           const temp = TEMP_CONFIG[lead.temperatura]
                           const TempIcon = temp.icon
                           return (
@@ -205,13 +205,15 @@ export default function FunilPage() {
                             </div>
                           )
                         })}
-                        {stageLeads.length > LEADS_PREVIEW && showAll !== stage.key && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setShowAll(stage.key) }}
-                            className="mt-2 w-full rounded-lg py-2 text-center text-[12px] font-medium text-accent transition-colors hover:bg-[rgba(79,209,197,0.05)]"
+                        {stageLeads.length > LEADS_PREVIEW && (
+                          <Link
+                            href={`/leads?estagio=${stage.filter}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg py-2.5 text-[12px] font-medium text-accent transition-colors hover:bg-[rgba(79,209,197,0.05)]"
                           >
                             Ver todos os {stageLeads.length} leads
-                          </button>
+                            <ArrowRight className="h-3 w-3" />
+                          </Link>
                         )}
                       </div>
                     </motion.div>
