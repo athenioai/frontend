@@ -45,10 +45,10 @@ function getInitials(name: string) {
 export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
   const searchParams = useSearchParams()
   const paramEstagio = searchParams.get('estagio')
-  const initialEstagio = paramEstagio || 'todos'
+  const initialEstagio = paramEstagio || 'Todos'
 
   const [busca, setBusca] = useState('')
-  const [tempFilter, setTempFilter] = useState<string>('todos')
+  const [tempFilter, setTempFilter] = useState<string>('Todos')
   const [estagioFilter, setEstagioFilter] = useState<string>(initialEstagio)
   const [sortBy, setSortBy] = useState<keyof Lead>('updated_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
@@ -62,10 +62,10 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
       const q = busca.toLowerCase()
       result = result.filter((l) => l.nome.toLowerCase().includes(q) || l.telefone.includes(q))
     }
-    if (tempFilter !== 'todos') {
+    if (tempFilter !== 'Todos') {
       result = result.filter((l) => l.temperatura === tempFilter)
     }
-    if (estagioFilter !== 'todos') {
+    if (estagioFilter !== 'Todos') {
       result = result.filter((l) => l.estagio_funil === estagioFilter)
     }
 
@@ -120,7 +120,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
             <SelectValue placeholder="Temperatura" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
-            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="Todos">Todos</SelectItem>
               <SelectItem value="quente">🔥 Quente</SelectItem>
               <SelectItem value="morno">🌡️ Morno</SelectItem>
               <SelectItem value="frio">❄️ Frio</SelectItem>
@@ -132,7 +132,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
             <SelectValue placeholder="Estágio" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
-            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="Todos">Todos</SelectItem>
               <SelectItem value="captado">Captado</SelectItem>
               <SelectItem value="qualificado">Qualificado</SelectItem>
               <SelectItem value="negociacao">Negociação</SelectItem>
