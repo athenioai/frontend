@@ -2,12 +2,26 @@
 
 import { useState } from 'react'
 import { useActionState } from 'react'
+import { motion } from 'motion/react'
 import { loginAction } from './actions'
 import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/ui/logo'
+import { MOTION } from '@/lib/motion'
+
+const stagger = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
+  },
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+}
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
@@ -44,32 +58,52 @@ export default function LoginPage() {
           }}
         />
 
-        {/* Content */}
-        <div className="relative z-10 flex flex-col items-center px-12 text-center">
-          <Logo width={200} height={50} />
+        {/* Content — staggered entry */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={stagger}
+          className="relative z-10 flex flex-col items-center px-12 text-center"
+        >
+          <motion.div variants={fadeUp} transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}>
+            <Logo width={200} height={50} />
+          </motion.div>
 
-          <p className="mt-6 max-w-[320px] text-[15px] leading-relaxed text-[rgba(240,237,232,0.7)]">
+          <motion.p
+            variants={fadeUp}
+            transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+            className="mt-6 max-w-[320px] text-[15px] leading-relaxed text-[rgba(240,237,232,0.7)]"
+          >
             Seus agentes de IA trabalhando 24/7.
             <br />
             Acompanhe tudo em tempo real.
-          </p>
+          </motion.p>
 
-          {/* Stats */}
-          <div className="mt-12 flex gap-10">
+          {/* Stats with separators */}
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+            className="mt-12 flex items-center gap-0"
+          >
             {[
               { value: '3', label: 'Agentes IA' },
               { value: '24/7', label: 'Operação' },
               { value: '3.5×', label: 'ROAS médio' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="font-title text-[22px] font-bold text-text-primary">{stat.value}</p>
-                <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.1em] text-[rgba(240,237,232,0.4)]">
-                  {stat.label}
-                </p>
+            ].map((stat, i) => (
+              <div key={stat.label} className="flex items-center">
+                {i > 0 && (
+                  <div className="mx-8 h-8 w-[1px] bg-gradient-to-b from-transparent via-[rgba(240,237,232,0.12)] to-transparent" />
+                )}
+                <div className="text-center">
+                  <p className="font-title text-[22px] font-bold text-text-primary">{stat.value}</p>
+                  <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.1em] text-[rgba(240,237,232,0.4)]">
+                    {stat.label}
+                  </p>
+                </div>
               </div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#080A0E] to-transparent" />
@@ -79,12 +113,12 @@ export default function LoginPage() {
         <div className="absolute right-0 top-0 bottom-0 w-[60px] bg-gradient-to-l from-[#4FD1C5]/[0.04] to-transparent" />
       </div>
 
-      {/* ─── Right panel: login form — noticeably lighter ─── */}
+      {/* ─── Right panel: login form ─── */}
       <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 py-12 lg:px-16">
         {/* Lighter background */}
         <div className="absolute inset-0 bg-[#141820]" />
 
-        {/* Floating ambient orbs — visible, slow drift */}
+        {/* Floating ambient orbs */}
         <div className="pointer-events-none absolute -right-[10%] top-[5%] h-[450px] w-[450px] rounded-full bg-[#4FD1C5]/[0.12] blur-[100px] animate-[float-slow_20s_ease-in-out_infinite]" />
         <div className="pointer-events-none absolute -left-[5%] bottom-[0%] h-[400px] w-[400px] rounded-full bg-[#A78BFA]/[0.10] blur-[90px] animate-[float-slow_25s_ease-in-out_infinite_reverse]" />
         <div className="pointer-events-none absolute right-[15%] bottom-[15%] h-[250px] w-[250px] rounded-full bg-[#E8C872]/[0.07] blur-[70px] animate-[float-slow_18s_ease-in-out_infinite_2s]" />
@@ -106,18 +140,32 @@ export default function LoginPage() {
           <Logo width={160} height={40} />
         </div>
 
-        <div className="relative z-10 w-full max-w-[380px]">
-          <div className="mb-8 text-center">
+        {/* Form — staggered entry */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={stagger}
+          className="relative z-10 w-full max-w-[380px]"
+        >
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+            className="mb-8 text-center"
+          >
             <h2 className="font-title text-[24px] font-bold text-text-primary">
               Bem-vindo de volta
             </h2>
             <p className="mt-1.5 text-[14px] text-text-muted">
               Acesse o painel da sua operação
             </p>
-          </div>
+          </motion.div>
 
           <form action={formAction} className="space-y-5">
-            <div className="space-y-1.5">
+            <motion.div
+              variants={fadeUp}
+              transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+              className="space-y-1.5"
+            >
               <Label htmlFor="email" className="text-[13px] font-medium text-text-muted">
                 E-mail
               </Label>
@@ -130,9 +178,13 @@ export default function LoginPage() {
                 autoComplete="email"
                 className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
               />
-            </div>
+            </motion.div>
 
-            <div className="space-y-1.5">
+            <motion.div
+              variants={fadeUp}
+              transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+              className="space-y-1.5"
+            >
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-[13px] font-medium text-text-muted">
                   Senha
@@ -160,40 +212,72 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-            </div>
+            </motion.div>
 
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                name="remember"
-                className="h-4 w-4 rounded border-[rgba(240,237,232,0.15)] bg-[rgba(240,237,232,0.06)] text-accent accent-accent focus:ring-accent/20"
-              />
-              <span className="text-[13px] text-text-muted">Lembrar-me</span>
-            </label>
+            <motion.div
+              variants={fadeUp}
+              transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+            >
+              <label className="inline-flex items-center gap-2.5 cursor-pointer group">
+                <span className="relative flex h-[18px] w-[18px] items-center justify-center">
+                  <input
+                    type="checkbox"
+                    name="remember"
+                    className="peer sr-only"
+                  />
+                  <span className="absolute inset-0 rounded-md border border-[rgba(240,237,232,0.15)] bg-[rgba(240,237,232,0.04)] transition-all peer-checked:border-accent/50 peer-checked:bg-accent/15 peer-focus-visible:ring-2 peer-focus-visible:ring-accent/20" />
+                  <svg
+                    className="relative h-2.5 w-2.5 text-accent opacity-0 transition-opacity peer-checked:opacity-100"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M2 6l3 3 5-5" />
+                  </svg>
+                </span>
+                <span className="text-[13px] text-text-muted group-hover:text-text-primary transition-colors">Lembrar-me</span>
+              </label>
+            </motion.div>
 
             {state?.error && (
-              <div className="rounded-lg bg-danger/8 px-3 py-2.5">
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-lg bg-danger/8 px-3 py-2.5"
+              >
                 <p className="text-[13px] text-danger">{state.error}</p>
-              </div>
+              </motion.div>
             )}
 
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(79,209,197,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(79,209,197,0.18)] active:scale-[0.99] disabled:opacity-50"
+            <motion.div
+              variants={fadeUp}
+              transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
             >
-              {isPending ? (
-                <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-                  Entrando...
-                </span>
-              ) : (
-                'Acessar painel'
-              )}
-            </Button>
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(79,209,197,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(79,209,197,0.18)] active:scale-[0.99] disabled:opacity-50"
+              >
+                {isPending ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                    Entrando...
+                  </span>
+                ) : (
+                  'Acessar painel'
+                )}
+              </Button>
+            </motion.div>
           </form>
 
-          <div className="mt-10 flex flex-col items-center gap-3">
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+            className="mt-10 flex flex-col items-center gap-3"
+          >
             <p className="text-[13px] text-text-subtle">
               Ainda não é cliente?
             </p>
@@ -208,8 +292,8 @@ export default function LoginPage() {
               </svg>
               Falar com a equipe
             </a>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   )
