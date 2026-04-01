@@ -14,7 +14,9 @@ import {
   Shield,
   ChevronsLeft,
   ChevronsRight,
+  LogOut,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { MOTION } from '@/lib/motion'
 import { Logo, LogoMark } from '@/components/ui/logo'
 
@@ -46,6 +48,7 @@ interface SidebarProps {
 
 export function Sidebar({ isAdmin, userName }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -213,16 +216,40 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
         )}
       </nav>
 
-      {/* Footer — user avatar */}
+      {/* Footer — user + logout */}
       <div className="border-t border-border-default p-3">
         <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : 'px-2'}`}>
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/5 text-[11px] font-bold text-accent ring-1 ring-accent/10">
             {getInitials(userName)}
           </div>
           {!collapsed && (
-            <span className="truncate text-[13px] text-text-muted">{userName}</span>
+            <>
+              <span className="flex-1 truncate text-[13px] text-text-muted">{userName}</span>
+              <button
+                onClick={async () => {
+                  await fetch('/api/auth/logout', { method: 'POST' })
+                  router.push('/login')
+                }}
+                title="Sair"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-text-subtle/50 transition-all duration-200 hover:bg-[rgba(240,112,112,0.08)] hover:text-danger"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
+            </>
           )}
         </div>
+        {collapsed && (
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST' })
+              router.push('/login')
+            }}
+            title="Sair"
+            className="mt-2 flex w-full items-center justify-center rounded-lg p-2 text-text-subtle/50 transition-all duration-200 hover:bg-[rgba(240,112,112,0.08)] hover:text-danger"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
     </motion.aside>
   )
