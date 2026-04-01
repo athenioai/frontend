@@ -1,117 +1,198 @@
 'use client'
 
-import { Megaphone, MessageSquare, Brain } from 'lucide-react'
+import { Megaphone, MessageSquare, Brain, Activity } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils/format'
 import { AnimateIn } from '@/components/ui/animate-in'
 import { AGENT_COLORS } from '@/lib/constants/theme'
 import type { AgentesAtividade } from '@/lib/types'
 
-export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
-  const agents = [
-    {
-      nome: 'Hermes',
-      subtitulo: 'Marketing',
-      icon: Megaphone,
-      color: AGENT_COLORS.hermes,
-      highlight: { label: 'Campanhas ativas', value: data.hermes.campanhas_ativas },
-      metricas: [
-        { label: 'Leads em nutrição', value: data.hermes.leads_nutricao },
-        { label: 'Último criativo', value: data.hermes.ultimo_criativo },
-        { label: 'Próximo ciclo', value: data.hermes.proximo_ciclo },
-      ],
-    },
-    {
-      nome: 'Ares',
-      subtitulo: 'Comercial',
-      icon: MessageSquare,
-      color: AGENT_COLORS.ares,
-      highlight: { label: 'Vendas hoje', value: data.ares.vendas_hoje },
-      metricas: [
-        { label: 'Conversas ativas', value: data.ares.conversas_ativas },
-        { label: 'Follow-ups agendados', value: data.ares.followups_agendados },
-        { label: 'Aguardando resposta', value: data.ares.leads_aguardando },
-      ],
-    },
-    {
-      nome: 'Athena',
-      subtitulo: 'Orquestrador',
-      icon: Brain,
-      color: AGENT_COLORS.athena,
-      highlight: { label: 'Alertas disparados', value: data.athena.alertas_disparados },
-      metricas: [
-        { label: 'Último ciclo', value: formatRelativeTime(data.athena.ultimo_ciclo) },
-        { label: 'Resumo', value: data.athena.ultimo_ciclo_resumo },
-        { label: 'Última decisão', value: data.athena.ultima_decisao },
-      ],
-    },
-  ]
-
+function AgentCard({
+  nome,
+  subtitulo,
+  icon: Icon,
+  color,
+  highlight,
+  metricas,
+  delay,
+  className = '',
+}: {
+  nome: string
+  subtitulo: string
+  icon: typeof Megaphone
+  color: string
+  highlight: { label: string; value: string | number }
+  metricas: { label: string; value: string | number }[]
+  delay: number
+  className?: string
+}) {
   return (
-    <div className="grid gap-5 lg:grid-cols-3">
-      {agents.map((agent, i) => (
-        <AnimateIn key={agent.nome} delay={i * 0.08}>
-          <div className="card-surface group relative overflow-hidden p-6">
-            {/* Top accent gradient line */}
-            <div
-              className="absolute left-0 right-0 top-0 h-[2px]"
-              style={{ background: `linear-gradient(90deg, ${agent.color}, transparent 70%)` }}
-            />
+    <AnimateIn delay={delay} className={className}>
+      <div className="card-surface group relative h-full overflow-hidden p-6">
+        {/* Top accent gradient line */}
+        <div
+          className="absolute left-0 right-0 top-0 h-[2px]"
+          style={{ background: `linear-gradient(90deg, ${color}, transparent 70%)` }}
+        />
 
-            {/* Header: icon + name + status */}
-            <div className="mb-5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: `linear-gradient(135deg, ${agent.color}20, ${agent.color}08)` }}
-                >
-                  <agent.icon className="h-[18px] w-[18px]" style={{ color: agent.color }} />
-                </div>
-                <div>
-                  <p className="font-title text-[14px] font-bold text-text-primary">{agent.nome}</p>
-                  <p className="text-[11px] text-text-subtle">{agent.subtitulo}</p>
-                </div>
-              </div>
-              <span
-                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
-                style={{ backgroundColor: `${agent.color}10`, color: agent.color }}
-              >
-                <span
-                  className="h-1.5 w-1.5 rounded-full animate-pulse"
-                  style={{ backgroundColor: agent.color }}
-                />
-                ativo
+        {/* Header */}
+        <div className="mb-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{ background: `linear-gradient(135deg, ${color}20, ${color}08)` }}
+            >
+              <Icon className="h-[18px] w-[18px]" style={{ color }} />
+            </div>
+            <div>
+              <p className="font-title text-[14px] font-bold text-text-primary">{nome}</p>
+              <p className="text-[11px] text-text-subtle">{subtitulo}</p>
+            </div>
+          </div>
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
+            style={{ backgroundColor: `${color}10`, color }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: color }} />
+            ativo
+          </span>
+        </div>
+
+        {/* Highlighted metric */}
+        <div
+          className="mb-5 rounded-xl p-4"
+          style={{ background: `linear-gradient(135deg, ${color}08, transparent)` }}
+        >
+          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">
+            {highlight.label}
+          </p>
+          <p className="mt-1 font-title text-[28px] font-bold leading-none" style={{ color }}>
+            {highlight.value}
+          </p>
+        </div>
+
+        {/* Secondary metrics */}
+        <div className="space-y-3">
+          {metricas.map(({ label, value }) => (
+            <div key={label} className="flex items-center justify-between gap-3">
+              <span className="text-[12px] text-text-subtle">{label}</span>
+              <span className="text-right text-[12px] font-medium text-text-primary">
+                {typeof value === 'string' && value.length > 28 ? value.slice(0, 28) + '…' : value}
               </span>
             </div>
+          ))}
+        </div>
+      </div>
+    </AnimateIn>
+  )
+}
 
-            {/* Highlighted metric — big number */}
-            <div
-              className="mb-5 rounded-xl p-4"
-              style={{ background: `linear-gradient(135deg, ${agent.color}08, transparent)` }}
-            >
-              <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">
-                {agent.highlight.label}
-              </p>
-              <p className="mt-1 font-title text-[28px] font-bold leading-none" style={{ color: agent.color }}>
-                {agent.highlight.value}
-              </p>
+export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
+  return (
+    <div className="space-y-5">
+      {/* Hermes + Ares — side by side */}
+      <div className="grid gap-5 lg:grid-cols-2">
+        <AgentCard
+          nome="Hermes"
+          subtitulo="Marketing"
+          icon={Megaphone}
+          color={AGENT_COLORS.hermes}
+          highlight={{ label: 'Campanhas ativas', value: data.hermes.campanhas_ativas }}
+          metricas={[
+            { label: 'Leads em nutrição', value: data.hermes.leads_nutricao },
+            { label: 'Último criativo', value: data.hermes.ultimo_criativo },
+            { label: 'Próximo ciclo', value: data.hermes.proximo_ciclo },
+          ]}
+          delay={0}
+        />
+        <AgentCard
+          nome="Ares"
+          subtitulo="Comercial"
+          icon={MessageSquare}
+          color={AGENT_COLORS.ares}
+          highlight={{ label: 'Vendas hoje', value: data.ares.vendas_hoje }}
+          metricas={[
+            { label: 'Conversas ativas', value: data.ares.conversas_ativas },
+            { label: 'Follow-ups agendados', value: data.ares.followups_agendados },
+            { label: 'Aguardando resposta', value: data.ares.leads_aguardando },
+          ]}
+          delay={0.08}
+        />
+      </div>
+
+      {/* Athena — full width, orchestrator gets special treatment */}
+      <AnimateIn delay={0.16}>
+        <div className="card-surface group relative overflow-hidden p-6">
+          <div
+            className="absolute left-0 right-0 top-0 h-[2px]"
+            style={{ background: `linear-gradient(90deg, ${AGENT_COLORS.athena}, transparent 50%)` }}
+          />
+
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            {/* Left: header + highlight */}
+            <div className="flex-1">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-xl"
+                    style={{ background: `linear-gradient(135deg, ${AGENT_COLORS.athena}20, ${AGENT_COLORS.athena}08)` }}
+                  >
+                    <Brain className="h-[18px] w-[18px]" style={{ color: AGENT_COLORS.athena }} />
+                  </div>
+                  <div>
+                    <p className="font-title text-[14px] font-bold text-text-primary">Athena</p>
+                    <p className="text-[11px] text-text-subtle">Orquestrador — monitora e decide</p>
+                  </div>
+                </div>
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
+                  style={{ backgroundColor: `${AGENT_COLORS.athena}10`, color: AGENT_COLORS.athena }}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: AGENT_COLORS.athena }} />
+                  ativo
+                </span>
+              </div>
+
+              <div
+                className="rounded-xl p-4"
+                style={{ background: `linear-gradient(135deg, ${AGENT_COLORS.athena}08, transparent)` }}
+              >
+                <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">
+                  Última decisão
+                </p>
+                <p className="mt-1.5 text-[14px] font-medium leading-relaxed text-text-primary">
+                  {data.athena.ultima_decisao}
+                </p>
+              </div>
             </div>
 
-            {/* Secondary metrics */}
-            <div className="space-y-3">
-              {agent.metricas.map(({ label, value }) => (
-                <div key={label} className="flex items-center justify-between gap-3">
-                  <span className="text-[12px] text-text-subtle">{label}</span>
-                  <span className="text-right text-[12px] font-medium text-text-primary">
-                    {typeof value === 'string' && value.length > 28
-                      ? value.slice(0, 28) + '…'
-                      : value}
-                  </span>
+            {/* Right: metrics in a row */}
+            <div className="flex gap-6 lg:gap-8">
+              {[
+                { label: 'Alertas disparados', value: data.athena.alertas_disparados, color: AGENT_COLORS.athena },
+                { label: 'Último ciclo', value: formatRelativeTime(data.athena.ultimo_ciclo), color: undefined },
+              ].map(({ label, value, color }) => (
+                <div key={label} className="text-center lg:text-right">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">{label}</p>
+                  <p
+                    className="mt-1 font-title text-[24px] font-bold leading-none"
+                    style={color ? { color } : undefined}
+                  >
+                    {value}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
-        </AnimateIn>
-      ))}
+
+          {/* Athena summary */}
+          <div className="mt-4 flex items-center gap-2 rounded-lg bg-[rgba(240,237,232,0.03)] px-3 py-2">
+            <Activity className="h-3.5 w-3.5 text-text-subtle" />
+            <p className="text-[12px] text-text-muted">
+              {data.athena.ultimo_ciclo_resumo}
+            </p>
+          </div>
+        </div>
+      </AnimateIn>
     </div>
   )
 }
