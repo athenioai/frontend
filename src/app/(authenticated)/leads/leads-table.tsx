@@ -35,8 +35,8 @@ const SENTIMENTO_CONFIG = {
   negativo: { icon: Frown, color: COLORS.danger, label: 'Negativo' },
 } as const
 
-const TEMP_OPTIONS = ['all', 'quente', 'morno', 'frio'] as const
-const ESTAGIO_OPTIONS = ['all', 'captado', 'qualificado', 'negociacao', 'convertido', 'perdido'] as const
+const TEMP_OPTIONS = ['todos', 'quente', 'morno', 'frio'] as const
+const ESTAGIO_OPTIONS = ['todos', 'captado', 'qualificado', 'negociacao', 'convertido', 'perdido'] as const
 
 function getInitials(name: string) {
   return name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
@@ -44,10 +44,11 @@ function getInitials(name: string) {
 
 export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
   const searchParams = useSearchParams()
-  const initialEstagio = searchParams.get('estagio') || 'all'
+  const paramEstagio = searchParams.get('estagio')
+  const initialEstagio = paramEstagio || 'todos'
 
   const [busca, setBusca] = useState('')
-  const [tempFilter, setTempFilter] = useState<string>('all')
+  const [tempFilter, setTempFilter] = useState<string>('todos')
   const [estagioFilter, setEstagioFilter] = useState<string>(initialEstagio)
   const [sortBy, setSortBy] = useState<keyof Lead>('updated_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
@@ -61,10 +62,10 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
       const q = busca.toLowerCase()
       result = result.filter((l) => l.nome.toLowerCase().includes(q) || l.telefone.includes(q))
     }
-    if (tempFilter !== 'all') {
+    if (tempFilter !== 'todos') {
       result = result.filter((l) => l.temperatura === tempFilter)
     }
-    if (estagioFilter !== 'all') {
+    if (estagioFilter !== 'todos') {
       result = result.filter((l) => l.estagio_funil === estagioFilter)
     }
 
@@ -115,11 +116,11 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
         </div>
 
         <Select value={tempFilter} onValueChange={(v: string | null) => { if (v) { setTempFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-44 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
+          <SelectTrigger className="w-full sm:flex-1 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
             <SelectValue placeholder="Temperatura" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
-            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="todos">Todos</SelectItem>
               <SelectItem value="quente">🔥 Quente</SelectItem>
               <SelectItem value="morno">🌡️ Morno</SelectItem>
               <SelectItem value="frio">❄️ Frio</SelectItem>
@@ -127,11 +128,11 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           </Select>
 
         <Select value={estagioFilter} onValueChange={(v: string | null) => { if (v) { setEstagioFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-44 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
+          <SelectTrigger className="w-full sm:flex-1 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
             <SelectValue placeholder="Estágio" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
-            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="todos">Todos</SelectItem>
               <SelectItem value="captado">Captado</SelectItem>
               <SelectItem value="qualificado">Qualificado</SelectItem>
               <SelectItem value="negociacao">Negociação</SelectItem>
