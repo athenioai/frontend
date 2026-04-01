@@ -1,277 +1,444 @@
-# Athenio.ai — Dashboard
+# Athenio.ai — Dashboard de Operacoes
 
-Painel de controle em tempo real para clientes da **Athenio.ai** acompanharem o desempenho dos agentes de IA que gerenciam suas operacoes de marketing e vendas.
+Painel de controle em tempo real para gerenciamento de agentes de IA que operam campanhas de marketing, qualificacao de leads e vendas via WhatsApp. O dashboard conecta o empresario aos agentes **Hermes** (Marketing), **Ares** (Comercial) e **Athena** (Orquestradora), dando visibilidade total sobre ROI, funil, conversas e saude da operacao.
 
-## Sobre o Projeto
+---
 
-A Athenio.ai opera com tres agentes autonomos de IA:
+## Objetivo do Sistema
 
-- **Hermes** (Marketing) — Cria e gerencia campanhas de anuncios, gera criativos, nutre leads.
-- **Ares** (Comercial) — Conduz conversas de vendas via WhatsApp, faz follow-ups, fecha negocios.
-- **Athena** (Orquestrador) — Monitora todos os sensores, toma decisoes estrategicas (pausar campanhas, escalar orcamento, disparar alertas).
+O Athenio e uma plataforma onde agentes de IA autonomos gerenciam todo o ciclo comercial de um negocio — desde a criacao de campanhas de anuncios ate o fechamento de vendas pelo WhatsApp. Este frontend e o **centro de comando** do empresario:
 
-Este dashboard permite que o cliente visualize tudo o que os agentes estao fazendo, o retorno sobre investimento e a saude da operacao — sem precisar entender a complexidade por tras.
+- Visualizar metricas de ROI, ROAS e health score em tempo real
+- Acompanhar conversas dos agentes com leads
+- Monitorar funil de vendas com taxas de conversao
+- Gerenciar campanhas ativas e pausadas
+- Gerar relatorios em PDF
+- Ajustar configuracoes de tom de voz, orcamento e metas
+- Chat de suporte com IA integrado
 
 Tambem inclui um **painel admin interno** para a equipe da Athenio monitorar todas as empresas clientes e identificar riscos de churn.
 
+---
+
 ## Stack Tecnologica
 
-| Tecnologia | Uso |
-|---|---|
-| **Next.js 16** (App Router) | Framework principal, SSR/SSG |
-| **React 19** | UI library |
-| **TypeScript** | Tipagem estatica em todo o projeto |
-| **Tailwind CSS v4** | Estilizacao utility-first |
-| **shadcn/ui** | Componentes base (Button, Card, Input, Select, Sheet, etc.) |
-| **Motion (Framer Motion v11+)** | Animacoes — sidebar collapse, viewport entry, count-up |
-| **Recharts** | Graficos (gauge, barras, linhas, funil, sparklines) |
-| **next-themes** | Toggle dark/light mode com persistencia |
-| **@react-pdf/renderer** | Geracao de PDF server-side |
-| **Lucide React** | Icones |
-| **Vitest** | Testes unitarios |
+| Camada | Tecnologia | Versao |
+|--------|-----------|--------|
+| Framework | Next.js (App Router) | 16.2.1 |
+| Linguagem | TypeScript (strict) | 5.x |
+| UI | React + shadcn/ui (base-nova) | 19.2.4 |
+| Estilizacao | Tailwind CSS v4 (CSS-first) | 4.x |
+| Animacoes | Motion (Framer Motion) | 12.x |
+| Graficos | Recharts | 3.8.1 |
+| PDF | @react-pdf/renderer | 4.3.2 |
+| Icones | Lucide React | 1.7.0 |
+| Testes | Vitest | 4.1.2 |
+| Tema | next-themes (dark/light) | 0.4.6 |
+
+---
 
 ## Arquitetura
 
-### Service Layer Pattern
-
-O projeto usa um padrao de Service Layer que separa completamente o acesso a dados da UI:
-
-```
-Componente (UI) → Service Interface → Mock Implementation
-                                    → Supabase Implementation (futuro)
-```
-
-Para trocar de mock para Supabase, basta alterar os imports em `src/lib/services/index.ts`. Nenhum componente precisa mudar.
-
-### Estrutura de Pastas
+### Estrutura de Diretorios
 
 ```
 src/
 ├── app/
-│   ├── layout.tsx                    # Root layout (ThemeProvider, fontes)
-│   ├── page.tsx                      # Redirect → /dashboard
-│   ├── login/
-│   │   ├── page.tsx                  # Pagina de login
+│   ├── layout.tsx                    # Layout raiz (fontes, ThemeProvider, metadata)
+│   ├── globals.css                   # Tema Tailwind v4 + variaveis CSS + card styles
+│   ├── page.tsx                      # "/" → redirect para /dashboard
+│   ├── middleware.ts                 # Auth + role gating
+│   │
+│   ├── login/                        # Tela de login (split layout com branding animado)
+│   │   ├── page.tsx
 │   │   └── actions.ts                # Server action de autenticacao
-│   ├── (authenticated)/              # Route group — requer sessao
-│   │   ├── layout.tsx                # AuthShell + Health Banner
+│   │
+│   ├── (authenticated)/              # Route group protegido por sessao
+│   │   ├── layout.tsx                # AuthShell (sidebar + topbar + health banner)
 │   │   ├── dashboard/page.tsx        # Dashboard bento grid
-│   │   ├── funil/page.tsx            # Funil de vendas expandivel
-│   │   ├── leads/                    # Tabela de leads com filtros
-│   │   ├── campanhas/                # Grid de campanhas + drawer
+│   │   ├── funil/page.tsx            # Funil de vendas com filtros de periodo
+│   │   ├── leads/
+│   │   │   ├── page.tsx              # Tabela de leads com filtros/busca
+│   │   │   └── [id]/page.tsx         # Detalhe do lead com tabs
+│   │   ├── campanhas/page.tsx        # Grid de campanhas
 │   │   ├── relatorios/page.tsx       # Preview + download PDF
-│   │   └── configuracoes/page.tsx    # Formulario de config
-│   ├── admin/                        # Painel admin (role check)
+│   │   ├── suporte/page.tsx          # Chat de suporte com IA
+│   │   └── configuracoes/page.tsx    # Formulario de ajustes
+│   │
+│   ├── admin/                        # Painel admin (role check no middleware)
 │   │   ├── layout.tsx
-│   │   ├── page.tsx                  # Lista de empresas
+│   │   ├── page.tsx                  # Lista de empresas clientes
 │   │   └── [empresaId]/page.tsx      # Dashboard read-only por empresa
+│   │
 │   └── api/
-│       ├── auth/logout/route.ts
-│       ├── campanhas/[id]/performance/route.ts
-│       └── relatorios/pdf/route.ts
+│       ├── auth/logout/route.ts      # POST — limpa sessao
+│       ├── leads/[id]/route.ts       # GET — dados do lead
+│       ├── campanhas/[id]/performance/route.ts  # GET — performance historica
+│       └── relatorios/pdf/route.ts   # POST — gera PDF server-side
+│
 ├── components/
 │   ├── ui/                           # shadcn/ui + componentes customizados
 │   │   ├── count-up.tsx              # Animacao de numeros (0 → valor)
 │   │   ├── animate-in.tsx            # Fade-in-up na viewport
-│   │   └── skeleton-block.tsx        # Bloco de skeleton loader
+│   │   ├── skeleton-block.tsx        # Skeleton loader
+│   │   ├── logo.tsx                  # Logo SVG (dark/light)
+│   │   └── ...                       # button, card, input, select, sheet, tabs, etc.
+│   │
+│   ├── layout/                       # Shell da aplicacao
+│   │   ├── auth-shell.tsx            # Wrapper client (sidebar + topbar + cmd palette)
+│   │   ├── sidebar.tsx               # Navegacao lateral colapsavel + mobile
+│   │   ├── topbar.tsx                # Breadcrumb, busca, tema, notificacoes
+│   │   ├── command-palette.tsx       # ⌘K — busca de paginas e acoes
+│   │   ├── health-banner.tsx         # Banner de alerta (health score < 60)
+│   │   └── theme-toggle.tsx          # Toggle dark/light
+│   │
 │   ├── charts/                       # Wrappers Recharts customizados
 │   │   ├── gauge-chart.tsx           # Gauge semicircular (Health Score)
-│   │   ├── funil-chart.tsx           # Funil vertical com taxas
+│   │   ├── funil-chart.tsx           # Funil vertical com taxas de conversao
 │   │   ├── bar-chart-horizontal.tsx  # Barras horizontais (objecoes)
-│   │   └── line-chart-simple.tsx     # Linha temporal (performance)
+│   │   └── line-chart-simple.tsx     # Linha temporal (performance campanha)
+│   │
 │   ├── widgets/                      # Widgets do dashboard
 │   │   ├── roi-card.tsx              # ROI hero com sparkline + count-up
-│   │   ├── health-score.tsx          # Gauge + indicadores
+│   │   ├── health-score.tsx          # Gauge + indicadores de saude
 │   │   ├── kpi-card.tsx              # Card generico de KPI
 │   │   ├── funil-widget.tsx          # Mini funil
-│   │   ├── top-objecoes.tsx          # Objecoes mais frequentes
+│   │   ├── top-objecoes.tsx          # Ranking de objecoes com barras
 │   │   ├── atividade-agentes.tsx     # Status Hermes/Ares/Athena
-│   │   └── feed-alertas.tsx          # Feed cronologico colorido
-│   ├── skeletons/
-│   │   └── dashboard-skeleton.tsx    # Skeleton do bento grid
-│   └── layout/
-│       ├── auth-shell.tsx            # Shell client — sidebar + topbar + cmd palette
-│       ├── sidebar.tsx               # Navegacao lateral colapsavel
-│       ├── topbar.tsx                # Breadcrumb, busca, tema, notificacoes
-│       ├── theme-toggle.tsx          # Toggle dark/light
-│       ├── command-palette.tsx       # ⌘K — busca de paginas e acoes
-│       └── health-banner.tsx         # Banner de alerta (score < 60)
-├── lib/
-│   ├── motion.ts                     # Constantes de animacao compartilhadas
-│   ├── types/                        # Tipos do dominio
-│   ├── services/
-│   │   ├── interfaces/               # Contratos TypeScript
-│   │   ├── mock/                     # Implementacoes com dados ficticios
-│   │   └── index.ts                  # Provider ativo (swap aqui)
-│   ├── utils/
-│   │   ├── format.ts                 # Formatacao BR (moeda, data, %)
-│   │   └── __tests__/format.test.ts  # 10 testes unitarios
-│   └── constants/
-│       └── theme.ts                  # Cores, helpers de tema
-├── middleware.ts                      # Auth check + role guard
-└── styles/
-    └── globals.css                   # Tailwind + design tokens + card classes
+│   │   ├── feed-alertas.tsx          # Feed cronologico de alertas
+│   │   └── dashboard-greeting.tsx    # Saudacao personalizada
+│   │
+│   ├── leads/                        # Componentes de leads
+│   │   ├── leads-table.tsx           # Tabela desktop + cards mobile
+│   │   ├── lead-detail-tabs.tsx      # Tabs: Visao Geral, Conversas, Pagamentos
+│   │   └── lead-detail-drawer.tsx    # Drawer lateral com resumo
+│   │
+│   ├── support/
+│   │   └── support-chat.tsx          # Chat com IA de suporte
+│   │
+│   └── skeletons/
+│       └── dashboard-skeleton.tsx    # Skeleton do bento grid
+│
+└── lib/
+    ├── types/                        # Interfaces TypeScript do dominio
+    │   ├── lead.ts                   # Lead, LeadFilters, FunilStats
+    │   ├── campaign.ts               # Campaign, CampaignPerformance, RoiTotal
+    │   ├── conversation.ts           # Conversation, Message
+    │   ├── payment.ts                # PaymentLog
+    │   ├── analytics.ts              # HealthScoreData, AgentesAtividade
+    │   ├── alert.ts                  # Alert
+    │   ├── empresa.ts                # Empresa
+    │   └── support.ts                # SupportTicket, SupportMessage
+    │
+    ├── services/
+    │   ├── interfaces/               # Contratos de servico
+    │   │   ├── auth-service.ts       # IAuthService
+    │   │   ├── lead-service.ts       # ILeadService
+    │   │   ├── campaign-service.ts   # ICampaignService
+    │   │   ├── analytics-service.ts  # IAnalyticsService
+    │   │   ├── alert-service.ts      # IAlertService
+    │   │   ├── empresa-service.ts    # IEmpresaService
+    │   │   └── admin-service.ts      # IAdminService
+    │   ├── mock/                     # Implementacoes mock para desenvolvimento
+    │   │   ├── data.ts               # Dataset ficticio completo
+    │   │   └── *.ts                  # Um mock por interface
+    │   └── index.ts                  # Exports ativos (swap mock ↔ real aqui)
+    │
+    ├── constants/
+    │   └── theme.ts                  # Paleta de cores, helpers de cor
+    │
+    ├── motion.ts                     # Constantes de animacao (duracoes, easings)
+    │
+    └── utils/
+        ├── format.ts                 # Formatacao BR (moeda, data, telefone, %)
+        └── __tests__/format.test.ts  # Testes unitarios
 ```
+
+### Camada de Servicos
+
+O acesso a dados e completamente abstraido por interfaces. Todas as paginas consomem servicos via import centralizado:
+
+```
+Componente (UI) → Service Interface → Mock Implementation (dev)
+                                    → Supabase Implementation (producao)
+```
+
+```typescript
+// src/lib/services/index.ts
+import { MockLeadService } from './mock/lead-service'
+export const leadService = new MockLeadService()
+
+// Para trocar para Supabase, basta mudar o import:
+// import { SupabaseLeadService } from './supabase/lead-service'
+// export const leadService = new SupabaseLeadService()
+```
+
+Nenhum componente precisa de mudanca ao trocar de backend.
+
+**Interfaces disponiveis:** `IAuthService`, `ILeadService`, `ICampaignService`, `IAnalyticsService`, `IAlertService`, `IEmpresaService`, `IAdminService`
+
+### Autenticacao
+
+- Login com email/senha via Server Action
+- Sessao armazenada em cookie HTTP-only (`athenio-session`, validade 7 dias)
+- Middleware valida sessao em todas as rotas protegidas
+- Rotas `/admin/*` exigem `role === 'admin'`
+- Logout via API route (`POST /api/auth/logout`)
+
+### Agentes IA
+
+| Agente | Funcao | Cor | Icone |
+|--------|--------|-----|-------|
+| Hermes | Marketing — cria campanhas, nutre leads, gera criativos | Teal `#4FD1C5` | Megaphone |
+| Ares | Comercial — negocia, fecha vendas via WhatsApp, faz follow-ups | Gold `#E8C872` | MessageSquare |
+| Athena | Orquestradora — monitora sensores, toma decisoes, dispara alertas | Violet `#A78BFA` | Shield |
+
+---
+
+## Paginas
+
+### `/login`
+
+Split layout com branding animado (orbs de gradiente, aneis orbitais, stats) na esquerda e formulario de login na direita. Mobile: formulario full-width com logo no topo.
+
+### `/dashboard`
+
+Bento grid de 12 colunas com 5 zonas:
+
+1. **Hero Zone** — ROI (8 cols, gradiente, sparkline 7d, count-up) + Health Score (4 cols, gauge semicircular)
+2. **KPI Strip** — 4 cards: Revenue, Conversao, LTV/CAC, Horas Salvas
+3. **Analise** — Funil de Vendas (8 cols) + Top Objecoes (4 cols, barras horizontais)
+4. **Agentes** — 3 cards com cores distintas: Hermes (teal), Ares (gold), Athena (violet)
+5. **Alertas** — Feed cronologico com icones coloridos por tipo
+
+### `/funil`
+
+Funil de vendas full-width com toggle de periodo (Hoje / 7d / 30d). Cada etapa mostra volume e taxa de conversao.
+
+### `/leads`
+
+Tabela filtravel com busca por nome/telefone, filtros por temperatura e estagio do funil, ordenacao por colunas, paginacao. Desktop: tabela completa. Mobile: cards empilhados.
+
+### `/leads/[id]`
+
+Detalhe do lead com hero card (avatar com score ring, badges, KPIs) e 3 tabs:
+- **Visao Geral** — KPIs, origem UTM, campanha de origem, objecoes ativas
+- **Conversas** — historico de chat com agentes IA (bubbles estilo WhatsApp)
+- **Pagamentos** — historico financeiro com status colorido
+
+### `/campanhas`
+
+Grid de cards de campanhas com status (ativa/pausada), ROAS, CPL, leads gerados. Click abre drawer com grafico de performance temporal.
+
+### `/relatorios`
+
+Selecao de mes/ano, preview em cards e botao "Baixar PDF". PDF gerado server-side com `@react-pdf/renderer`.
+
+### `/suporte`
+
+Chat com IA de suporte do Athenio. Layout two-panel: lista de chamados na esquerda, chat ativo na direita. Mobile: painel unico com navegacao back. Inclui historico de chamados, status (aberto/resolvido), indicador de digitacao, e respostas simuladas da IA.
+
+### `/configuracoes`
+
+Formulario em secoes (Metas, Orcamento, Comunicacao, Empresa) com mascaras de moeda e telefone. Dados persistem em localStorage.
+
+### `/admin`
+
+Tabela de empresas ordenada por Health Score. Clientes com score < 60 tem fundo vermelho. Click abre dashboard read-only da empresa selecionada.
+
+### Command Palette (`⌘K`)
+
+Modal de busca rapida por paginas e acoes. Navegacao por teclado (arrows + enter + esc). Acessivel via icone de busca na topbar ou atalho ⌘K / Ctrl+K.
+
+---
 
 ## Design System
 
-Design premium SaaS moderno inspirado em Linear, Vercel e Stripe. Suporte a dark mode (padrao) e light mode.
+Design premium dark SaaS inspirado em Linear, Vercel e Stripe. Suporte a dark mode (padrao) e light mode.
 
 ### Paleta de Cores
 
-**Dark mode (padrao):**
-
-| Token | Cor | Uso |
-|---|---|---|
-| `bg-base` | `#090F0F` | Background da pagina |
-| `surface-1` | `#111919` | Cards padrao |
-| `surface-2` | `#162020` | Cards elevados, dropdowns |
-| `accent` | `#4FD1C5` | CTAs, valores destaque, links |
-| `amber` | `#FBBF24` | Destaques financeiros (ROI, revenue) |
-| `violet` | `#A78BFA` | Dados comparativos, accent terciario |
-| `danger` | `#E07070` | Erros, Health Score baixo |
-
-**Light mode:** backgrounds claros (`#FAFBFC`, `#FFFFFF`, `#F4F7F7`), teal primary escurece para `#0D9488` (contraste WCAG AA), cards usam shadow em vez de border.
+| Token | Dark Mode | Light Mode | Uso |
+|-------|-----------|------------|-----|
+| `bg-base` | `#0E1012` | `#F8F6F3` | Background da pagina |
+| `surface-1` | `#161A1E` | `#FFFFFF` | Cards padrao |
+| `surface-2` | `#1E2228` | `#F4F4F5` | Cards elevados, dropdowns |
+| `accent` | `#4FD1C5` | `#0D9488` | CTAs, links, destaque |
+| `emerald` | `#34D399` | `#34D399` | Sucesso, valores confirmados |
+| `gold` | `#E8C872` | `#E8C872` | Financeiro, Ares |
+| `violet` | `#A78BFA` | `#A78BFA` | Dados comparativos, Athena |
+| `danger` | `#F07070` | `#F07070` | Erros, alertas, objecoes |
 
 ### Tipografia
 
 - **Titulos:** Space Grotesk (weight 400-700)
 - **Body:** Sora (weight 400-600)
-- **Hero numbers:** `clamp(36px, 5vw, 56px)`, weight 700
-- **Section titles:** 14px, weight 600, uppercase, letter-spacing 0.05em
+- Fontes carregadas via Google Fonts no root layout
 
 ### Animacoes
 
 Sistema de animacoes com Motion (Framer Motion):
-- **Hover:** cards com `translateY(-2px)`, botoes com `scale(1.02)` — 150ms
-- **Count-up:** numeros KPI animam de 0 ao valor na viewport — 400ms
-- **Viewport entry:** widgets com fade-in-up escalonado (60ms stagger) — 400ms
-- **Layout:** sidebar collapse/expand com transicao suave — 250ms
-- **Respeita `prefers-reduced-motion`**
+- **Count-up:** numeros KPI animam de 0 ao valor na viewport
+- **Viewport entry:** widgets com fade-in-up escalonado (60ms stagger)
+- **Layout:** sidebar collapse/expand, tab pill slide, sheet transitions
+- **Micro-interacoes:** hover com scale, glow effects, typing indicator
+- Constantes compartilhadas em `src/lib/motion.ts`
 
-## Paginas
+### Card Styles
 
-### `/login`
-Card clean com grid sutil e orbs de gradiente (teal + violet). Qualquer email/senha autentica (mock). Emails com "admin" ou "athenio" ganham role admin.
+Definidos em `globals.css` como classes utilitarias:
+- `.card-surface` — glassmorphism com border sutil (padrao)
+- `.card-elevated` — shadow mais forte
+- `.card-hero` — gradiente accent para secoes destaque
+- `.card-glass` — blur pesado para modais/login
 
-### `/dashboard`
-Bento grid de 12 colunas com 5 zonas:
+### Responsividade
 
-1. **Hero Zone** — ROI (8 cols, gradiente, sparkline 7 dias, count-up) + Health Score (4 cols, gauge)
-2. **KPI Strip** — 4 cards: Revenue (amber), Conversao (teal), LTV/CAC (violet), Horas Salvas (teal)
-3. **Analise** — Funil de Vendas (8 cols) + Top Objecoes (4 cols)
-4. **Agentes** — 3 cards com cores distintas: Hermes (teal), Ares (amber), Athena (violet)
-5. **Alertas** — Feed cronologico com icones coloridos por tipo
+- **Desktop:** sidebar fixa (colapsavel 256px ↔ 64px), grids de 12 colunas
+- **Tablet:** grids de 2 colunas, sidebar hidden
+- **Mobile:** layout single-column, sidebar via Sheet (hamburger), cards empilhados, tabs com icones compactos
+- Breakpoints: `sm` (640px), `md` (768px), `lg` (1024px)
+- Viewport height: usa `dvh` para compatibilidade com address bar mobile
 
-### `/funil`
-Funil full-width com toggle de periodo (Hoje / 7d / 30d). Cada etapa e expandivel para mostrar os leads naquele estagio.
-
-### `/leads`
-Tabela completa com busca, filtros por temperatura/estagio, ordenacao, paginacao. Mobile: cards empilhados.
-
-### `/campanhas`
-Grid de cards com hover interativo. Click abre drawer lateral com grafico de performance temporal.
-
-### `/relatorios`
-Selecao de mes/ano, preview em card elevado e botao "Baixar PDF". PDF gerado server-side com `@react-pdf/renderer`.
-
-### `/configuracoes`
-Formulario em secoes (Metas, Orcamento, Comunicacao, Empresa). Persiste em localStorage.
-
-### `/admin`
-Tabela de empresas ordenada por Health Score. Clientes com score < 60 ganham fundo vermelho. Click abre dashboard read-only da empresa.
-
-### Command Palette (`⌘K`)
-Modal de busca rapida por paginas e acoes. Navegacao por teclado (arrows + enter + esc).
-
-## Autenticacao
-
-**Mock auth** com cookie `athenio-session`:
-- Qualquer email/senha autentica
-- Emails com "admin" ou "athenio" recebem `role: 'admin'`
-- Middleware protege rotas autenticadas e valida role para `/admin`
-- Tipado para swap para Supabase Auth
+---
 
 ## Dados Mock
 
-10 leads, 3 campanhas, 3 pagamentos, 5 conversas, 7 alertas e 3 empresas. Dados realistas de uma academia digital (TechFit) com metricas coerentes entre si.
+Dataset ficticio de uma academia digital (TechFit) com dados coerentes:
+- 10 leads com temperaturas, scores, estagios e objecoes variados
+- 3 campanhas (ativa/pausada) com metricas de ROAS e CPL
+- 5 conversas com 36 mensagens de chat (agente ↔ lead)
+- 3 pagamentos (confirmado/pendente)
+- 7 alertas de diferentes tipos (venda, baleia, anomalia, etc.)
+- 3 empresas clientes para o painel admin
+- 3 chamados de suporte com historico de mensagens
 
-## Formatacao Brasil
+### Formatacao Brasil
 
 - Moeda: `R$ 1.234,50` via `Intl.NumberFormat('pt-BR')`
 - Datas: `dd/mm/aaaa` com timezone `America/Sao_Paulo`
 - Timestamps relativos: "agora", "ha 5 min", "ha 2h", "ontem"
+- Telefone: `+55 11 99999-9999`
 - Toda a UI em portugues brasileiro
 
-## Preparado para Producao
+---
 
-### Swap para Supabase
-
-1. Criar implementacoes em `src/lib/services/supabase/`
-2. Alterar imports em `src/lib/services/index.ts`
-3. Nenhum componente precisa mudar
-
-### Deploy
-
-O projeto e otimizado para Vercel:
-
-```bash
-npm run build    # Build de producao
-npm run start    # Servidor de producao local
-```
-
-## Como Rodar
+## Desenvolvimento
 
 ### Pre-requisitos
 
-- Node.js 18+
-- npm
+- Node.js 20+
+- npm 10+
 
-### Instalacao
+### Setup
 
 ```bash
 git clone <repo-url>
 cd frontend
 npm install
-```
-
-### Desenvolvimento
-
-```bash
 npm run dev
 ```
 
-Acesse [http://localhost:3000](http://localhost:3000). Voce sera redirecionado para `/login`.
+O servidor inicia em `http://localhost:3000` e redireciona para `/login`.
 
-**Login cliente:** qualquer email (ex: `eu@email.com`) + qualquer senha
-**Login admin:** email com "admin" (ex: `admin@athenio.ai`) + qualquer senha
+### Login (Mock)
 
-### Testes
+Qualquer email/senha funciona:
+- **Usuario comum:** qualquer email (ex: `user@test.com`)
+- **Admin:** email contendo "admin" ou "athenio" (ex: `admin@athenio.ai`)
 
-```bash
-npm test          # Watch mode
-npm run test:run  # Roda uma vez
+### Scripts
+
+| Comando | Descricao |
+|---------|-----------|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de producao |
+| `npm run start` | Rodar build de producao |
+| `npm run lint` | ESLint |
+| `npm run test` | Vitest (watch mode) |
+| `npm run test:run` | Vitest (single run) |
+
+---
+
+## Transicao para Producao
+
+### Conectar ao Supabase
+
+1. Criar implementacoes reais em `src/lib/services/supabase/`
+2. Implementar as interfaces de `src/lib/services/interfaces/`
+3. Trocar imports em `src/lib/services/index.ts`
+4. Configurar variaveis de ambiente:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 ```
 
-### Build
+Nenhuma mudanca em paginas ou componentes e necessaria.
+
+### Deploy
+
+Otimizado para Vercel:
 
 ```bash
 npm run build
+npm run start
 ```
+
+---
 
 ## Decisoes Tecnicas
 
 | Decisao | Motivacao |
-|---|---|
-| **Server Components por padrao** | Dados mock sao instantaneos; quando trocar para Supabase, fetch ja sera server-side |
-| **Client Components so para interatividade** | Charts (Recharts exige DOM), formularios, animacoes (Motion) |
-| **Route group `(authenticated)`** | Aplica AuthShell (sidebar/topbar/command palette) sem repetir em cada pagina |
-| **Service Layer com interfaces** | Swap de data source sem tocar UI — crucial para migracao futura |
-| **Mock auth via cookie** | Simula fluxo real completo (middleware, role check) sem dependencia externa |
-| **CSS custom properties + Tailwind** | Permite tematizacao dark/light consistente e uso tanto em classes quanto em JS (charts) |
-| **Motion para animacoes** | Viewport entry, count-up e layout animations suaves com performance |
-| **next-themes para tema** | Persistencia automatica, SSR-safe, toggle sem flash |
-| **Bento grid 12 colunas** | Hierarquia visual clara — ROI como hero, KPIs como strip, secoes tematicas |
-| **Sidebar colapsavel** | Mais espaco para conteudo, estado persiste em localStorage |
-| **Command Palette** | Navegacao rapida por teclado, padrao premium SaaS |
-| **`@react-pdf/renderer` server-side** | Zero dependencia de browser para gerar PDF — funciona em serverless |
+|---------|-----------|
+| Server Components por padrao | Dados mock sao instantaneos; Supabase futuro sera server-side fetch |
+| Client Components so para interatividade | Charts (Recharts exige DOM), formularios, animacoes (Motion) |
+| Route group `(authenticated)` | Aplica AuthShell sem repetir em cada pagina |
+| Service Layer com interfaces | Swap de data source sem tocar UI |
+| Mock auth via cookie | Simula fluxo real completo (middleware, role check) sem dependencia externa |
+| CSS variables + Tailwind v4 | Tematizacao dark/light consistente, usavel em classes e JS (charts) |
+| Motion para animacoes | Viewport entry, count-up e layout animations com performance |
+| Sidebar colapsavel + mobile Sheet | Mais espaco para conteudo, estado persiste em localStorage |
+| Command Palette (⌘K) | Navegacao rapida, padrao premium SaaS |
+| `@react-pdf/renderer` server-side | Zero dependencia de browser para gerar PDF |
+| Tabs customizadas (lead detail) | Base-ui tabs tinha estilos default que conflitavam com o design system |
+| `100dvh` em vez de `100vh` | Melhor comportamento com address bar mobile |
+
+---
+
+## Rotas — Resumo
+
+### Publicas
+
+| Rota | Descricao |
+|------|-----------|
+| `/login` | Tela de login com branding animado |
+
+### Protegidas (Cliente)
+
+| Rota | Descricao |
+|------|-----------|
+| `/dashboard` | Bento grid com ROI, health score, KPIs, funil, agentes, alertas |
+| `/funil` | Funil de vendas com taxas de conversao |
+| `/leads` | Tabela filtravel de leads |
+| `/leads/[id]` | Detalhe do lead com tabs |
+| `/campanhas` | Grid de campanhas com performance |
+| `/relatorios` | Relatorio PDF |
+| `/suporte` | Chat com IA de suporte |
+| `/configuracoes` | Ajustes de metas e configuracao |
+
+### Protegidas (Admin)
+
+| Rota | Descricao |
+|------|-----------|
+| `/admin` | Lista de empresas com health score |
+| `/admin/[empresaId]` | Dashboard read-only da empresa |
+
+### API Routes
+
+| Rota | Metodo | Descricao |
+|------|--------|-----------|
+| `/api/auth/logout` | POST | Limpa cookie de sessao |
+| `/api/leads/[id]` | GET | Dados do lead + conversas + pagamentos |
+| `/api/campanhas/[id]/performance` | GET | Performance historica |
+| `/api/relatorios/pdf` | POST | Gera e retorna PDF |

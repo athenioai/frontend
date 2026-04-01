@@ -12,6 +12,7 @@ import {
   FileText,
   Settings,
   Shield,
+  Headset,
   ChevronsLeft,
   ChevronsRight,
   LogOut,
@@ -29,6 +30,7 @@ const NAV_MAIN = [
 
 const NAV_SECONDARY = [
   { href: '/relatorios', label: 'Relatórios', icon: FileText },
+  { href: '/suporte', label: 'Suporte', icon: Headset },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
 ]
 
@@ -44,15 +46,20 @@ function getInitials(name: string) {
 interface SidebarProps {
   isAdmin: boolean
   userName: string
+  mobile?: boolean
 }
 
-export function Sidebar({ isAdmin, userName }: SidebarProps) {
+export function Sidebar({ isAdmin, userName, mobile = false }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    if (mobile) {
+      setMounted(true)
+      return
+    }
     const stored = localStorage.getItem('sidebar-collapsed') === 'true'
     if (stored !== collapsed) setCollapsed(stored)
     // Small delay so the stagger animation plays on first render
@@ -95,7 +102,7 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
       >
         <Link
           href={href}
-          title={collapsed ? label : undefined}
+          title={effectiveCollapsed ? label : undefined}
           className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ${
             isActive
               ? 'text-accent'
@@ -131,7 +138,7 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
           </span>
 
           {/* Label */}
-          {!collapsed && (
+          {!effectiveCollapsed && (
             <span className="relative z-10 whitespace-nowrap">{label}</span>
           )}
         </Link>
@@ -139,38 +146,46 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
     )
   }
 
+  const effectiveCollapsed = mobile ? false : collapsed
+
   let itemIndex = 0
 
   return (
     <motion.aside
       initial={false}
-      animate={{ width: collapsed ? 64 : 256 }}
+      animate={{ width: mobile ? '100%' : (effectiveCollapsed ? 64 : 256) }}
       transition={{ duration: MOTION.duration.normal, ease: MOTION.ease.inOut }}
-      className="fixed left-0 top-0 z-40 hidden h-screen flex-col overflow-hidden border-r border-border-default bg-bg-base/80 backdrop-blur-xl lg:flex"
+      className={
+        mobile
+          ? 'flex h-full w-full flex-col overflow-hidden bg-bg-base'
+          : 'fixed left-0 top-0 z-40 hidden h-screen flex-col overflow-hidden border-r border-border-default bg-bg-base/80 backdrop-blur-xl lg:flex'
+      }
     >
       {/* Subtle inner edge highlight */}
       <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[rgba(255,255,255,0.04)] to-transparent" />
 
       {/* Logo + collapse toggle */}
       <div className="flex h-16 items-center justify-between px-4">
-        {collapsed ? (
+        {effectiveCollapsed ? (
           <LogoMark size={28} />
         ) : (
           <Logo width={120} height={30} />
         )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          title={collapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-text-subtle/50 transition-all duration-200 hover:bg-[rgba(255,255,255,0.05)] hover:text-text-muted"
-        >
-          {collapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <ChevronsLeft className="h-3.5 w-3.5" />}
-        </button>
+        {!mobile && (
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            title={collapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-text-subtle/50 transition-all duration-200 hover:bg-[rgba(255,255,255,0.05)] hover:text-text-muted"
+          >
+            {collapsed ? <ChevronsRight className="h-3.5 w-3.5" /> : <ChevronsLeft className="h-3.5 w-3.5" />}
+          </button>
+        )}
       </div>
 
       {/* Nav */}
       <nav className="flex-1 overflow-hidden px-2 py-2">
         <AnimatePresence>
-          {!collapsed && (
+          {!effectiveCollapsed && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -191,7 +206,7 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
         <div className="my-4 mx-3 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
 
         <AnimatePresence>
-          {!collapsed && (
+          {!effectiveCollapsed && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -218,11 +233,11 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
 
       {/* Footer — user + logout */}
       <div className="border-t border-border-default p-3">
-        <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : 'px-2'}`}>
+        <div className={`flex items-center gap-3 ${effectiveCollapsed ? 'justify-center' : 'px-2'}`}>
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/5 text-[11px] font-bold text-accent ring-1 ring-accent/10">
             {getInitials(userName)}
           </div>
-          {!collapsed && (
+          {!effectiveCollapsed && (
             <>
               <span className="flex-1 truncate text-[13px] text-text-muted">{userName}</span>
               <button
@@ -238,7 +253,7 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
             </>
           )}
         </div>
-        {collapsed && (
+        {effectiveCollapsed && (
           <button
             onClick={async () => {
               await fetch('/api/auth/logout', { method: 'POST' })

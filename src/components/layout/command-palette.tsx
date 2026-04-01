@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'motion/react'
 import {
   LayoutDashboard, GitBranch, Users, Megaphone, FileText,
-  Settings, Shield, Search, FileDown
+  Settings, Shield, Headset, Search, FileDown
 } from 'lucide-react'
 import { MOTION } from '@/lib/motion'
 
@@ -41,6 +41,7 @@ export function CommandPalette({ open, onClose, isAdmin }: CommandPaletteProps) 
     { id: 'campanhas', label: 'Campanhas', icon: Megaphone, action: () => navigate('/campanhas'), group: 'Navegação' },
     { id: 'relatorios', label: 'Relatórios', icon: FileText, action: () => navigate('/relatorios'), group: 'Navegação' },
     { id: 'configuracoes', label: 'Configurações', icon: Settings, action: () => navigate('/configuracoes'), group: 'Navegação' },
+    { id: 'suporte', label: 'Suporte', icon: Headset, action: () => navigate('/suporte'), group: 'Navegação' },
     ...(isAdmin ? [{ id: 'admin', label: 'Admin', icon: Shield, action: () => navigate('/admin'), group: 'Navegação' as const }] : []),
     { id: 'export-pdf', label: 'Exportar relatório PDF', icon: FileDown, action: () => navigate('/relatorios'), group: 'Ações' },
     { id: 'settings', label: 'Abrir configurações', icon: Settings, action: () => navigate('/configuracoes'), group: 'Ações' },

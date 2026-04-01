@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 import {
   Menu, Search, Bell,
   LayoutDashboard, GitBranch, Users, Megaphone,
-  FileText, Settings, Shield,
+  FileText, Settings, Shield, Headset,
 } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Sidebar } from './sidebar'
@@ -21,6 +21,7 @@ const BREADCRUMB_MAP: Record<string, { label: string; icon: typeof LayoutDashboa
   '/campanhas': { label: 'Campanhas', icon: Megaphone },
   '/relatorios': { label: 'Relatórios', icon: FileText },
   '/configuracoes': { label: 'Configurações', icon: Settings },
+  '/suporte': { label: 'Suporte', icon: Headset },
   '/admin': { label: 'Admin', icon: Shield },
 }
 
@@ -59,8 +60,8 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
           <SheetTrigger className="lg:hidden text-text-muted hover:text-text-primary p-2 transition-colors">
             <Menu className="h-5 w-5" />
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 border-border-default bg-bg-base p-0">
-            <Sidebar isAdmin={isAdmin} userName={userName} />
+          <SheetContent side="left" className="w-64 border-border-default bg-bg-base p-0" showCloseButton={false}>
+            <Sidebar isAdmin={isAdmin} userName={userName} mobile />
           </SheetContent>
         </Sheet>
 

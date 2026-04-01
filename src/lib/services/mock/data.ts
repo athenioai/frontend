@@ -1,4 +1,4 @@
-import type { Lead, Campaign, PaymentLog, Conversation, Alert, Empresa, Message } from '@/lib/types'
+import type { Lead, Campaign, PaymentLog, Conversation, Alert, Empresa, Message, SupportTicket, SupportMessage } from '@/lib/types'
 
 export const MOCK_EMPRESA_ID = 'emp-001'
 
@@ -170,6 +170,24 @@ export const mockMessages: Message[] = [
   { id: 'msg-018', conversation_id: 'conv-003', sender: 'agent', text: 'Conheço a FitApp. A grande diferença é que nós oferecemos nutricionista individual + ajuste semanal do treino baseado no seu progresso. Na FitApp é treino genérico. No Plano Premium Anual da TechFit, o custo mensal fica em R$247 mas com acompanhamento que realmente funciona.', created_at: '2026-03-25T16:06:00Z' },
   { id: 'msg-019', conversation_id: 'conv-003', sender: 'lead', text: 'Faz sentido. Vou fechar o anual de vocês.', created_at: '2026-03-25T16:15:00Z' },
   { id: 'msg-020', conversation_id: 'conv-003', sender: 'agent', text: 'Excelente escolha, Fernanda! 🎉 Estou gerando o link de pagamento agora. Você vai receber no WhatsApp em instantes.', created_at: '2026-03-25T16:16:00Z' },
+  // conv-004: Ares falando com Marcos Oliveira
+  { id: 'msg-021', conversation_id: 'conv-004', sender: 'agent', text: 'Oi Marcos! Tudo bem? Aqui é o assistente da TechFit. Vi que você demonstrou interesse no Plano Básico Mensal. Posso te ajudar?', created_at: '2026-03-31T08:00:00Z' },
+  { id: 'msg-022', conversation_id: 'conv-004', sender: 'lead', text: 'Oi. Olha, pra ser sincero não entendi direito o que vocês oferecem. É academia online?', created_at: '2026-03-31T08:02:00Z' },
+  { id: 'msg-023', conversation_id: 'conv-004', sender: 'agent', text: 'Boa pergunta! A TechFit é uma plataforma de treinos personalizados. Você recebe um plano montado por educadores físicos, com vídeos explicativos e acompanhamento semanal. Tudo pelo celular.', created_at: '2026-03-31T08:03:00Z' },
+  { id: 'msg-024', conversation_id: 'conv-004', sender: 'lead', text: 'Tá, mas eu já uso um app grátis que tem treino. Qual a diferença?', created_at: '2026-03-31T08:05:00Z' },
+  { id: 'msg-025', conversation_id: 'conv-004', sender: 'agent', text: 'A diferença é que apps grátis dão treinos genéricos iguais para todo mundo. Aqui o treino é ajustado à sua rotina, nível e objetivos. Além disso, você tem um nutricionista de apoio.', created_at: '2026-03-31T08:06:00Z' },
+  { id: 'msg-026', conversation_id: 'conv-004', sender: 'lead', text: 'Sei lá, vou pensar. Conheço outras opções mais baratas.', created_at: '2026-03-31T08:08:00Z' },
+  { id: 'msg-027', conversation_id: 'conv-004', sender: 'agent', text: 'Sem problemas, Marcos. Se quiser, posso te mandar um comparativo mostrando o que está incluso no nosso plano versus as alternativas. Fica à vontade pra me chamar quando quiser.', created_at: '2026-03-31T08:09:00Z' },
+  // conv-005: Ares falando com Juliana Santos
+  { id: 'msg-028', conversation_id: 'conv-005', sender: 'agent', text: 'Oi Juliana! Aqui é o assistente da TechFit. Vi que você está avaliando o Plano Premium Anual. Tem alguma dúvida que eu possa esclarecer?', created_at: '2026-03-31T11:00:00Z' },
+  { id: 'msg-029', conversation_id: 'conv-005', sender: 'lead', text: 'Oi! Tenho sim. Quero começar mas preciso saber se consigo parcelar.', created_at: '2026-03-31T11:01:00Z' },
+  { id: 'msg-030', conversation_id: 'conv-005', sender: 'agent', text: 'Claro! O Plano Premium Anual de R$ 2.970 pode ser parcelado em até 12x de R$ 247,50 no cartão. E se preferir à vista, tem 10% de desconto.', created_at: '2026-03-31T11:02:00Z' },
+  { id: 'msg-031', conversation_id: 'conv-005', sender: 'lead', text: 'Legal, mas só consigo começar mês que vem. Esse valor vai mudar?', created_at: '2026-03-31T11:04:00Z' },
+  { id: 'msg-032', conversation_id: 'conv-005', sender: 'agent', text: 'Entendo! O preço atual é promocional e não sei por quanto tempo vai durar. Se quiser garantir, posso travar o valor pra você e o acesso começa quando preferir. Quer que eu faça isso?', created_at: '2026-03-31T11:05:00Z' },
+  { id: 'msg-033', conversation_id: 'conv-005', sender: 'lead', text: 'Hmm, pode travar sim. Mas só vou pagar quando começar, certo?', created_at: '2026-03-31T11:07:00Z' },
+  { id: 'msg-034', conversation_id: 'conv-005', sender: 'agent', text: 'Combinado! Vou reservar o valor promocional pra você. Quando estiver pronta pra começar, é só me chamar aqui que a gente ativa tudo. Sem compromisso até lá. 😊', created_at: '2026-03-31T11:08:00Z' },
+  { id: 'msg-035', conversation_id: 'conv-005', sender: 'lead', text: 'Perfeito! Obrigada!', created_at: '2026-03-31T11:09:00Z' },
+  { id: 'msg-036', conversation_id: 'conv-005', sender: 'agent', text: 'Eu que agradeço, Juliana! Qualquer dúvida, estou por aqui. Bom dia! 🙌', created_at: '2026-03-31T11:10:00Z' },
 ]
 
 export const mockRoiTotal = {
@@ -186,4 +204,32 @@ export const mockAlerts: Alert[] = [
   { id: 'alt-005', empresa_id: 'emp-001', tipo: 'humano_solicitado', descricao: 'Marcos Oliveira pediu para falar com um humano — sentimento negativo', created_at: '2026-03-31T08:00:00Z' },
   { id: 'alt-006', empresa_id: 'emp-001', tipo: 'anomalia', descricao: 'Padrão suspeito detectado: 12 mensagens em 30s do número +5511900000000', created_at: '2026-03-30T23:00:00Z' },
   { id: 'alt-007', empresa_id: 'emp-001', tipo: 'venda', descricao: 'Venda confirmada: Ricardo Tavares — Plano Básico Mensal (R$ 497)', created_at: '2026-03-30T14:00:00Z' },
+]
+
+export const mockSupportTickets: SupportTicket[] = [
+  { id: 'ticket-001', empresa_id: 'emp-001', assunto: 'Como configurar o tom de voz do agente?', status: 'resolvido', created_at: '2026-03-25T09:00:00Z', updated_at: '2026-03-25T09:12:00Z' },
+  { id: 'ticket-002', empresa_id: 'emp-001', assunto: 'Campanha pausada automaticamente', status: 'resolvido', created_at: '2026-03-28T14:30:00Z', updated_at: '2026-03-28T14:45:00Z' },
+  { id: 'ticket-003', empresa_id: 'emp-001', assunto: 'Erro ao gerar relatório PDF', status: 'aberto', created_at: '2026-03-31T08:00:00Z', updated_at: '2026-03-31T08:10:00Z' },
+]
+
+export const mockSupportMessages: SupportMessage[] = [
+  // ticket-001
+  { id: 'smsg-001', ticket_id: 'ticket-001', sender: 'user', text: 'Oi, como faço para mudar o tom de voz do agente Ares? Quero que ele seja mais informal.', created_at: '2026-03-25T09:00:00Z' },
+  { id: 'smsg-002', ticket_id: 'ticket-001', sender: 'agent', text: 'Olá! Para configurar o tom de voz do Ares, acesse Configurações > Tom de Voz. Lá você pode personalizar o estilo de comunicação de cada agente individualmente.', created_at: '2026-03-25T09:01:00Z' },
+  { id: 'smsg-003', ticket_id: 'ticket-001', sender: 'user', text: 'Achei! E posso colocar exemplos de frases que ele deve usar?', created_at: '2026-03-25T09:03:00Z' },
+  { id: 'smsg-004', ticket_id: 'ticket-001', sender: 'agent', text: 'Sim! No campo de tom de voz, você pode incluir instruções como "Usar gírias informais", "Sempre chamar pelo primeiro nome" ou até colar exemplos de mensagens ideais. O agente vai adaptar o estilo automaticamente.', created_at: '2026-03-25T09:04:00Z' },
+  { id: 'smsg-005', ticket_id: 'ticket-001', sender: 'user', text: 'Perfeito, muito obrigado!', created_at: '2026-03-25T09:06:00Z' },
+  { id: 'smsg-006', ticket_id: 'ticket-001', sender: 'agent', text: 'Disponível! Se precisar de mais alguma coisa, é só chamar. 😊', created_at: '2026-03-25T09:07:00Z' },
+  // ticket-002
+  { id: 'smsg-007', ticket_id: 'ticket-002', sender: 'user', text: 'Minha campanha "Imagem Promo - Básico" foi pausada do nada. O que aconteceu?', created_at: '2026-03-28T14:30:00Z' },
+  { id: 'smsg-008', ticket_id: 'ticket-002', sender: 'agent', text: 'Verifiquei aqui e a campanha foi pausada automaticamente porque o CPA (Custo por Aquisição) ultrapassou o limite configurado. Quando o CPA fica acima do teto, o sistema pausa para proteger seu orçamento.', created_at: '2026-03-28T14:31:00Z' },
+  { id: 'smsg-009', ticket_id: 'ticket-002', sender: 'user', text: 'Entendi. E como reativo ela?', created_at: '2026-03-28T14:33:00Z' },
+  { id: 'smsg-010', ticket_id: 'ticket-002', sender: 'agent', text: 'Você pode reativar em Campanhas > selecionar a campanha > clicar em "Reativar". Recomendo também ajustar o teto de CPA em Configurações se achar que o limite está muito baixo para essa campanha.', created_at: '2026-03-28T14:34:00Z' },
+  { id: 'smsg-011', ticket_id: 'ticket-002', sender: 'user', text: 'Boa, vou ajustar. Valeu!', created_at: '2026-03-28T14:36:00Z' },
+  { id: 'smsg-012', ticket_id: 'ticket-002', sender: 'agent', text: 'Por nada! Qualquer dúvida sobre limites de campanha, estou aqui.', created_at: '2026-03-28T14:37:00Z' },
+  // ticket-003
+  { id: 'smsg-013', ticket_id: 'ticket-003', sender: 'user', text: 'Estou tentando gerar o relatório PDF do mês mas dá um erro na hora de exportar. Pode me ajudar?', created_at: '2026-03-31T08:00:00Z' },
+  { id: 'smsg-014', ticket_id: 'ticket-003', sender: 'agent', text: 'Claro! Pode me dizer qual mensagem de erro aparece? E em qual navegador você está usando?', created_at: '2026-03-31T08:01:00Z' },
+  { id: 'smsg-015', ticket_id: 'ticket-003', sender: 'user', text: 'Aparece "Falha ao processar relatório". Estou no Chrome.', created_at: '2026-03-31T08:03:00Z' },
+  { id: 'smsg-016', ticket_id: 'ticket-003', sender: 'agent', text: 'Entendi. Esse erro pode ocorrer quando o período selecionado tem muitos dados. Tente gerar para uma semana de cada vez ao invés do mês inteiro. Estamos trabalhando numa correção para relatórios grandes. Enquanto isso, essa solução alternativa deve funcionar.', created_at: '2026-03-31T08:05:00Z' },
 ]
