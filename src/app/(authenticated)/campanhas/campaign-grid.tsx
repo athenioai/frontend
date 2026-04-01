@@ -1,14 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { LineChartSimple } from '@/components/charts/line-chart-simple'
 import { formatCurrency } from '@/lib/utils/format'
 import { AnimateIn } from '@/components/ui/animate-in'
 import { COLORS } from '@/lib/constants/theme'
-import { MOTION } from '@/lib/motion'
-import { TrendingUp, DollarSign, Users, ShoppingCart, X } from 'lucide-react'
+import { TrendingUp, DollarSign, Users, ShoppingCart, Target, Percent, Calendar } from 'lucide-react'
 import type { Campaign, CampaignPerformance } from '@/lib/types'
 
 export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
@@ -110,97 +108,148 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
         </div>
       </div>
 
-      {/* Detail Drawer */}
+      {/* ─── Detail Drawer ─── */}
       <Sheet open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <SheetContent className="w-full overflow-y-auto border-border-default bg-bg-base sm:max-w-lg">
-          {selected && (
-            <div className="space-y-6 pt-2">
-              {/* Drawer header */}
+        <SheetContent className="w-full overflow-y-auto border-border-default bg-bg-base p-0 sm:max-w-lg">
+          {selected && (() => {
+            const isActive = selected.status === 'ativa'
+            const conversionRate = selected.leads_gerados > 0
+              ? ((selected.vendas_confirmadas / selected.leads_gerados) * 100).toFixed(1)
+              : '0.0'
+
+            return (
               <div>
-                <div className="flex items-center justify-between">
-                  <h2 className="font-title text-[20px] font-bold text-text-primary">{selected.nome}</h2>
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
+                {/* Hero header with gradient */}
+                <div className="relative overflow-hidden px-6 pt-8 pb-6">
+                  {/* Background glow */}
+                  <div
+                    className="pointer-events-none absolute inset-0"
                     style={{
-                      backgroundColor: selected.status === 'ativa' ? `${COLORS.emerald}12` : `${COLORS.textSubtle}15`,
-                      color: selected.status === 'ativa' ? COLORS.emerald : COLORS.textSubtle,
+                      background: isActive
+                        ? `linear-gradient(135deg, ${COLORS.accent}08, transparent 60%)`
+                        : `linear-gradient(135deg, ${COLORS.textSubtle}05, transparent 60%)`,
                     }}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 rounded-full ${selected.status === 'ativa' ? 'animate-pulse' : ''}`}
-                      style={{ backgroundColor: selected.status === 'ativa' ? COLORS.emerald : COLORS.textSubtle }}
-                    />
-                    {selected.status}
-                  </span>
-                </div>
-                <p className="mt-1 text-[13px] text-text-subtle">
-                  Criada em {new Date(selected.created_at).toLocaleDateString('pt-BR')}
-                </p>
-              </div>
-
-              {/* KPI cards */}
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: 'ROAS', value: `${selected.roas.toFixed(1)}×`, icon: TrendingUp, color: COLORS.accent },
-                  { label: 'Gasto Total', value: formatCurrency(selected.gasto_total), icon: DollarSign, color: COLORS.gold },
-                  { label: 'Leads Gerados', value: String(selected.leads_gerados), icon: Users, color: COLORS.violet },
-                  { label: 'Vendas', value: String(selected.vendas_confirmadas), icon: ShoppingCart, color: COLORS.emerald },
-                ].map((kpi) => (
-                  <div key={kpi.label} className="card-surface p-4">
-                    <div className="mb-2 flex items-center gap-2">
-                      <div
-                        className="flex h-7 w-7 items-center justify-center rounded-lg"
-                        style={{ backgroundColor: `${kpi.color}12` }}
-                      >
-                        <kpi.icon className="h-3.5 w-3.5" style={{ color: kpi.color }} />
+                  />
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <span
+                          className="mb-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
+                          style={{
+                            backgroundColor: isActive ? `${COLORS.emerald}12` : `${COLORS.textSubtle}15`,
+                            color: isActive ? COLORS.emerald : COLORS.textSubtle,
+                          }}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${isActive ? 'animate-pulse' : ''}`}
+                            style={{ backgroundColor: isActive ? COLORS.emerald : COLORS.textSubtle }}
+                          />
+                          {selected.status}
+                        </span>
+                        <h2 className="font-title text-[22px] font-bold text-text-primary">{selected.nome}</h2>
+                        <div className="mt-2 flex items-center gap-1.5 text-[12px] text-text-subtle">
+                          <Calendar className="h-3 w-3" />
+                          Criada em {new Date(selected.created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </div>
                       </div>
-                      <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-subtle">{kpi.label}</span>
                     </div>
-                    <p className="font-title text-[20px] font-bold leading-none text-text-primary">{kpi.value}</p>
-                  </div>
-                ))}
-              </div>
 
-              {/* CPL detail */}
-              <div className="card-surface p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-text-subtle">Custo por Lead (CPL)</span>
-                  <span className="font-title text-[16px] font-bold text-gold">{formatCurrency(selected.cpl)}</span>
+                    {/* Hero ROAS */}
+                    <div className="mt-6 flex items-baseline gap-2">
+                      <span className="font-title text-[48px] font-bold leading-none text-accent">
+                        {selected.roas.toFixed(1)}
+                      </span>
+                      <span className="font-title text-[24px] font-bold text-accent/50">×</span>
+                      <span className="ml-2 text-[13px] text-text-subtle">ROAS</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-[12px] text-text-subtle">Taxa de conversão</span>
-                  <span className="font-title text-[16px] font-bold text-emerald">
-                    {selected.leads_gerados > 0 ? ((selected.vendas_confirmadas / selected.leads_gerados) * 100).toFixed(1) : 0}%
-                  </span>
-                </div>
-              </div>
 
-              {/* Performance chart */}
-              <div>
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
-                  Performance ao longo do tempo
-                </p>
-                {loading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+                {/* Separator */}
+                <div className="mx-6 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
+
+                {/* Metrics section */}
+                <div className="space-y-5 px-6 py-6">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
+                    Métricas da campanha
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Gasto Total', value: formatCurrency(selected.gasto_total), icon: DollarSign, color: COLORS.gold },
+                      { label: 'Custo por Lead', value: formatCurrency(selected.cpl), icon: Target, color: COLORS.gold },
+                      { label: 'Leads Gerados', value: String(selected.leads_gerados), icon: Users, color: COLORS.violet },
+                      { label: 'Vendas Confirmadas', value: String(selected.vendas_confirmadas), icon: ShoppingCart, color: COLORS.emerald },
+                    ].map((kpi) => (
+                      <div key={kpi.label} className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
+                        <div className="mb-2.5 flex items-center gap-2">
+                          <div
+                            className="flex h-7 w-7 items-center justify-center rounded-lg"
+                            style={{ backgroundColor: `${kpi.color}12` }}
+                          >
+                            <kpi.icon className="h-3.5 w-3.5" style={{ color: kpi.color }} />
+                          </div>
+                          <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-subtle">{kpi.label}</span>
+                        </div>
+                        <p className="font-title text-[20px] font-bold leading-none text-text-primary">{kpi.value}</p>
+                      </div>
+                    ))}
                   </div>
-                ) : perfData.length > 0 ? (
-                  <div className="card-surface p-4">
-                    <LineChartSimple
-                      data={perfData.map((d) => ({ ...d, data: d.data.slice(5) }))}
-                      xKey="data"
-                      yKey="roas"
-                      height={200}
-                    />
+
+                  {/* Conversion rate bar */}
+                  <div className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ backgroundColor: `${COLORS.emerald}12` }}>
+                          <Percent className="h-3.5 w-3.5" style={{ color: COLORS.emerald }} />
+                        </div>
+                        <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-subtle">Taxa de conversão</span>
+                      </div>
+                      <span className="font-title text-[18px] font-bold text-emerald">{conversionRate}%</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-[rgba(240,237,232,0.05)]">
+                      <div
+                        className="h-full rounded-full transition-all duration-700 ease-out"
+                        style={{
+                          width: `${Math.min(parseFloat(conversionRate), 100)}%`,
+                          background: `linear-gradient(90deg, ${COLORS.emerald}, ${COLORS.emerald}80)`,
+                        }}
+                      />
+                    </div>
                   </div>
-                ) : (
-                  <div className="flex items-center justify-center py-12 text-[13px] text-text-subtle">
-                    Sem dados de performance
-                  </div>
-                )}
+                </div>
+
+                {/* Separator */}
+                <div className="mx-6 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
+
+                {/* Performance chart */}
+                <div className="px-6 py-6">
+                  <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
+                    Performance ao longo do tempo
+                  </p>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-16">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+                    </div>
+                  ) : perfData.length > 0 ? (
+                    <div className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
+                      <LineChartSimple
+                        data={perfData.map((d) => ({ ...d, data: d.data.slice(5) }))}
+                        xKey="data"
+                        yKey="roas"
+                        height={200}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <TrendingUp className="mb-2 h-5 w-5 text-text-subtle/40" />
+                      <p className="text-[13px] text-text-subtle">Sem dados de performance ainda</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
         </SheetContent>
       </Sheet>
     </>
