@@ -93,21 +93,21 @@
 
 /* ─── Dark theme (default) ─── */
 :root {
-  --bg-base: #08090A;
-  --surface-1: #0F1114;
-  --surface-2: #161A1E;
-  --background: #08090A;
+  --bg-base: #0E1012;
+  --surface-1: #161A1E;
+  --surface-2: #1E2228;
+  --background: #0E1012;
   --foreground: #F0EDE8;
-  --text-subtle: rgba(240, 237, 232, 0.35);
-  --muted-foreground: rgba(240, 237, 232, 0.55);
+  --text-subtle: rgba(240, 237, 232, 0.45);
+  --muted-foreground: rgba(240, 237, 232, 0.65);
   --primary: #4FD1C5;
   --primary-hover: #6EE7D8;
-  --primary-foreground: #08090A;
-  --border: rgba(240, 237, 232, 0.06);
-  --border-hover: rgba(240, 237, 232, 0.12);
-  --input: rgba(240, 237, 232, 0.04);
+  --primary-foreground: #0E1012;
+  --border: rgba(240, 237, 232, 0.08);
+  --border-hover: rgba(240, 237, 232, 0.16);
+  --input: rgba(240, 237, 232, 0.06);
   --ring: #4FD1C5;
-  --sidebar-item-active: rgba(79, 209, 197, 0.06);
+  --sidebar-item-active: rgba(79, 209, 197, 0.08);
   --radius: 0.75rem;
   --card-shadow: none;
 }
@@ -134,21 +134,21 @@
 }
 
 .dark {
-  --bg-base: #08090A;
-  --surface-1: #0F1114;
-  --surface-2: #161A1E;
-  --background: #08090A;
+  --bg-base: #0E1012;
+  --surface-1: #161A1E;
+  --surface-2: #1E2228;
+  --background: #0E1012;
   --foreground: #F0EDE8;
-  --text-subtle: rgba(240, 237, 232, 0.35);
-  --muted-foreground: rgba(240, 237, 232, 0.55);
+  --text-subtle: rgba(240, 237, 232, 0.45);
+  --muted-foreground: rgba(240, 237, 232, 0.65);
   --primary: #4FD1C5;
   --primary-hover: #6EE7D8;
-  --primary-foreground: #08090A;
-  --border: rgba(240, 237, 232, 0.06);
-  --border-hover: rgba(240, 237, 232, 0.12);
-  --input: rgba(240, 237, 232, 0.04);
+  --primary-foreground: #0E1012;
+  --border: rgba(240, 237, 232, 0.08);
+  --border-hover: rgba(240, 237, 232, 0.16);
+  --input: rgba(240, 237, 232, 0.06);
   --ring: #4FD1C5;
-  --sidebar-item-active: rgba(79, 209, 197, 0.06);
+  --sidebar-item-active: rgba(79, 209, 197, 0.08);
   --card-shadow: none;
 }
 
