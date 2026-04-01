@@ -32,12 +32,12 @@ function CampaignChart({ data, loading }: { data: CampaignPerformance[]; loading
         </p>
         {/* Metric toggle */}
         {data.length > 0 && (
-          <div className="mt-3 flex gap-1 rounded-lg bg-[rgba(240,237,232,0.04)] p-0.5 w-fit">
+          <div className="mt-3 flex gap-1 rounded-lg bg-[rgba(240,237,232,0.04)] p-0.5">
             {METRICS.map((m) => (
               <button
                 key={m.key}
                 onClick={() => setActiveMetric(m)}
-                className={`rounded-md px-3 py-1.5 text-[11px] font-semibold transition-all duration-200 ${
+                className={`flex-1 rounded-md px-3 py-1.5 text-[11px] font-semibold transition-all duration-200 ${
                   activeMetric.key === m.key
                     ? 'bg-[rgba(240,237,232,0.08)] text-text-primary'
                     : 'text-text-subtle hover:text-text-muted'
