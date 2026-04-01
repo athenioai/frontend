@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { useActionState } from 'react'
 import { loginAction } from './actions'
+import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,6 +11,7 @@ import { Logo } from '@/components/ui/logo'
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <div className="flex min-h-screen">
@@ -138,15 +141,25 @@ export default function LoginPage() {
                   Esqueceu?
                 </button>
               </div>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-                className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] pr-11 text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-subtle transition-colors hover:text-text-muted"
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer">
