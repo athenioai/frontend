@@ -1,12 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Save, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Settings, Save, CheckCircle, AlertTriangle, Target, Wallet, MessageSquare, Building2 } from 'lucide-react'
+import { COLORS } from '@/lib/constants/theme'
+import { MOTION } from '@/lib/motion'
 import type { Empresa } from '@/lib/types'
+
+const INPUT_CLASS = "h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/30 focus:ring-2 focus:ring-accent/10"
 
 export default function ConfiguracoesPage() {
   const [config, setConfig] = useState<Partial<Empresa>>({})
@@ -35,123 +40,221 @@ export default function ConfiguracoesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="font-title text-2xl font-bold">Configurações</h1>
-
-      <p className="flex items-center gap-2 text-sm text-warning">
-        <AlertTriangle className="h-4 w-4" />
-        Alterações aqui impactam o comportamento dos agentes
-      </p>
-
-      {/* Metas */}
-      <div className="card-surface p-6 space-y-4">
-        <h2 className="font-title text-lg font-bold">Metas</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label className="text-text-muted">ROAS Meta</Label>
-            <Input
-              type="number"
-              step="0.1"
-              value={config.roas_meta || ''}
-              onChange={(e) => handleChange('roas_meta', parseFloat(e.target.value))}
-              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
-            />
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent/15 to-accent/5">
+            <Settings className="h-[18px] w-[18px] text-accent" />
           </div>
-          <div className="space-y-2">
-            <Label className="text-text-muted">CPL Alvo (R$)</Label>
-            <Input
-              type="number"
-              step="0.50"
-              value={config.cpl_alvo || ''}
-              onChange={(e) => handleChange('cpl_alvo', parseFloat(e.target.value))}
-              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
+          <div>
+            <h1 className="font-title text-[22px] font-bold text-text-primary">Configurações</h1>
+            <p className="text-[13px] text-text-muted">Ajuste o comportamento dos agentes</p>
+          </div>
+        </div>
+
+        {/* Save button — top right */}
+        <Button
+          onClick={handleSave}
+          className="h-11 rounded-xl bg-accent px-6 text-[14px] font-semibold text-primary-foreground shadow-[0_0_24px_rgba(79,209,197,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(79,209,197,0.18)] active:scale-[0.99]"
+        >
+          <AnimatePresence mode="wait">
+            {saved ? (
+              <motion.span
+                key="saved"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex items-center gap-2"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Salvo
+              </motion.span>
+            ) : (
+              <motion.span
+                key="save"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex items-center gap-2"
+              >
+                <Save className="h-4 w-4" />
+                Salvar
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </Button>
+      </div>
+
+      {/* Warning banner */}
+      <div className="flex items-center gap-3 rounded-xl border border-gold/20 bg-gold/5 px-4 py-3">
+        <AlertTriangle className="h-4 w-4 shrink-0 text-gold" />
+        <p className="text-[13px] text-gold/90">
+          Alterações aqui impactam diretamente o comportamento dos agentes Hermes, Ares e Athena.
+        </p>
+      </div>
+
+      {/* Sections */}
+      <div className="space-y-6">
+        {/* Metas */}
+        <div className="card-surface overflow-hidden">
+          <div className="relative border-b border-border-default px-6 py-4">
+            <div
+              className="absolute left-0 right-0 top-0 h-[2px]"
+              style={{ background: `linear-gradient(90deg, ${COLORS.accent}, transparent 60%)` }}
             />
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: `${COLORS.accent}12` }}>
+                <Target className="h-4 w-4" style={{ color: COLORS.accent }} />
+              </div>
+              <div>
+                <h2 className="font-title text-[15px] font-bold text-text-primary">Metas</h2>
+                <p className="text-[11px] text-text-subtle">Defina os objetivos de performance</p>
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-5 p-6 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-medium text-text-muted">ROAS Meta</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={config.roas_meta || ''}
+                onChange={(e) => handleChange('roas_meta', parseFloat(e.target.value))}
+                className={INPUT_CLASS}
+                placeholder="3.0"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-medium text-text-muted">CPL Alvo (R$)</Label>
+              <Input
+                type="number"
+                step="0.50"
+                value={config.cpl_alvo || ''}
+                onChange={(e) => handleChange('cpl_alvo', parseFloat(e.target.value))}
+                className={INPUT_CLASS}
+                placeholder="15.00"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Orçamento */}
+        <div className="card-surface overflow-hidden">
+          <div className="relative border-b border-border-default px-6 py-4">
+            <div
+              className="absolute left-0 right-0 top-0 h-[2px]"
+              style={{ background: `linear-gradient(90deg, ${COLORS.gold}, transparent 60%)` }}
+            />
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: `${COLORS.gold}12` }}>
+                <Wallet className="h-4 w-4" style={{ color: COLORS.gold }} />
+              </div>
+              <div>
+                <h2 className="font-title text-[15px] font-bold text-text-primary">Orçamento</h2>
+                <p className="text-[11px] text-text-subtle">Controle os limites de gasto</p>
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-5 p-6 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-medium text-text-muted">Limite Diário (R$)</Label>
+              <Input
+                type="number"
+                value={config.orcamento_diario || ''}
+                onChange={(e) => handleChange('orcamento_diario', parseFloat(e.target.value))}
+                className={INPUT_CLASS}
+                placeholder="500"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-medium text-text-muted">Teto Absoluto do Cartão (R$)</Label>
+              <Input
+                type="number"
+                value={config.teto_cartao || ''}
+                onChange={(e) => handleChange('teto_cartao', parseFloat(e.target.value))}
+                className={INPUT_CLASS}
+                placeholder="10000"
+              />
+              <p className="flex items-center gap-1 text-[11px] text-danger">
+                <AlertTriangle className="h-3 w-3" />
+                Nenhuma lógica de ROAS pode ultrapassar este valor
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Comunicação */}
+        <div className="card-surface overflow-hidden">
+          <div className="relative border-b border-border-default px-6 py-4">
+            <div
+              className="absolute left-0 right-0 top-0 h-[2px]"
+              style={{ background: `linear-gradient(90deg, ${COLORS.violet}, transparent 60%)` }}
+            />
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: `${COLORS.violet}12` }}>
+                <MessageSquare className="h-4 w-4" style={{ color: COLORS.violet }} />
+              </div>
+              <div>
+                <h2 className="font-title text-[15px] font-bold text-text-primary">Comunicação</h2>
+                <p className="text-[11px] text-text-subtle">Personalize como os agentes se comunicam</p>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-5 p-6">
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-medium text-text-muted">Tom de Voz do Agente</Label>
+              <Textarea
+                value={config.tom_de_voz || ''}
+                onChange={(e) => handleChange('tom_de_voz', e.target.value)}
+                rows={3}
+                className="rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/30 focus:ring-2 focus:ring-accent/10"
+                placeholder="Ex: Profissional e amigável, usando linguagem simples..."
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-medium text-text-muted">WhatsApp para Alertas</Label>
+              <Input
+                type="tel"
+                value={config.whatsapp_alertas || ''}
+                onChange={(e) => handleChange('whatsapp_alertas', e.target.value)}
+                className={INPUT_CLASS}
+                placeholder="+55 11 99988-7766"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Empresa */}
+        <div className="card-surface overflow-hidden">
+          <div className="relative border-b border-border-default px-6 py-4">
+            <div
+              className="absolute left-0 right-0 top-0 h-[2px]"
+              style={{ background: `linear-gradient(90deg, ${COLORS.emerald}, transparent 60%)` }}
+            />
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: `${COLORS.emerald}12` }}>
+                <Building2 className="h-4 w-4" style={{ color: COLORS.emerald }} />
+              </div>
+              <div>
+                <h2 className="font-title text-[15px] font-bold text-text-primary">Empresa</h2>
+                <p className="text-[11px] text-text-subtle">Informações da sua empresa</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-medium text-text-muted">Nome da Empresa</Label>
+              <Input
+                value={config.nome || ''}
+                onChange={(e) => handleChange('nome', e.target.value)}
+                className={INPUT_CLASS}
+                placeholder="Minha Empresa"
+              />
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Orçamento */}
-      <div className="card-surface p-6 space-y-4">
-        <h2 className="font-title text-lg font-bold">Orçamento</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label className="text-text-muted">Limite Diário (R$)</Label>
-            <Input
-              type="number"
-              value={config.orcamento_diario || ''}
-              onChange={(e) => handleChange('orcamento_diario', parseFloat(e.target.value))}
-              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-text-muted">Teto Absoluto do Cartão (R$)</Label>
-            <Input
-              type="number"
-              value={config.teto_cartao || ''}
-              onChange={(e) => handleChange('teto_cartao', parseFloat(e.target.value))}
-              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
-            />
-            <p className="text-xs text-danger">Nenhuma lógica de ROAS pode ultrapassar este valor</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Comunicação */}
-      <div className="card-surface p-6 space-y-4">
-        <h2 className="font-title text-lg font-bold">Comunicação</h2>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label className="text-text-muted">Tom de Voz do Agente</Label>
-            <Textarea
-              value={config.tom_de_voz || ''}
-              onChange={(e) => handleChange('tom_de_voz', e.target.value)}
-              rows={3}
-              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
-              placeholder="Descreva como os agentes devem se comunicar..."
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-text-muted">WhatsApp para Alertas</Label>
-            <Input
-              type="tel"
-              value={config.whatsapp_alertas || ''}
-              onChange={(e) => handleChange('whatsapp_alertas', e.target.value)}
-              className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
-              placeholder="+5511999887766"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Empresa */}
-      <div className="card-surface p-6 space-y-4">
-        <h2 className="font-title text-lg font-bold">Empresa</h2>
-        <div className="space-y-2">
-          <Label className="text-text-muted">Nome da Empresa</Label>
-          <Input
-            value={config.nome || ''}
-            onChange={(e) => handleChange('nome', e.target.value)}
-            className="border-border-default bg-surface-2 text-text-primary focus:border-accent"
-          />
-        </div>
-      </div>
-
-      <Button
-        onClick={handleSave}
-        className="rounded-xl bg-accent px-8 font-semibold text-primary-foreground transition-all hover:brightness-110"
-      >
-        {saved ? (
-          <>
-            <CheckCircle className="mr-2 h-4 w-4" />
-            Salvo com sucesso
-          </>
-        ) : (
-          <>
-            <Save className="mr-2 h-4 w-4" />
-            Salvar configurações
-          </>
-        )}
-      </Button>
     </div>
   )
 }
