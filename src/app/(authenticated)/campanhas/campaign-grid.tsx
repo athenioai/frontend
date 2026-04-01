@@ -26,18 +26,18 @@ function CampaignChart({ data, loading }: { data: CampaignPerformance[]; loading
 
   return (
     <div className="px-8 py-8">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
           Performance ao longo do tempo
         </p>
         {/* Metric toggle */}
         {data.length > 0 && (
-          <div className="flex gap-1 rounded-lg bg-[rgba(240,237,232,0.04)] p-0.5">
+          <div className="mt-3 flex gap-1 rounded-lg bg-[rgba(240,237,232,0.04)] p-0.5 w-fit">
             {METRICS.map((m) => (
               <button
                 key={m.key}
                 onClick={() => setActiveMetric(m)}
-                className={`rounded-md px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider transition-all duration-200 ${
+                className={`rounded-md px-3 py-1.5 text-[11px] font-semibold transition-all duration-200 ${
                   activeMetric.key === m.key
                     ? 'bg-[rgba(240,237,232,0.08)] text-text-primary'
                     : 'text-text-subtle hover:text-text-muted'
