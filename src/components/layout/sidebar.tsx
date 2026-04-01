@@ -150,7 +150,7 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
       initial={false}
       animate={{ width: collapsed ? 64 : 256 }}
       transition={{ duration: MOTION.duration.normal, ease: MOTION.ease.inOut }}
-      className="fixed left-0 top-0 z-40 hidden h-screen flex-col border-r border-border-default bg-bg-base/80 backdrop-blur-xl lg:flex"
+      className="fixed left-0 top-0 z-40 hidden h-screen flex-col overflow-hidden border-r border-border-default bg-bg-base/80 backdrop-blur-xl lg:flex"
     >
       {/* Subtle inner edge highlight */}
       <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[rgba(255,255,255,0.04)] to-transparent" />
