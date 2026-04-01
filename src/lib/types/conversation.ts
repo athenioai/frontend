@@ -8,6 +8,14 @@ export interface Conversation {
   created_at: string
 }
 
+export interface Message {
+  id: string
+  conversation_id: string
+  sender: 'agent' | 'lead'
+  text: string
+  created_at: string
+}
+
 export interface ConversationSummary {
   id: string
   empresa_id: string

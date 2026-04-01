@@ -1,4 +1,4 @@
-import type { Lead, Campaign, PaymentLog, Conversation, Alert, Empresa } from '@/lib/types'
+import type { Lead, Campaign, PaymentLog, Conversation, Alert, Empresa, Message } from '@/lib/types'
 
 export const MOCK_EMPRESA_ID = 'emp-001'
 
@@ -144,6 +144,32 @@ export const mockConversations: Conversation[] = [
   { id: 'conv-003', empresa_id: 'emp-001', lead_id: 'lead-004', mensagens_count: 32, duracao_minutos: 55, agente: 'ares', created_at: '2026-03-25T16:00:00Z' },
   { id: 'conv-004', empresa_id: 'emp-001', lead_id: 'lead-005', mensagens_count: 15, duracao_minutos: 20, agente: 'ares', created_at: '2026-03-31T08:00:00Z' },
   { id: 'conv-005', empresa_id: 'emp-001', lead_id: 'lead-006', mensagens_count: 28, duracao_minutos: 45, agente: 'ares', created_at: '2026-03-31T11:00:00Z' },
+]
+
+export const mockMessages: Message[] = [
+  // conv-001: Ares falando com Carlos Silva
+  { id: 'msg-001', conversation_id: 'conv-001', sender: 'agent', text: 'Oi Carlos! Aqui é o assistente da TechFit. Vi que você se interessou pelo Plano Premium Anual. Posso te ajudar com mais informações?', created_at: '2026-03-31T10:00:00Z' },
+  { id: 'msg-002', conversation_id: 'conv-001', sender: 'lead', text: 'Oi! Sim, quero saber o preço e o que inclui.', created_at: '2026-03-31T10:01:00Z' },
+  { id: 'msg-003', conversation_id: 'conv-001', sender: 'agent', text: 'O Plano Premium Anual custa R$ 2.970 (equivale a R$ 247,50/mês). Inclui acesso a todos os treinos, acompanhamento nutricional personalizado e suporte via WhatsApp.', created_at: '2026-03-31T10:02:00Z' },
+  { id: 'msg-004', conversation_id: 'conv-001', sender: 'lead', text: 'Achei caro. Não tem desconto?', created_at: '2026-03-31T10:03:00Z' },
+  { id: 'msg-005', conversation_id: 'conv-001', sender: 'agent', text: 'Entendo, Carlos. Comparando com academias presenciais da sua região, nosso plano custa 60% menos e oferece acompanhamento individual. Se fechar hoje, consigo liberar 7 dias grátis pra você testar antes de confirmar.', created_at: '2026-03-31T10:04:00Z' },
+  { id: 'msg-006', conversation_id: 'conv-001', sender: 'lead', text: 'Hmm, os 7 dias grátis me interessam. Como funciona?', created_at: '2026-03-31T10:06:00Z' },
+  { id: 'msg-007', conversation_id: 'conv-001', sender: 'agent', text: 'Simples: eu libero seu acesso agora, você testa por 7 dias com tudo incluso. Se gostar, o pagamento é processado. Se não, cancela sem custo. Quer que eu libere?', created_at: '2026-03-31T10:07:00Z' },
+  { id: 'msg-008', conversation_id: 'conv-001', sender: 'lead', text: 'Pode liberar, vou testar.', created_at: '2026-03-31T10:10:00Z' },
+  // conv-002: Hermes nutrição Ana Beatriz
+  { id: 'msg-009', conversation_id: 'conv-002', sender: 'agent', text: 'Oi Ana! 👋 Tudo bem? Vi que você baixou nosso e-book sobre treino em casa. Gostou do conteúdo?', created_at: '2026-03-30T18:00:00Z' },
+  { id: 'msg-010', conversation_id: 'conv-002', sender: 'lead', text: 'Oi! Gostei sim, mas ainda estou avaliando se vale a pena assinar.', created_at: '2026-03-30T18:02:00Z' },
+  { id: 'msg-011', conversation_id: 'conv-002', sender: 'agent', text: 'Entendo perfeitamente. O que mais te preocupa? Posso te mandar um vídeo de depoimento de uma aluna que começou na mesma situação.', created_at: '2026-03-30T18:03:00Z' },
+  { id: 'msg-012', conversation_id: 'conv-002', sender: 'lead', text: 'Quanto tempo leva pra ver resultado?', created_at: '2026-03-30T18:05:00Z' },
+  { id: 'msg-013', conversation_id: 'conv-002', sender: 'agent', text: 'A maioria dos alunos sente diferença nas primeiras 2 semanas — mais disposição, sono melhor. Resultados visíveis no corpo geralmente aparecem entre 30-45 dias. Te mando o depoimento da Mariana que treina há 3 meses?', created_at: '2026-03-30T18:06:00Z' },
+  // conv-003: Ares vendendo Fernanda Costa
+  { id: 'msg-014', conversation_id: 'conv-003', sender: 'agent', text: 'Fernanda, boa tarde! Vimos que você acessou a página do Plano Premium pela terceira vez. Posso tirar alguma dúvida?', created_at: '2026-03-25T16:00:00Z' },
+  { id: 'msg-015', conversation_id: 'conv-003', sender: 'lead', text: 'Oi! Estava comparando com outra plataforma. O de vocês é mais completo mas mais caro.', created_at: '2026-03-25T16:02:00Z' },
+  { id: 'msg-016', conversation_id: 'conv-003', sender: 'agent', text: 'Qual plataforma está comparando? Posso te ajudar a entender as diferenças reais.', created_at: '2026-03-25T16:03:00Z' },
+  { id: 'msg-017', conversation_id: 'conv-003', sender: 'lead', text: 'A FitApp. O plano deles é R$150/mês.', created_at: '2026-03-25T16:05:00Z' },
+  { id: 'msg-018', conversation_id: 'conv-003', sender: 'agent', text: 'Conheço a FitApp. A grande diferença é que nós oferecemos nutricionista individual + ajuste semanal do treino baseado no seu progresso. Na FitApp é treino genérico. No Plano Premium Anual da TechFit, o custo mensal fica em R$247 mas com acompanhamento que realmente funciona.', created_at: '2026-03-25T16:06:00Z' },
+  { id: 'msg-019', conversation_id: 'conv-003', sender: 'lead', text: 'Faz sentido. Vou fechar o anual de vocês.', created_at: '2026-03-25T16:15:00Z' },
+  { id: 'msg-020', conversation_id: 'conv-003', sender: 'agent', text: 'Excelente escolha, Fernanda! 🎉 Estou gerando o link de pagamento agora. Você vai receber no WhatsApp em instantes.', created_at: '2026-03-25T16:16:00Z' },
 ]
 
 export const mockRoiTotal = {
