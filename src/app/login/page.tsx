@@ -77,7 +77,7 @@ export default function LoginPage() {
       </div>
 
       {/* ─── Right panel: login form — noticeably lighter ─── */}
-      <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-12 lg:px-16">
+      <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 py-12 lg:px-16">
         {/* Lighter background */}
         <div className="absolute inset-0 bg-[#141820]" />
 
