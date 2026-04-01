@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Space_Grotesk, Sora } from 'next/font/google'
-import { ThemeProvider } from 'next-themes'
+import { Providers } from '@/components/providers'
 import './globals.css'
 
 const spaceGrotesk = Space_Grotesk({
@@ -27,10 +27,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className={`${spaceGrotesk.variable} ${sora.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen bg-bg-base text-text-primary antialiased">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <body className="min-h-screen bg-bg-base text-text-primary antialiased" suppressHydrationWarning>
+        <Providers>
           {children}
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )
