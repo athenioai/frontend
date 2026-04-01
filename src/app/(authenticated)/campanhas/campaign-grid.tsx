@@ -25,7 +25,7 @@ function CampaignChart({ data, loading }: { data: CampaignPerformance[]; loading
   const chartData = data.map((d) => ({ ...d, data: d.data.slice(5) }))
 
   return (
-    <div className="px-6 py-6">
+    <div className="px-8 py-8">
       <div className="mb-4 flex items-center justify-between">
         <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
           Performance ao longo do tempo
@@ -184,7 +184,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
                   </div>
 
                   {/* Metrics grid */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-subtle">Gasto</p>
                       <p className="mt-0.5 text-[14px] font-semibold text-text-muted">{formatCurrency(c.gasto_total)}</p>
@@ -211,7 +211,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
 
       {/* ─── Detail Drawer ─── */}
       <Sheet open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <SheetContent className="w-full overflow-y-auto border-border-default bg-bg-base p-0 sm:max-w-lg">
+        <SheetContent className="w-full overflow-y-auto border-border-default bg-bg-base p-0 sm:max-w-xl">
           {selected && (() => {
             const isActive = selected.status === 'ativa'
             const conversionRate = selected.leads_gerados > 0
@@ -221,7 +221,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
             return (
               <div>
                 {/* Hero header with gradient */}
-                <div className="relative overflow-hidden px-6 pt-8 pb-6">
+                <div className="relative overflow-hidden px-8 pt-10 pb-8">
                   {/* Background glow */}
                   <div
                     className="pointer-events-none absolute inset-0"
@@ -267,15 +267,15 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
                 </div>
 
                 {/* Separator */}
-                <div className="mx-6 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
+                <div className="mx-8 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
 
                 {/* Metrics section */}
-                <div className="space-y-5 px-6 py-6">
+                <div className="space-y-5 px-8 py-8">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
                     Métricas da campanha
                   </p>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     {[
                       { label: 'Gasto Total', value: formatCurrency(selected.gasto_total), icon: DollarSign, color: COLORS.gold },
                       { label: 'Custo por Lead', value: formatCurrency(selected.cpl), icon: Target, color: COLORS.gold },
@@ -321,7 +321,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
                 </div>
 
                 {/* Separator */}
-                <div className="mx-6 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
+                <div className="mx-8 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
 
                 {/* Performance chart */}
                 <CampaignChart data={perfData} loading={loading} />
