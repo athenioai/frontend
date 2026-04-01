@@ -1,7 +1,7 @@
 'use client'
 
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { CHART_COLORS } from '@/lib/constants/theme'
+import { CHART_COLORS, COLORS } from '@/lib/constants/theme'
 
 interface LineChartSimpleProps {
   data: Record<string, unknown>[]
@@ -13,25 +13,26 @@ interface LineChartSimpleProps {
 export function LineChartSimple({ data, xKey, yKey, height = 250 }: LineChartSimpleProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ left: 10, right: 10 }}>
+      <LineChart data={data} margin={{ left: 10, right: 10, top: 5, bottom: 5 }}>
         <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" />
         <XAxis
           dataKey={xKey}
-          tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
+          tick={{ fill: COLORS.textSubtle, fontSize: 11 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
+          tick={{ fill: COLORS.textSubtle, fontSize: 11 }}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
           contentStyle={{
-            background: CHART_COLORS.tooltipBg,
-            border: `1px solid ${CHART_COLORS.primary}33`,
-            borderRadius: 8,
-            color: '#fff',
+            background: COLORS.surface1,
+            border: `1px solid ${COLORS.border}`,
+            borderRadius: 10,
+            color: COLORS.textPrimary,
+            fontSize: 12,
           }}
         />
         <Line
@@ -39,8 +40,8 @@ export function LineChartSimple({ data, xKey, yKey, height = 250 }: LineChartSim
           dataKey={yKey}
           stroke={CHART_COLORS.primary}
           strokeWidth={2}
-          dot={{ fill: CHART_COLORS.primary, r: 3 }}
-          activeDot={{ r: 5, fill: CHART_COLORS.secondary }}
+          dot={{ fill: CHART_COLORS.primary, r: 3, stroke: COLORS.surface1, strokeWidth: 2 }}
+          activeDot={{ r: 5, fill: CHART_COLORS.primary, stroke: COLORS.surface1, strokeWidth: 2 }}
         />
       </LineChart>
     </ResponsiveContainer>
