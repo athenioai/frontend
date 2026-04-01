@@ -1,7 +1,7 @@
 'use client'
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { CHART_COLORS } from '@/lib/constants/theme'
+import { CHART_COLORS, COLORS } from '@/lib/constants/theme'
 
 interface BarChartHorizontalProps {
   data: { label: string; value: number }[]
@@ -17,21 +17,26 @@ export function BarChartHorizontal({ data, height = 250 }: BarChartHorizontalPro
           type="category"
           dataKey="label"
           width={140}
-          tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 13 }}
+          tick={{ fill: COLORS.textMuted, fontSize: 12 }}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
           contentStyle={{
             background: CHART_COLORS.tooltipBg,
-            border: `1px solid ${CHART_COLORS.primary}33`,
-            borderRadius: 8,
-            color: '#fff',
+            border: `1px solid ${COLORS.border}`,
+            borderRadius: 10,
+            color: COLORS.textPrimary,
+            fontSize: 12,
           }}
         />
-        <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={24}>
+        <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={22}>
           {data.map((_, i) => (
-            <Cell key={i} fill={i === 0 ? CHART_COLORS.primary : CHART_COLORS.secondary} fillOpacity={1 - i * 0.12} />
+            <Cell
+              key={i}
+              fill={CHART_COLORS.primary}
+              fillOpacity={1 - i * 0.15}
+            />
           ))}
         </Bar>
       </BarChart>
