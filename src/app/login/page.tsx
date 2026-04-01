@@ -81,16 +81,16 @@ export default function LoginPage() {
         {/* Lighter background */}
         <div className="absolute inset-0 bg-[#141820]" />
 
-        {/* Floating ambient orbs — slow drift animation */}
-        <div className="pointer-events-none absolute -right-[15%] top-[10%] h-[400px] w-[400px] rounded-full bg-[#4FD1C5]/[0.04] blur-[120px] animate-[float-slow_20s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute -left-[10%] bottom-[5%] h-[350px] w-[350px] rounded-full bg-[#A78BFA]/[0.04] blur-[100px] animate-[float-slow_25s_ease-in-out_infinite_reverse]" />
-        <div className="pointer-events-none absolute right-[20%] bottom-[20%] h-[200px] w-[200px] rounded-full bg-[#E8C872]/[0.025] blur-[80px] animate-[float-slow_18s_ease-in-out_infinite_2s]" />
+        {/* Floating ambient orbs — visible, slow drift */}
+        <div className="pointer-events-none absolute -right-[10%] top-[5%] h-[450px] w-[450px] rounded-full bg-[#4FD1C5]/[0.12] blur-[100px] animate-[float-slow_20s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute -left-[5%] bottom-[0%] h-[400px] w-[400px] rounded-full bg-[#A78BFA]/[0.10] blur-[90px] animate-[float-slow_25s_ease-in-out_infinite_reverse]" />
+        <div className="pointer-events-none absolute right-[15%] bottom-[15%] h-[250px] w-[250px] rounded-full bg-[#E8C872]/[0.07] blur-[70px] animate-[float-slow_18s_ease-in-out_infinite_2s]" />
 
-        {/* Dot grid — matches left panel style */}
+        {/* Dot grid */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.03]"
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(240,237,232,0.5) 0.5px, transparent 0.5px)',
+            backgroundImage: 'radial-gradient(circle, rgba(240,237,232,0.6) 0.5px, transparent 0.5px)',
             backgroundSize: '40px 40px',
           }}
         />
