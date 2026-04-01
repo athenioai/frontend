@@ -129,14 +129,7 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
 
           {/* Label */}
           {!collapsed && (
-            <span className="relative z-10">{label}</span>
-          )}
-
-          {/* Collapsed tooltip */}
-          {collapsed && (
-            <span className="pointer-events-none absolute left-full ml-3 z-50 rounded-lg border border-border-hover bg-surface-2 px-2.5 py-1.5 text-[11px] font-medium text-text-primary opacity-0 shadow-xl backdrop-blur-sm transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1">
-              {label}
-            </span>
+            <span className="relative z-10 whitespace-nowrap">{label}</span>
           )}
         </Link>
       </motion.div>
@@ -150,8 +143,7 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
       initial={false}
       animate={{ width: collapsed ? 64 : 256 }}
       transition={{ duration: MOTION.duration.normal, ease: MOTION.ease.inOut }}
-      style={{ overflow: 'clip' }}
-      className="fixed left-0 top-0 z-40 hidden h-screen flex-col border-r border-border-default bg-bg-base/80 backdrop-blur-xl lg:flex"
+      className="fixed left-0 top-0 z-40 hidden h-screen flex-col overflow-hidden border-r border-border-default bg-bg-base/80 backdrop-blur-xl lg:flex"
     >
       {/* Subtle inner edge highlight */}
       <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[rgba(255,255,255,0.04)] to-transparent" />
@@ -173,7 +165,7 @@ export function Sidebar({ isAdmin, userName }: SidebarProps) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-2 py-2">
+      <nav className="flex-1 overflow-hidden px-2 py-2">
         <AnimatePresence>
           {!collapsed && (
             <motion.p
