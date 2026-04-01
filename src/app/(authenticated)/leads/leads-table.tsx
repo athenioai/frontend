@@ -9,6 +9,7 @@ import {
   ChevronLeft, ChevronRight, Users as UsersIcon,
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TEMPERATURA_COLORS, COLORS } from '@/lib/constants/theme'
 import type { Lead } from '@/lib/types'
 
@@ -113,56 +114,32 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           />
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {/* Temperature chips */}
-          <div className="flex gap-1.5">
-            {TEMP_OPTIONS.map((t) => {
-              const isActive = tempFilter === t
-              const config = t !== 'all' ? TEMP_CONFIG[t] : null
-              const TempIcon = config?.icon
-              return (
-                <button
-                  key={t}
-                  onClick={() => { setTempFilter(t); setPage(1) }}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-accent/10 text-accent ring-1 ring-accent/20'
-                      : 'bg-[rgba(240,237,232,0.04)] text-text-muted hover:bg-[rgba(240,237,232,0.06)] hover:text-text-primary'
-                  }`}
-                >
-                  {TempIcon && <TempIcon className="h-3 w-3" style={isActive ? {} : { color: config?.color }} />}
-                  {t === 'all' ? 'Todas temp.' : config?.label}
-                </button>
-              )
-            })}
-          </div>
+        <div className="flex flex-wrap gap-3">
+          <Select value={tempFilter} onValueChange={(v: string | null) => { if (v) { setTempFilter(v); setPage(1) } }}>
+            <SelectTrigger className="w-44 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
+              <SelectValue placeholder="Temperatura" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-border-default bg-surface-2">
+              <SelectItem value="all">Todas temperaturas</SelectItem>
+              <SelectItem value="quente">🔥 Quente</SelectItem>
+              <SelectItem value="morno">🌡️ Morno</SelectItem>
+              <SelectItem value="frio">❄️ Frio</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <div className="h-6 w-[1px] bg-border-default self-center mx-1" />
-
-          {/* Estagio chips */}
-          <div className="flex flex-wrap gap-1.5">
-            {ESTAGIO_OPTIONS.map((e) => {
-              const isActive = estagioFilter === e
-              const config = e !== 'all' ? ESTAGIO_CONFIG[e] : null
-              return (
-                <button
-                  key={e}
-                  onClick={() => { setEstagioFilter(e); setPage(1) }}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'ring-1 ring-accent/20'
-                      : 'bg-[rgba(240,237,232,0.04)] text-text-muted hover:bg-[rgba(240,237,232,0.06)] hover:text-text-primary'
-                  }`}
-                  style={isActive && config ? { backgroundColor: `${config.color}15`, color: config.color } : isActive ? { backgroundColor: 'rgba(79,209,197,0.1)', color: COLORS.accent } : {}}
-                >
-                  {config && (
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: config.color }} />
-                  )}
-                  {e === 'all' ? 'Todos estágios' : config?.label}
-                </button>
-              )
-            })}
-          </div>
+          <Select value={estagioFilter} onValueChange={(v: string | null) => { if (v) { setEstagioFilter(v); setPage(1) } }}>
+            <SelectTrigger className="w-44 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
+              <SelectValue placeholder="Estágio" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-border-default bg-surface-2">
+              <SelectItem value="all">Todos estágios</SelectItem>
+              <SelectItem value="captado">Captado</SelectItem>
+              <SelectItem value="qualificado">Qualificado</SelectItem>
+              <SelectItem value="negociacao">Negociação</SelectItem>
+              <SelectItem value="convertido">Convertido</SelectItem>
+              <SelectItem value="perdido">Perdido</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
