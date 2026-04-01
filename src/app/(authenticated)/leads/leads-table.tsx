@@ -116,7 +116,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
         </div>
 
         <Select value={tempFilter} onValueChange={(v: string | null) => { if (v) { setTempFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-40 h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
+          <SelectTrigger className="w-full sm:w-40 !h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
             <SelectValue placeholder="Temperatura" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
@@ -128,7 +128,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           </Select>
 
         <Select value={estagioFilter} onValueChange={(v: string | null) => { if (v) { setEstagioFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-40 h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
+          <SelectTrigger className="w-full sm:w-40 !h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
             <SelectValue placeholder="Estágio" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
