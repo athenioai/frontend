@@ -24,8 +24,8 @@ export function RoiCard({ initial }: { initial: RoiTotal }) {
   const sparkData = roi.historico_7d.map((v, i) => ({ day: i, value: v }))
 
   return (
-    <AnimateIn>
-      <div className="card-hero relative p-8 lg:p-10">
+    <AnimateIn className="h-full">
+      <div className="card-hero relative h-full p-8 lg:p-10">
         <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           {/* Main content */}
           <div className="flex-1">
