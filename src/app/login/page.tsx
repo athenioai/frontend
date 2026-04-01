@@ -104,7 +104,7 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 w-full max-w-[380px]">
-          <div className="mb-8">
+          <div className="mb-8 text-center">
             <h2 className="font-title text-[24px] font-bold text-text-primary">
               Bem-vindo de volta
             </h2>
