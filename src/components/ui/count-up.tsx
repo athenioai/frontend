@@ -57,7 +57,7 @@ export function CountUp({
 
   return (
     <span ref={ref} className={className}>
-      {prefix}{display.toFixed(decimals)}{suffix}
+      {prefix}{new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(display)}{suffix}
     </span>
   )
 }

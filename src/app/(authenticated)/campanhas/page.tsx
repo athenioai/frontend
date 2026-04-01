@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { authService, campaignService } from '@/lib/services'
 import { Megaphone } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils/format'
 import { CampaignGrid } from './campaign-grid'
 
 export default async function CampanhasPage() {
@@ -36,7 +37,7 @@ export default async function CampanhasPage() {
         <div className="card-surface p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">Gasto Total</p>
           <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-gold">
-            R$ {totalGasto.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+            {formatCurrency(totalGasto)}
           </p>
         </div>
         <div className="card-surface p-5">

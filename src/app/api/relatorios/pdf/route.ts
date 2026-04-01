@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import ReactPDF from '@react-pdf/renderer'
-import { Document, Page, Text, View, StyleSheet, Svg, Path, G } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
 import React from 'react'
+import path from 'path'
 
 const styles = StyleSheet.create({
   page: { padding: 40, backgroundColor: '#0E1012', color: '#F0EDE8', fontFamily: 'Helvetica' },
@@ -32,20 +33,7 @@ const styles = StyleSheet.create({
   footerText: { fontSize: 8, color: 'rgba(240,237,232,0.3)' },
 })
 
-function AthenioLogo() {
-  return React.createElement(Svg, { width: 28, height: 26, viewBox: '0 0 105 99' },
-    React.createElement(G, { fillRule: 'evenodd' },
-      React.createElement(Path, {
-        d: 'M102.52 98.71H87.61a4 4 0 0 1-3.41-2l-3.61-6.26a2.57 2.57 0 0 1 2.22-3.86h14.92a3.93 3.93 0 0 1 3.41 2l3.61 6.26a2.58 2.58 0 0 1-2.23 3.86',
-        fill: '#4FD1C5',
-      }),
-      React.createElement(Path, {
-        d: 'M85.77 62L60.89 18.87l.08-.13L50.15 0 1.27 84.64A9.38 9.38 0 0 0 17.5 94l32.57-56.38L64.12 62H49.23a9.37 9.37 0 0 0-9.36 9.37 9.37 9.37 0 0 0 9.36 9.36h47.35z',
-        fill: '#F0EDE8',
-      }),
-    )
-  )
-}
+const logoPath = path.join(process.cwd(), 'public', 'logo', 'athenio-dark.png')
 
 function ReportDocument({ mes, ano }: { mes: string; ano: string }) {
   return React.createElement(Document, null,
@@ -53,9 +41,7 @@ function ReportDocument({ mes, ano }: { mes: string; ano: string }) {
 
       // ─── Logo header ───
       React.createElement(View, { style: styles.logoRow },
-        React.createElement(AthenioLogo, null),
-        React.createElement(Text, { style: styles.logoText }, 'Athenio'),
-        React.createElement(Text, { style: styles.logoTextSuffix }, '.ai'),
+        React.createElement(Image, { src: logoPath, style: { width: 140, height: 35 } }),
       ),
       React.createElement(Text, { style: styles.subtitle }, `Relatório de Resultados — ${mes}/${ano}`),
       React.createElement(View, { style: styles.divider }),
