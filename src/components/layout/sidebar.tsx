@@ -46,10 +46,13 @@ interface SidebarProps {
 
 export function Sidebar({ isAdmin, userName }: SidebarProps) {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return localStorage.getItem('sidebar-collapsed') === 'true'
-  })
+  const [collapsed, setCollapsed] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('sidebar-collapsed') === 'true'
+    if (stored !== collapsed) setCollapsed(stored)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('sidebar-collapsed', String(collapsed))
