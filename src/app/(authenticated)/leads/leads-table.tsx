@@ -270,7 +270,12 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
                   {/* Agente */}
                   <td className="px-4 py-3.5">
                     {lead.agente_responsavel ? (
-                      <span className="text-[12px] font-medium text-text-muted capitalize">{lead.agente_responsavel}</span>
+                      <span className="text-[12px] font-medium text-text-muted capitalize">
+                        {lead.agente_responsavel}
+                        <span className="ml-1 text-text-subtle">
+                          ({lead.agente_responsavel === 'hermes' ? 'Marketing' : lead.agente_responsavel === 'ares' ? 'Comercial' : 'Orquestrador'})
+                        </span>
+                      </span>
                     ) : (
                       <span className="text-[12px] text-text-subtle">—</span>
                     )}
