@@ -1,22 +1,37 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, LogOut, Search, Bell } from 'lucide-react'
+import { motion } from 'motion/react'
+import {
+  Menu, LogOut, Search, Bell,
+  LayoutDashboard, GitBranch, Users, Megaphone,
+  FileText, Settings, Shield,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Sidebar } from './sidebar'
 import { ThemeToggle } from './theme-toggle'
 import { Logo } from '@/components/ui/logo'
+import { MOTION } from '@/lib/motion'
 
-const BREADCRUMB_MAP: Record<string, string> = {
-  '/dashboard': 'Dashboard',
-  '/funil': 'Funil de Vendas',
-  '/leads': 'Leads',
-  '/campanhas': 'Campanhas',
-  '/relatorios': 'Relatórios',
-  '/configuracoes': 'Configurações',
-  '/admin': 'Admin',
+const BREADCRUMB_MAP: Record<string, { label: string; icon: typeof LayoutDashboard }> = {
+  '/dashboard': { label: 'Dashboard', icon: LayoutDashboard },
+  '/funil': { label: 'Funil de Vendas', icon: GitBranch },
+  '/leads': { label: 'Leads', icon: Users },
+  '/campanhas': { label: 'Campanhas', icon: Megaphone },
+  '/relatorios': { label: 'Relatórios', icon: FileText },
+  '/configuracoes': { label: 'Configurações', icon: Settings },
+  '/admin': { label: 'Admin', icon: Shield },
+}
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 }
 
 interface TopbarProps {
@@ -30,8 +45,17 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
   const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  const breadcrumb = BREADCRUMB_MAP[pathname] || pathname.split('/').filter(Boolean).pop() || 'Dashboard'
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true))
+  }, [])
+
+  const breadcrumb = BREADCRUMB_MAP[pathname] || {
+    label: pathname.split('/').filter(Boolean).pop() || 'Dashboard',
+    icon: LayoutDashboard,
+  }
+  const BreadcrumbIcon = breadcrumb.icon
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
@@ -39,8 +63,13 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-default bg-bg-base/70 px-4 backdrop-blur-xl">
-      {/* Mobile menu */}
+    <motion.header
+      initial={mounted ? false : { opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out, delay: 0.1 }}
+      className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-default bg-bg-base/70 px-4 backdrop-blur-xl"
+    >
+      {/* Left: mobile menu + breadcrumb */}
       <div className="flex items-center gap-3">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger className="lg:hidden text-text-muted hover:text-text-primary p-2 transition-colors">
@@ -54,12 +83,15 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
         {/* Logo for mobile */}
         <Logo width={110} height={28} className="lg:hidden" />
 
-        {/* Breadcrumb for desktop */}
-        <span className="hidden text-[13px] font-medium text-text-muted lg:block">{breadcrumb}</span>
+        {/* Breadcrumb for desktop — icon + text */}
+        <div className="hidden items-center gap-2 lg:flex">
+          <BreadcrumbIcon className="h-4 w-4 text-text-subtle" />
+          <span className="text-[13px] font-medium text-text-muted">{breadcrumb.label}</span>
+        </div>
       </div>
 
-      {/* Right actions */}
-      <div className="flex items-center gap-1.5">
+      {/* Right: actions */}
+      <div className="flex items-center gap-2">
         {/* Search trigger */}
         <button
           onClick={onOpenCommandPalette}
@@ -93,10 +125,13 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
         </button>
 
         {/* Separator */}
-        <div className="mx-1 h-5 w-[1px] bg-border-default" />
+        <div className="mx-0.5 h-5 w-[1px] bg-gradient-to-b from-transparent via-border-default to-transparent" />
 
-        {/* User */}
+        {/* User — avatar + name + logout */}
         <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/5 text-[10px] font-bold text-accent ring-1 ring-accent/10">
+            {getInitials(userName)}
+          </div>
           <span className="hidden text-[13px] text-text-muted lg:block">{userName}</span>
           <Button
             variant="ghost"
@@ -108,6 +143,6 @@ export function Topbar({ userName, isAdmin, alertCount, onOpenCommandPalette }: 
           </Button>
         </div>
       </div>
-    </header>
+    </motion.header>
   )
 }
