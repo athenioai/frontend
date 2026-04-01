@@ -102,37 +102,36 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
 
   return (
     <div className="space-y-5">
-      {/* Search + Filter chips */}
-      <div className="space-y-3">
-        <div className="relative">
+      {/* Search + Filters — same row */}
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-subtle" />
           <Input
             placeholder="Buscar por nome ou telefone..."
             value={busca}
             onChange={(e) => { setBusca(e.target.value); setPage(1) }}
-            className="h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] pl-10 text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/30 focus:ring-2 focus:ring-accent/10"
+            className="h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] pl-10 text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/30 focus:ring-2 focus:ring-accent/10"
           />
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <Select value={tempFilter} onValueChange={(v: string | null) => { if (v) { setTempFilter(v); setPage(1) } }}>
-            <SelectTrigger className="w-44 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
-              <SelectValue placeholder="Temperatura" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-border-default bg-surface-2">
-              <SelectItem value="all">Todas temperaturas</SelectItem>
+        <Select value={tempFilter} onValueChange={(v: string | null) => { if (v) { setTempFilter(v); setPage(1) } }}>
+          <SelectTrigger className="w-full sm:w-44 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
+            <SelectValue placeholder="Temperatura" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
+            <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="quente">🔥 Quente</SelectItem>
               <SelectItem value="morno">🌡️ Morno</SelectItem>
               <SelectItem value="frio">❄️ Frio</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select value={estagioFilter} onValueChange={(v: string | null) => { if (v) { setEstagioFilter(v); setPage(1) } }}>
-            <SelectTrigger className="w-44 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
-              <SelectValue placeholder="Estágio" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-border-default bg-surface-2">
-              <SelectItem value="all">Todos estágios</SelectItem>
+        <Select value={estagioFilter} onValueChange={(v: string | null) => { if (v) { setEstagioFilter(v); setPage(1) } }}>
+          <SelectTrigger className="w-full sm:w-44 h-10 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-[13px] text-text-muted transition-all duration-200 hover:border-border-hover">
+            <SelectValue placeholder="Estágio" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
+            <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="captado">Captado</SelectItem>
               <SelectItem value="qualificado">Qualificado</SelectItem>
               <SelectItem value="negociacao">Negociação</SelectItem>
@@ -140,7 +139,6 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
               <SelectItem value="perdido">Perdido</SelectItem>
             </SelectContent>
           </Select>
-        </div>
       </div>
 
       {/* Desktop table */}
