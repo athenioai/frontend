@@ -16,13 +16,13 @@ type Metric = { key: string; label: string; color: string; format: (v: number) =
 const METRICS: Metric[] = [
   { key: 'roas', label: 'ROAS', color: COLORS.accent, format: (v: number) => `${v.toFixed(1)}×` },
   { key: 'leads', label: 'Leads', color: COLORS.violet, format: (v: number) => String(v) },
-  { key: 'vendas', label: 'Vendas', color: COLORS.emerald, format: (v: number) => String(v) },
-  { key: 'gasto', label: 'Gasto', color: COLORS.gold, format: (v: number) => formatCurrency(v) },
+  { key: 'sales', label: 'Vendas', color: COLORS.emerald, format: (v: number) => String(v) },
+  { key: 'spent', label: 'Gasto', color: COLORS.gold, format: (v: number) => formatCurrency(v) },
 ]
 
 function CampaignChart({ data, loading }: { data: CampaignPerformance[]; loading: boolean }) {
   const [activeMetric, setActiveMetric] = useState<Metric>(METRICS[0])
-  const chartData = data.map((d) => ({ ...d, data: d.data.slice(5) }))
+  const chartData = data.map((d) => ({ ...d, date: d.date.slice(5) }))
 
   return (
     <div className="px-8 py-8">
@@ -66,7 +66,7 @@ function CampaignChart({ data, loading }: { data: CampaignPerformance[]; loading
               </defs>
               <CartesianGrid stroke="rgba(240,237,232,0.04)" strokeDasharray="3 3" />
               <XAxis
-                dataKey="data"
+                dataKey="date"
                 tick={{ fill: COLORS.textSubtle, fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
@@ -116,8 +116,8 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
   const [loading, setLoading] = useState(false)
 
   const sorted = [...campaigns].sort((a, b) => {
-    if (a.status === 'ativa' && b.status !== 'ativa') return -1
-    if (a.status !== 'ativa' && b.status === 'ativa') return 1
+    if (a.status === 'active' && b.status !== 'active') return -1
+    if (a.status !== 'active' && b.status === 'active') return 1
     return b.roas - a.roas
   })
 
@@ -138,7 +138,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
         </p>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {sorted.map((c, i) => {
-            const isActive = c.status === 'ativa'
+            const isActive = c.status === 'active'
             return (
               <AnimateIn key={c.id} delay={i * 0.05}>
                 <button
@@ -159,7 +159,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
 
                   {/* Header */}
                   <div className="mb-4 flex items-center justify-between">
-                    <h3 className="font-title text-[15px] font-bold text-text-primary">{c.nome}</h3>
+                    <h3 className="font-title text-[15px] font-bold text-text-primary">{c.name}</h3>
                     <span
                       className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
                       style={{
@@ -187,7 +187,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-subtle">Gasto</p>
-                      <p className="mt-0.5 text-[14px] font-semibold text-text-muted">{formatCurrency(c.gasto_total)}</p>
+                      <p className="mt-0.5 text-[14px] font-semibold text-text-muted">{formatCurrency(c.total_spent)}</p>
                     </div>
                     <div>
                       <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-subtle">CPL</p>
@@ -195,11 +195,11 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
                     </div>
                     <div>
                       <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-subtle">Leads</p>
-                      <p className="mt-0.5 text-[14px] font-semibold text-text-primary">{c.leads_gerados}</p>
+                      <p className="mt-0.5 text-[14px] font-semibold text-text-primary">{c.leads_generated}</p>
                     </div>
                     <div>
                       <p className="text-[10px] font-medium uppercase tracking-[0.1em] text-text-subtle">Vendas</p>
-                      <p className="mt-0.5 text-[14px] font-semibold text-emerald">{c.vendas_confirmadas}</p>
+                      <p className="mt-0.5 text-[14px] font-semibold text-emerald">{c.confirmed_sales}</p>
                     </div>
                   </div>
                 </button>
@@ -213,9 +213,9 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
       <Sheet open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
         <SheetContent className="w-full overflow-y-auto border-border-default bg-bg-base p-0 sm:max-w-xl">
           {selected && (() => {
-            const isActive = selected.status === 'ativa'
-            const conversionRate = selected.leads_gerados > 0
-              ? ((selected.vendas_confirmadas / selected.leads_gerados) * 100).toFixed(1)
+            const isActive = selected.status === 'active'
+            const conversionRate = selected.leads_generated > 0
+              ? ((selected.confirmed_sales / selected.leads_generated) * 100).toFixed(1)
               : '0.0'
 
             return (
@@ -247,7 +247,7 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
                           />
                           {selected.status}
                         </span>
-                        <h2 className="font-title text-[22px] font-bold text-text-primary">{selected.nome}</h2>
+                        <h2 className="font-title text-[22px] font-bold text-text-primary">{selected.name}</h2>
                         <div className="mt-2 flex items-center gap-1.5 text-[12px] text-text-subtle">
                           <Calendar className="h-3 w-3" />
                           Criada em {new Date(selected.created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -277,10 +277,10 @@ export function CampaignGrid({ campaigns }: { campaigns: Campaign[] }) {
 
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { label: 'Gasto Total', value: formatCurrency(selected.gasto_total), icon: DollarSign, color: COLORS.gold },
+                      { label: 'Gasto Total', value: formatCurrency(selected.total_spent), icon: DollarSign, color: COLORS.gold },
                       { label: 'Custo por Lead', value: formatCurrency(selected.cpl), icon: Target, color: COLORS.gold },
-                      { label: 'Leads Gerados', value: String(selected.leads_gerados), icon: Users, color: COLORS.violet },
-                      { label: 'Vendas Confirmadas', value: String(selected.vendas_confirmadas), icon: ShoppingCart, color: COLORS.emerald },
+                      { label: 'Leads Gerados', value: String(selected.leads_generated), icon: Users, color: COLORS.violet },
+                      { label: 'Vendas Confirmadas', value: String(selected.confirmed_sales), icon: ShoppingCart, color: COLORS.emerald },
                     ].map((kpi) => (
                       <div key={kpi.label} className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
                         <div className="mb-2.5 flex items-center gap-2">

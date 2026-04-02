@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "olympius-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,6 +13,8 @@
   "dependencies": {
     "@base-ui/react": "^1.3.0",
     "@react-pdf/renderer": "^4.3.2",
+    "@supabase/ssr": "^0.10.0",
+    "@supabase/supabase-js": "^2.101.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.7.0",

@@ -1,9 +1,9 @@
 export interface AuthUser {
   id: string
   email: string
-  empresa_id: string
+  company_id: string
   role: 'client' | 'admin'
-  nome: string
+  name: string
 }
 
 export interface IAuthService {

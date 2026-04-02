@@ -34,7 +34,7 @@ type TabKey = (typeof TABS)[number]['key']
 
 export function LeadDetailTabs({ lead, conversations, payments, campaign, scoreColor }: LeadDetailTabsProps) {
   const [active, setActive] = useState<TabKey>('geral')
-  const totalPago = payments.filter(p => p.status === 'confirmado').reduce((s, p) => s + p.valor, 0)
+  const totalPago = payments.filter(p => p.status === 'confirmado').reduce((s, p) => s + p.amount, 0)
 
   const counts: Record<TabKey, number | null> = {
     geral: null,
@@ -127,9 +127,9 @@ function TabGeral({
       {/* KPI row */}
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Produto', value: lead.produto_interesse, Icon: Package, color: COLORS.accent },
+          { label: 'Produto', value: lead.product_interest, Icon: Package, color: COLORS.accent },
           { label: 'Conversas', value: String(conversations.length), Icon: MessageSquare, color: COLORS.accent },
-          { label: 'Objeções', value: String(lead.objecoes.length), Icon: AlertTriangle, color: lead.objecoes.length > 0 ? COLORS.danger : COLORS.textSubtle },
+          { label: 'Objeções', value: String(lead.objections.length), Icon: AlertTriangle, color: lead.objections.length > 0 ? COLORS.danger : COLORS.textSubtle },
           { label: 'Total pago', value: formatCurrency(totalPago), Icon: TrendingUp, color: COLORS.emerald },
         ].map((kpi) => (
           <div key={kpi.label} className="card-surface group relative overflow-hidden p-4">
@@ -155,10 +155,10 @@ function TabGeral({
           </p>
           <div className="card-surface divide-y divide-border-default overflow-hidden">
             {[
-              { label: 'Fonte', value: lead.origem_utm.source, Icon: ExternalLink },
-              { label: 'Meio', value: lead.origem_utm.medium, Icon: MapPin },
-              { label: 'Conteúdo', value: lead.origem_utm.content, Icon: Tag },
-              { label: 'Telefone', value: formatPhone(lead.telefone), Icon: Phone },
+              { label: 'Fonte', value: lead.utm_source.source, Icon: ExternalLink },
+              { label: 'Meio', value: lead.utm_source.medium, Icon: MapPin },
+              { label: 'Conteúdo', value: lead.utm_source.content, Icon: Tag },
+              { label: 'Telefone', value: formatPhone(lead.phone), Icon: Phone },
               { label: 'Captado em', value: formatDate(lead.created_at), Icon: Calendar },
               { label: 'Atualizado', value: formatRelativeTime(lead.updated_at), Icon: Clock },
             ].map((item) => (
@@ -185,7 +185,7 @@ function TabGeral({
                     <Megaphone className="h-[18px] w-[18px]" style={{ color: COLORS.gold }} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14px] font-semibold text-text-primary">{campaign.nome}</p>
+                    <p className="truncate text-[14px] font-semibold text-text-primary">{campaign.name}</p>
                     <div className="mt-2 flex gap-4">
                       <div>
                         <p className="text-[10px] font-medium uppercase tracking-wider text-text-subtle">ROAS</p>
@@ -202,13 +202,13 @@ function TabGeral({
             </div>
           )}
 
-          {lead.objecoes.length > 0 && (
+          {lead.objections.length > 0 && (
             <div>
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
                 Objeções Ativas
               </p>
               <div className="flex flex-wrap gap-2">
-                {lead.objecoes.map((obj) => (
+                {lead.objections.map((obj) => (
                   <span
                     key={obj}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-danger/12 bg-danger/5 px-3 py-2 text-[12px] font-medium text-danger"
@@ -246,9 +246,9 @@ function TabConversas({ conversations }: { conversations: ConversationWithMessag
   return (
     <div className="space-y-5">
       {conversations.map((conv) => {
-        const agentColor = conv.agente === 'hermes' ? AGENT_COLORS.hermes : AGENT_COLORS.ares
-        const agentLabel = conv.agente === 'hermes' ? 'Hermes (Marketing)' : 'Ares (Comercial)'
-        const agentInitial = conv.agente === 'hermes' ? 'H' : 'A'
+        const agentColor = conv.agente === 'ares' ? AGENT_COLORS.ares : AGENT_COLORS.kairos
+        const agentLabel = conv.agente === 'ares' ? 'Ares (Marketing)' : 'Kairos (Comercial)'
+        const agentInitial = conv.agente === 'ares' ? 'A' : 'K'
 
         return (
           <div key={conv.id} className="card-surface overflow-hidden">
@@ -306,7 +306,7 @@ function TabConversas({ conversations }: { conversations: ConversationWithMessag
                           <p className="text-[13px] leading-relaxed text-text-primary">{msg.text}</p>
                           <p className={`mt-1.5 text-[10px] ${isAgent ? 'text-text-subtle' : ''}`} style={!isAgent ? { color: `${agentColor}80` } : {}}>
                             {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                            {isAgent && <span className="ml-1 opacity-60">· {conv.agente === 'hermes' ? 'Hermes' : 'Ares'}</span>}
+                            {isAgent && <span className="ml-1 opacity-60">· {conv.agente === 'ares' ? 'Ares' : 'Kairos'}</span>}
                           </p>
                         </div>
                       </div>
@@ -356,7 +356,7 @@ function TabPagamentos({ payments, totalPago }: { payments: PaymentLog[]; totalP
                 </div>
                 <div>
                   <p className="font-title text-[22px] font-bold" style={{ color: statusColor }}>
-                    {formatCurrency(pay.valor)}
+                    {formatCurrency(pay.amount)}
                   </p>
                   <p className="mt-0.5 text-[12px] text-text-subtle">{formatDate(pay.created_at)}</p>
                 </div>

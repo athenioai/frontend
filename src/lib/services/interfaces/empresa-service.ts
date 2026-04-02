@@ -1,6 +1,6 @@
-import type { Empresa } from '@/lib/types'
+import type { Company } from '@/lib/types'
 
-export interface IEmpresaService {
-  getById(empresaId: string): Promise<Empresa | null>
-  updateConfig(empresaId: string, data: Partial<Empresa>): Promise<Empresa>
+export interface ICompanyService {
+  getById(companyId: string): Promise<Company | null>
+  updateConfig(companyId: string, data: Partial<Company>): Promise<Company>
 }

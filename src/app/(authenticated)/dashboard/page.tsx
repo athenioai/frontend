@@ -13,21 +13,21 @@ export default async function DashboardPage() {
   const user = await authService.getSession()
   if (!user) redirect('/login')
 
-  const [roi, health, funil, ltvCac, objecoes, economia, agentes, alerts] = await Promise.all([
-    campaignService.getRoiTotal(user.empresa_id),
-    analyticsService.getHealthScore(user.empresa_id),
-    leadService.getFunilStats(user.empresa_id, '30d'),
-    analyticsService.getLtvCac(user.empresa_id),
-    leadService.getTopObjecoes(user.empresa_id),
-    analyticsService.getEconomiaHoras(user.empresa_id),
-    analyticsService.getAtividadeAgentes(user.empresa_id),
-    alertService.getRecentes(user.empresa_id),
+  const [roi, health, funnel, ltvCac, objections, hoursSaved, agents, alerts] = await Promise.all([
+    campaignService.getTotalRoi(user.company_id),
+    analyticsService.getHealthScore(user.company_id),
+    leadService.getFunnelStats(user.company_id, '30d'),
+    analyticsService.getLtvCac(user.company_id),
+    leadService.getTopObjections(user.company_id),
+    analyticsService.getHoursSaved(user.company_id),
+    analyticsService.getAgentsActivity(user.company_id),
+    alertService.getRecent(user.company_id),
   ])
 
   return (
     <div className="space-y-8">
       {/* Greeting */}
-      <DashboardGreeting userName={user.nome} healthScore={health.score} />
+      <DashboardGreeting userName={user.name} healthScore={health.score} />
 
       {/* Row 1: Hero Zone */}
       <div className="grid gap-6 grid-cols-12">
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
         <div className="grid gap-5 grid-cols-2 lg:grid-cols-4">
           <KpiCard
             label="Revenue"
-            value={roi.retorno}
+            value={roi.revenue}
             prefix="R$ "
             decimals={0}
             icon="DollarSign"
@@ -57,7 +57,7 @@ export default async function DashboardPage() {
           />
           <KpiCard
             label="Conversão"
-            value={health.taxa_conversao * 100}
+            value={health.conversion_rate * 100}
             suffix="%"
             decimals={1}
             icon="TrendingUp"
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
           />
           <KpiCard
             label="Horas Salvas"
-            value={economia.horas}
+            value={hoursSaved.hours}
             suffix="h"
             decimals={0}
             icon="Clock"
@@ -95,10 +95,10 @@ export default async function DashboardPage() {
         </p>
         <div className="grid gap-6 grid-cols-12">
           <div className="col-span-12 lg:col-span-8">
-            <FunilWidget stats={funil} />
+            <FunilWidget stats={funnel} />
           </div>
           <div className="col-span-12 lg:col-span-4">
-            <TopObjecoesWidget data={objecoes} />
+            <TopObjecoesWidget data={objections} />
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@ export default async function DashboardPage() {
         <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
           Agentes IA
         </p>
-        <AtividadeAgentesWidget data={agentes} />
+        <AtividadeAgentesWidget data={agents} />
       </div>
 
       {/* Section: Alertas */}

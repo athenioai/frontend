@@ -18,27 +18,27 @@ import type { Lead } from '@/lib/types'
 const PER_PAGE_OPTIONS = [10, 25, 50]
 
 const TEMP_CONFIG = {
-  quente: { color: TEMPERATURA_COLORS.quente, icon: Flame, label: 'Quente' },
-  morno: { color: TEMPERATURA_COLORS.morno, icon: Thermometer, label: 'Morno' },
-  frio: { color: TEMPERATURA_COLORS.frio, icon: Snowflake, label: 'Frio' },
+  hot: { color: TEMPERATURA_COLORS.hot, icon: Flame, label: 'Quente' },
+  warm: { color: TEMPERATURA_COLORS.warm, icon: Thermometer, label: 'Morno' },
+  cold: { color: TEMPERATURA_COLORS.cold, icon: Snowflake, label: 'Frio' },
 } as const
 
 const ESTAGIO_CONFIG: Record<string, { label: string; color: string }> = {
-  captado: { label: 'Captado', color: COLORS.accent },
-  qualificado: { label: 'Qualificado', color: '#3BBEB2' },
-  negociacao: { label: 'Negociação', color: COLORS.emerald },
-  convertido: { label: 'Convertido', color: COLORS.gold },
-  perdido: { label: 'Perdido', color: COLORS.danger },
+  captured: { label: 'Captado', color: COLORS.accent },
+  qualified: { label: 'Qualificado', color: '#3BBEB2' },
+  negotiation: { label: 'Negociação', color: COLORS.emerald },
+  converted: { label: 'Convertido', color: COLORS.gold },
+  lost: { label: 'Perdido', color: COLORS.danger },
 }
 
 const SENTIMENTO_CONFIG = {
-  positivo: { icon: SmilePlus, color: COLORS.emerald, label: 'Positivo' },
-  neutro: { icon: Meh, color: COLORS.textMuted, label: 'Neutro' },
-  negativo: { icon: Frown, color: COLORS.danger, label: 'Negativo' },
+  positive: { icon: SmilePlus, color: COLORS.emerald, label: 'Positivo' },
+  neutral: { icon: Meh, color: COLORS.textMuted, label: 'Neutro' },
+  negative: { icon: Frown, color: COLORS.danger, label: 'Negativo' },
 } as const
 
-const TEMP_OPTIONS = ['todos', 'quente', 'morno', 'frio'] as const
-const ESTAGIO_OPTIONS = ['todos', 'captado', 'qualificado', 'negociacao', 'convertido', 'perdido'] as const
+const TEMP_OPTIONS = ['todos', 'hot', 'warm', 'cold'] as const
+const ESTAGIO_OPTIONS = ['todos', 'captured', 'qualified', 'negotiation', 'converted', 'lost'] as const
 
 function getInitials(name: string) {
   return name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
@@ -63,13 +63,13 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
 
     if (busca) {
       const q = busca.toLowerCase()
-      result = result.filter((l) => l.nome.toLowerCase().includes(q) || l.telefone.includes(q))
+      result = result.filter((l) => l.name.toLowerCase().includes(q) || l.phone.includes(q))
     }
     if (tempFilter !== 'Todos') {
-      result = result.filter((l) => l.temperatura === tempFilter)
+      result = result.filter((l) => l.temperature === tempFilter)
     }
     if (estagioFilter !== 'Todos') {
-      result = result.filter((l) => l.estagio_funil === estagioFilter)
+      result = result.filter((l) => l.funnel_stage === estagioFilter)
     }
 
     result.sort((a, b) => {
@@ -124,9 +124,9 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           </SelectTrigger>
           <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
             <SelectItem value="Todos">Todos</SelectItem>
-              <SelectItem value="quente">🔥 Quente</SelectItem>
-              <SelectItem value="morno">🌡️ Morno</SelectItem>
-              <SelectItem value="frio">❄️ Frio</SelectItem>
+              <SelectItem value="hot">🔥 Quente</SelectItem>
+              <SelectItem value="warm">🌡️ Morno</SelectItem>
+              <SelectItem value="cold">❄️ Frio</SelectItem>
             </SelectContent>
           </Select>
 
@@ -136,11 +136,11 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           </SelectTrigger>
           <SelectContent className="rounded-xl border-border-default bg-surface-2 p-1">
             <SelectItem value="Todos">Todos</SelectItem>
-              <SelectItem value="captado">Captado</SelectItem>
-              <SelectItem value="qualificado">Qualificado</SelectItem>
-              <SelectItem value="negociacao">Negociação</SelectItem>
-              <SelectItem value="convertido">Convertido</SelectItem>
-              <SelectItem value="perdido">Perdido</SelectItem>
+              <SelectItem value="captured">Captado</SelectItem>
+              <SelectItem value="qualified">Qualificado</SelectItem>
+              <SelectItem value="negotiation">Negociação</SelectItem>
+              <SelectItem value="converted">Convertido</SelectItem>
+              <SelectItem value="lost">Perdido</SelectItem>
             </SelectContent>
           </Select>
       </div>
@@ -151,12 +151,12 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           <thead>
             <tr className="border-b border-border-default bg-[rgba(240,237,232,0.03)]">
               {[
-                { key: 'nome', label: 'Lead' },
-                { key: 'temperatura', label: 'Temperatura' },
-                { key: 'estagio_funil', label: 'Estágio' },
+                { key: 'name', label: 'Lead' },
+                { key: 'temperature', label: 'Temperatura' },
+                { key: 'funnel_stage', label: 'Estágio' },
                 { key: 'score', label: 'Score' },
-                { key: 'sentimento', label: 'Sentimento' },
-                { key: 'agente_responsavel', label: 'Agente' },
+                { key: 'sentiment', label: 'Sentimento' },
+                { key: 'assigned_agent', label: 'Agente' },
               ].map(({ key, label }) => (
                 <th
                   key={key}
@@ -173,10 +173,10 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
           </thead>
           <tbody>
             {paginated.map((lead) => {
-              const temp = TEMP_CONFIG[lead.temperatura]
+              const temp = TEMP_CONFIG[lead.temperature]
               const TempIcon = temp.icon
-              const estagio = ESTAGIO_CONFIG[lead.estagio_funil]
-              const sentimento = SENTIMENTO_CONFIG[lead.sentimento]
+              const estagio = ESTAGIO_CONFIG[lead.funnel_stage]
+              const sentimento = SENTIMENTO_CONFIG[lead.sentiment]
               const SentIcon = sentimento.icon
 
               return (
@@ -185,11 +185,11 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(240,237,232,0.05)] text-[10px] font-bold text-text-subtle">
-                        {getInitials(lead.nome)}
+                        {getInitials(lead.name)}
                       </div>
                       <div>
-                        <p className="font-medium text-text-primary">{lead.nome}</p>
-                        <p className="text-[11px] text-text-subtle">{formatPhone(lead.telefone)} · {lead.produto_interesse}</p>
+                        <p className="font-medium text-text-primary">{lead.name}</p>
+                        <p className="text-[11px] text-text-subtle">{formatPhone(lead.phone)} · {lead.product_interest}</p>
                       </div>
                     </div>
                   </td>
@@ -216,7 +216,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
                         {estagio.label}
                       </span>
                     ) : (
-                      <span className="text-text-subtle">{lead.estagio_funil}</span>
+                      <span className="text-text-subtle">{lead.funnel_stage}</span>
                     )}
                   </td>
 
@@ -248,11 +248,11 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
 
                   {/* Agente */}
                   <td className="px-4 py-3.5">
-                    {lead.agente_responsavel ? (
+                    {lead.assigned_agent ? (
                       <span className="text-[12px] font-medium text-text-muted capitalize">
-                        {lead.agente_responsavel}
+                        {lead.assigned_agent}
                         <span className="ml-1 text-text-subtle">
-                          ({lead.agente_responsavel === 'hermes' ? 'Marketing' : lead.agente_responsavel === 'ares' ? 'Comercial' : 'Orquestrador'})
+                          ({lead.assigned_agent === 'ares' ? 'Marketing' : lead.assigned_agent === 'kairos' ? 'Comercial' : 'Orquestrador'})
                         </span>
                       </span>
                     ) : (
@@ -269,20 +269,20 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
       {/* Mobile cards */}
       <div className="space-y-3 md:hidden">
         {paginated.map((lead) => {
-          const temp = TEMP_CONFIG[lead.temperatura]
+          const temp = TEMP_CONFIG[lead.temperature]
           const TempIcon = temp.icon
-          const estagio = ESTAGIO_CONFIG[lead.estagio_funil]
+          const estagio = ESTAGIO_CONFIG[lead.funnel_stage]
 
           return (
             <div key={lead.id} onClick={() => router.push(`/leads/${lead.id}`)} className="card-surface cursor-pointer p-4 transition-colors hover:border-border-hover">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgba(240,237,232,0.05)] text-[10px] font-bold text-text-subtle">
-                    {getInitials(lead.nome)}
+                    {getInitials(lead.name)}
                   </div>
                   <div>
-                    <p className="text-[14px] font-semibold text-text-primary">{lead.nome}</p>
-                    <p className="text-[11px] text-text-subtle">{formatPhone(lead.telefone)}</p>
+                    <p className="text-[14px] font-semibold text-text-primary">{lead.name}</p>
+                    <p className="text-[11px] text-text-subtle">{formatPhone(lead.phone)}</p>
                   </div>
                 </div>
                 <span
@@ -304,7 +304,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
                   </span>
                 )}
                 <span className="text-[11px] text-text-subtle">Score {lead.score}</span>
-                <span className="text-[11px] text-text-subtle">· {lead.produto_interesse}</span>
+                <span className="text-[11px] text-text-subtle">· {lead.product_interest}</span>
               </div>
             </div>
           )

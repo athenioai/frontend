@@ -121,7 +121,7 @@ function ReportDocument({ mes, ano }: { mes: string; ano: string }) {
         React.createElement(Text, { style: styles.sectionTitle }, 'Economia de Tempo'),
         React.createElement(View, { style: styles.sectionDivider }),
         React.createElement(Text, { style: styles.highlightGold }, '187 horas'),
-        React.createElement(Text, { style: styles.body }, 'de trabalho humano economizadas neste mês pela automação dos agentes Hermes, Ares e Athena.'),
+        React.createElement(Text, { style: styles.body }, 'de trabalho humano economizadas neste mês pela automação dos agentes Ares, Kairos e Athena.'),
       ),
 
       // ─── Footer ───

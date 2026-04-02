@@ -5,9 +5,9 @@ import { formatRelativeTime } from '@/lib/utils/format'
 import { getHealthScoreColor } from '@/lib/constants/theme'
 
 export default async function AdminPage() {
-  const empresas = await adminService.getAllEmpresas()
+  const companies = await adminService.getAllCompanies()
 
-  const sorted = [...empresas].sort((a, b) => a.health_score - b.health_score)
+  const sorted = [...companies].sort((a, b) => a.health_score - b.health_score)
 
   return (
     <div className="space-y-6">
@@ -34,7 +34,7 @@ export default async function AdminPage() {
               >
                 <td className="px-4 py-3">
                   <Link href={`/admin/${e.id}`} className="font-medium text-accent hover:underline">
-                    {e.nome}
+                    {e.name}
                   </Link>
                 </td>
                 <td className="px-4 py-3">
@@ -42,20 +42,20 @@ export default async function AdminPage() {
                     {e.health_score}
                   </span>
                 </td>
-                <td className="px-4 py-3 font-medium">{e.roas_mes.toFixed(1)}x</td>
+                <td className="px-4 py-3 font-medium">{e.monthly_roas.toFixed(1)}x</td>
                 <td className="px-4 py-3 text-text-muted">
-                  {e.ultimo_alerta ? formatRelativeTime(e.ultimo_alerta) : '—'}
+                  {e.last_alert ? formatRelativeTime(e.last_alert) : '—'}
                 </td>
                 <td className="px-4 py-3">
                   <Badge
                     variant="outline"
                     className={
-                      e.assinatura_status === 'ativa'
+                      e.subscription_status === 'active'
                         ? 'border-accent text-accent'
                         : 'border-danger text-danger'
                     }
                   >
-                    {e.assinatura_status}
+                    {e.subscription_status}
                   </Badge>
                 </td>
               </tr>

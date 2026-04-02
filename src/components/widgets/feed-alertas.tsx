@@ -3,15 +3,15 @@
 import { DollarSign, Pause, TrendingUp, Star, User, Shield } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils/format'
 import { AnimateIn } from '@/components/ui/animate-in'
-import type { Alert, AlertTipo } from '@/lib/types'
+import type { Alert, AlertType } from '@/lib/types'
 
-const ALERT_CONFIG: Record<AlertTipo, { icon: typeof DollarSign; color: string; label: string }> = {
-  venda: { icon: DollarSign, color: '#34D399', label: 'Venda' },
-  campanha_pausada: { icon: Pause, color: '#E8C872', label: 'Campanha' },
-  campanha_escalada: { icon: TrendingUp, color: '#4FD1C5', label: 'Escala' },
-  baleia: { icon: Star, color: '#A78BFA', label: 'Baleia' },
-  humano_solicitado: { icon: User, color: '#E8C872', label: 'Humano' },
-  anomalia: { icon: Shield, color: '#F07070', label: 'Alerta' },
+const ALERT_CONFIG: Record<AlertType, { icon: typeof DollarSign; color: string; label: string }> = {
+  sale: { icon: DollarSign, color: '#34D399', label: 'Venda' },
+  campaign_paused: { icon: Pause, color: '#E8C872', label: 'Campanha' },
+  campaign_scaled: { icon: TrendingUp, color: '#4FD1C5', label: 'Escala' },
+  whale: { icon: Star, color: '#A78BFA', label: 'Baleia' },
+  human_requested: { icon: User, color: '#E8C872', label: 'Humano' },
+  anomaly: { icon: Shield, color: '#F07070', label: 'Alerta' },
 }
 
 function groupByTime(alerts: Alert[]): { label: string; items: Alert[] }[] {
@@ -49,7 +49,7 @@ export function FeedAlertasWidget({ alerts }: { alerts: Alert[] }) {
               </p>
               <div className="space-y-1">
                 {group.items.map((alert) => {
-                  const config = ALERT_CONFIG[alert.tipo] ?? ALERT_CONFIG.anomalia
+                  const config = ALERT_CONFIG[alert.tipo] ?? ALERT_CONFIG.anomaly
                   const Icon = config.icon
                   return (
                     <div
@@ -75,7 +75,7 @@ export function FeedAlertasWidget({ alerts }: { alerts: Alert[] }) {
                           </span>
                         </div>
                         <p className="mt-1 text-[13px] leading-snug text-text-muted group-hover:text-text-primary transition-colors">
-                          {alert.descricao}
+                          {alert.description}
                         </p>
                       </div>
                     </div>

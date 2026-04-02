@@ -1,8 +1,8 @@
-import type { HealthScoreData, LtvCacData, AgentesAtividade } from '@/lib/types'
+import type { HealthScoreData, LtvCacData, AgentsActivity } from '@/lib/types'
 
 export interface IAnalyticsService {
-  getHealthScore(empresaId: string): Promise<HealthScoreData>
-  getLtvCac(empresaId: string): Promise<LtvCacData>
-  getEconomiaHoras(empresaId: string): Promise<{ horas: number }>
-  getAtividadeAgentes(empresaId: string): Promise<AgentesAtividade>
+  getHealthScore(companyId: string): Promise<HealthScoreData>
+  getLtvCac(companyId: string): Promise<LtvCacData>
+  getHoursSaved(companyId: string): Promise<{ hours: number }>
+  getAgentsActivity(companyId: string): Promise<AgentsActivity>
 }

@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Settings, Save, CheckCircle, AlertTriangle, Target, Wallet, MessageSquare, Building2 } from 'lucide-react'
 import { COLORS } from '@/lib/constants/theme'
 import { MOTION } from '@/lib/motion'
-import type { Empresa } from '@/lib/types'
+import type { Company } from '@/lib/types'
 
 const INPUT_CLASS = "h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/30 focus:ring-2 focus:ring-accent/10"
 
@@ -38,7 +38,7 @@ function parsePhoneInput(raw: string): string {
 }
 
 export default function ConfiguracoesPage() {
-  const [config, setConfig] = useState<Partial<Empresa>>({})
+  const [config, setConfig] = useState<Partial<Company>>({})
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function ConfiguracoesPage() {
     }
   }, [])
 
-  function handleChange(field: keyof Empresa, value: string | number) {
+  function handleChange(field: keyof Company, value: string | number) {
     setConfig((prev) => ({ ...prev, [field]: value }))
     setSaved(false)
   }
@@ -114,7 +114,7 @@ export default function ConfiguracoesPage() {
       <div className="flex items-center gap-3 rounded-xl border border-gold/20 bg-gold/5 px-4 py-3">
         <AlertTriangle className="h-4 w-4 shrink-0 text-gold" />
         <p className="text-[13px] text-gold/90">
-          Alterações aqui impactam diretamente o comportamento dos agentes Hermes, Ares e Athena.
+          Alterações aqui impactam diretamente o comportamento dos agentes Ares, Kairos e Athena.
         </p>
       </div>
 
@@ -143,8 +143,8 @@ export default function ConfiguracoesPage() {
               <Input
                 type="number"
                 step="0.1"
-                value={config.roas_meta || ''}
-                onChange={(e) => handleChange('roas_meta', parseFloat(e.target.value))}
+                value={config.target_roas || ''}
+                onChange={(e) => handleChange('target_roas', parseFloat(e.target.value))}
                 className={INPUT_CLASS}
                 placeholder="3.0"
               />
@@ -154,8 +154,8 @@ export default function ConfiguracoesPage() {
               <Input
                 type="text"
                 inputMode="decimal"
-                value={formatCurrencyInput(config.cpl_alvo)}
-                onChange={(e) => handleChange('cpl_alvo', parseCurrencyInput(e.target.value))}
+                value={formatCurrencyInput(config.target_cpl)}
+                onChange={(e) => handleChange('target_cpl', parseCurrencyInput(e.target.value))}
                 className={INPUT_CLASS}
                 placeholder="15,00"
               />
@@ -186,8 +186,8 @@ export default function ConfiguracoesPage() {
               <Input
                 type="text"
                 inputMode="decimal"
-                value={formatCurrencyInput(config.orcamento_diario)}
-                onChange={(e) => handleChange('orcamento_diario', parseCurrencyInput(e.target.value))}
+                value={formatCurrencyInput(config.daily_budget)}
+                onChange={(e) => handleChange('daily_budget', parseCurrencyInput(e.target.value))}
                 className={INPUT_CLASS}
                 placeholder="500,00"
               />
@@ -197,8 +197,8 @@ export default function ConfiguracoesPage() {
               <Input
                 type="text"
                 inputMode="decimal"
-                value={formatCurrencyInput(config.teto_cartao)}
-                onChange={(e) => handleChange('teto_cartao', parseCurrencyInput(e.target.value))}
+                value={formatCurrencyInput(config.card_limit)}
+                onChange={(e) => handleChange('card_limit', parseCurrencyInput(e.target.value))}
                 className={INPUT_CLASS}
                 placeholder="10.000,00"
               />
@@ -231,8 +231,8 @@ export default function ConfiguracoesPage() {
             <div className="space-y-1.5">
               <Label className="text-[12px] font-medium text-text-muted">Tom de Voz do Agente</Label>
               <Textarea
-                value={config.tom_de_voz || ''}
-                onChange={(e) => handleChange('tom_de_voz', e.target.value)}
+                value={config.tone_of_voice || ''}
+                onChange={(e) => handleChange('tone_of_voice', e.target.value)}
                 rows={3}
                 className="rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/30 focus:ring-2 focus:ring-accent/10"
                 placeholder="Ex: Profissional e amigável, usando linguagem simples..."
@@ -242,8 +242,8 @@ export default function ConfiguracoesPage() {
               <Label className="text-[12px] font-medium text-text-muted">WhatsApp para Alertas</Label>
               <Input
                 type="tel"
-                value={formatPhoneInput(config.whatsapp_alertas || '')}
-                onChange={(e) => handleChange('whatsapp_alertas', parsePhoneInput(e.target.value))}
+                value={formatPhoneInput(config.whatsapp_alerts || '')}
+                onChange={(e) => handleChange('whatsapp_alerts', parsePhoneInput(e.target.value))}
                 className={INPUT_CLASS}
                 placeholder="(11) 99988-7766"
               />
@@ -272,8 +272,8 @@ export default function ConfiguracoesPage() {
             <div className="space-y-1.5">
               <Label className="text-[12px] font-medium text-text-muted">Nome da Empresa</Label>
               <Input
-                value={config.nome || ''}
-                onChange={(e) => handleChange('nome', e.target.value)}
+                value={config.name || ''}
+                onChange={(e) => handleChange('name', e.target.value)}
                 className={INPUT_CLASS}
                 placeholder="Minha Empresa"
               />

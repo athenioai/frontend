@@ -8,12 +8,12 @@ export default async function CampanhasPage() {
   const user = await authService.getSession()
   if (!user) redirect('/login')
 
-  const campaigns = await campaignService.getAll(user.empresa_id)
+  const campaigns = await campaignService.getAll(user.company_id)
 
-  const ativas = campaigns.filter((c) => c.status === 'ativa').length
-  const totalGasto = campaigns.reduce((sum, c) => sum + c.gasto_total, 0)
+  const active = campaigns.filter((c) => c.status === 'active').length
+  const totalSpent = campaigns.reduce((sum, c) => sum + c.total_spent, 0)
   const avgRoas = campaigns.length > 0 ? campaigns.reduce((sum, c) => sum + c.roas, 0) / campaigns.length : 0
-  const totalLeads = campaigns.reduce((sum, c) => sum + c.leads_gerados, 0)
+  const totalLeads = campaigns.reduce((sum, c) => sum + c.leads_generated, 0)
 
   return (
     <div className="space-y-8">
@@ -32,12 +32,12 @@ export default async function CampanhasPage() {
       <div className="grid gap-5 grid-cols-2 lg:grid-cols-4">
         <div className="card-surface p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">Ativas</p>
-          <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-emerald">{ativas}</p>
+          <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-emerald">{active}</p>
         </div>
         <div className="card-surface p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">Gasto Total</p>
           <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-gold">
-            {formatCurrency(totalGasto)}
+            {formatCurrency(totalSpent)}
           </p>
         </div>
         <div className="card-surface p-5">

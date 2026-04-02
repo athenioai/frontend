@@ -14,14 +14,14 @@ export function RoiCard({ initial }: { initial: RoiTotal }) {
     const interval = setInterval(() => {
       setRoi((prev) => ({
         ...prev,
-        retorno: prev.retorno + Math.random() * 50,
-        roas: (prev.retorno + Math.random() * 50) / prev.investido,
+        revenue: prev.revenue + Math.random() * 50,
+        roas: (prev.revenue + Math.random() * 50) / prev.invested,
       }))
     }, 8000)
     return () => clearInterval(interval)
   }, [])
 
-  const sparkData = roi.historico_7d.map((v, i) => ({ day: i, value: v }))
+  const sparkData = roi.history_7d.map((v, i) => ({ day: i, value: v }))
 
   return (
     <AnimateIn className="h-full">
@@ -78,8 +78,8 @@ export function RoiCard({ initial }: { initial: RoiTotal }) {
                 </LineChart>
               </ResponsiveContainer>
               <div className="flex justify-between px-1 text-[9px] text-text-subtle">
-                <span>{Math.min(...roi.historico_7d).toFixed(1)}×</span>
-                <span>{Math.max(...roi.historico_7d).toFixed(1)}×</span>
+                <span>{Math.min(...roi.history_7d).toFixed(1)}×</span>
+                <span>{Math.max(...roi.history_7d).toFixed(1)}×</span>
               </div>
             </div>
           </div>
@@ -89,17 +89,17 @@ export function RoiCard({ initial }: { initial: RoiTotal }) {
         <div className="relative z-10 mt-8 flex gap-8">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">Investido</p>
-            <p className="mt-1 text-[18px] font-semibold text-text-muted">{formatCurrency(roi.investido)}</p>
+            <p className="mt-1 text-[18px] font-semibold text-text-muted">{formatCurrency(roi.invested)}</p>
           </div>
           <div className="h-10 w-[1px] bg-gradient-to-b from-transparent via-border-default to-transparent" />
           <div>
             <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">Retorno</p>
-            <p className="mt-1 text-[18px] font-semibold text-gold">{formatCurrency(roi.retorno)}</p>
+            <p className="mt-1 text-[18px] font-semibold text-gold">{formatCurrency(roi.revenue)}</p>
           </div>
           <div className="h-10 w-[1px] bg-gradient-to-b from-transparent via-border-default to-transparent" />
           <div>
             <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">Lucro</p>
-            <p className="mt-1 text-[18px] font-semibold text-emerald">{formatCurrency(roi.retorno - roi.investido)}</p>
+            <p className="mt-1 text-[18px] font-semibold text-emerald">{formatCurrency(roi.revenue - roi.invested)}</p>
           </div>
         </div>
       </div>

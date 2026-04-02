@@ -1,8 +1,8 @@
-import type { Lead, LeadFilters, FunilStats, ObjecaoCount } from '@/lib/types'
+import type { Lead, LeadFilters, FunnelStats, ObjectionCount } from '@/lib/types'
 
 export interface ILeadService {
-  getAll(empresaId: string, filters?: LeadFilters): Promise<Lead[]>
+  getAll(companyId: string, filters?: LeadFilters): Promise<Lead[]>
   getById(id: string): Promise<Lead | null>
-  getFunilStats(empresaId: string, periodo: '1d' | '7d' | '30d'): Promise<FunilStats>
-  getTopObjecoes(empresaId: string): Promise<ObjecaoCount[]>
+  getFunnelStats(companyId: string, periodo: '1d' | '7d' | '30d'): Promise<FunnelStats>
+  getTopObjections(companyId: string): Promise<ObjectionCount[]>
 }

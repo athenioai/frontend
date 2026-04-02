@@ -7,9 +7,9 @@ export class MockCampaignService implements ICampaignService {
     return mockCampaigns.filter((c) => c.empresa_id === empresaId)
   }
 
-  async getRoiTotal(_empresaId: string): Promise<RoiTotal> {
-    const { investido, retorno, historico_7d } = mockRoiTotal
-    return { investido, retorno, roas: retorno / investido, historico_7d }
+  async getTotalRoi(_empresaId: string): Promise<RoiTotal> {
+    const { invested, revenue, history_7d } = mockRoiTotal
+    return { invested, revenue, roas: revenue / invested, history_7d }
   }
 
   async getPerformance(_campaignId: string): Promise<CampaignPerformance[]> {

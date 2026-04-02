@@ -4,7 +4,7 @@ import { Megaphone, MessageSquare, Brain, Activity } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils/format'
 import { AnimateIn } from '@/components/ui/animate-in'
 import { AGENT_COLORS } from '@/lib/constants/theme'
-import type { AgentesAtividade } from '@/lib/types'
+import type { AgentsActivity } from '@/lib/types'
 
 function AgentCard({
   nome,
@@ -86,34 +86,34 @@ function AgentCard({
   )
 }
 
-export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
+export function AtividadeAgentesWidget({ data }: { data: AgentsActivity }) {
   return (
     <div className="space-y-5">
-      {/* Hermes + Ares — side by side */}
+      {/* Ares + Kairos — side by side */}
       <div className="grid gap-5 lg:grid-cols-2">
         <AgentCard
-          nome="Hermes"
+          nome="Ares"
           subtitulo="Marketing"
           icon={Megaphone}
-          color={AGENT_COLORS.hermes}
-          highlight={{ label: 'Campanhas ativas', value: data.hermes.campanhas_ativas }}
+          color={AGENT_COLORS.ares}
+          highlight={{ label: 'Campanhas ativas', value: data.ares.active_campaigns }}
           metricas={[
-            { label: 'Leads em nutrição', value: data.hermes.leads_nutricao },
-            { label: 'Último criativo', value: data.hermes.ultimo_criativo },
-            { label: 'Próximo ciclo', value: data.hermes.proximo_ciclo },
+            { label: 'Leads em nutrição', value: data.ares.nurturing_leads },
+            { label: 'Último criativo', value: data.ares.latest_creative },
+            { label: 'Próximo ciclo', value: data.ares.next_cycle },
           ]}
           delay={0}
         />
         <AgentCard
-          nome="Ares"
+          nome="Kairos"
           subtitulo="Comercial"
           icon={MessageSquare}
-          color={AGENT_COLORS.ares}
-          highlight={{ label: 'Vendas hoje', value: data.ares.vendas_hoje }}
+          color={AGENT_COLORS.kairos}
+          highlight={{ label: 'Vendas hoje', value: data.kairos.sales_today }}
           metricas={[
-            { label: 'Conversas ativas', value: data.ares.conversas_ativas },
-            { label: 'Follow-ups agendados', value: data.ares.followups_agendados },
-            { label: 'Aguardando resposta', value: data.ares.leads_aguardando },
+            { label: 'Conversas ativas', value: data.kairos.active_conversations },
+            { label: 'Follow-ups agendados', value: data.kairos.scheduled_followups },
+            { label: 'Aguardando resposta', value: data.kairos.waiting_leads },
           ]}
           delay={0.08}
         />
@@ -160,7 +160,7 @@ export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
                   Última decisão
                 </p>
                 <p className="mt-1.5 text-[14px] font-medium leading-relaxed text-text-primary">
-                  {data.athena.ultima_decisao}
+                  {data.athena.last_decision}
                 </p>
               </div>
             </div>
@@ -168,8 +168,8 @@ export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
             {/* Right: metrics in a row */}
             <div className="flex gap-6 lg:gap-8">
               {[
-                { label: 'Alertas disparados', value: data.athena.alertas_disparados, color: AGENT_COLORS.athena },
-                { label: 'Último ciclo', value: formatRelativeTime(data.athena.ultimo_ciclo), color: undefined },
+                { label: 'Alertas disparados', value: data.athena.alerts_fired, color: AGENT_COLORS.athena },
+                { label: 'Último ciclo', value: formatRelativeTime(data.athena.last_cycle), color: undefined },
               ].map(({ label, value, color }) => (
                 <div key={label} className="text-center lg:text-right">
                   <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">{label}</p>
@@ -188,7 +188,7 @@ export function AtividadeAgentesWidget({ data }: { data: AgentesAtividade }) {
           <div className="mt-4 flex items-center gap-2 rounded-lg bg-[rgba(240,237,232,0.03)] px-3 py-2">
             <Activity className="h-3.5 w-3.5 text-text-subtle" />
             <p className="text-[12px] text-text-muted">
-              {data.athena.ultimo_ciclo_resumo}
+              {data.athena.last_cycle_summary}
             </p>
           </div>
         </div>

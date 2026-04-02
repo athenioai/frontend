@@ -12,14 +12,14 @@ export default async function AuthenticatedLayout({
   if (!user) redirect('/login')
 
   const [health, alerts] = await Promise.all([
-    analyticsService.getHealthScore(user.empresa_id),
-    alertService.getRecentes(user.empresa_id),
+    analyticsService.getHealthScore(user.company_id),
+    alertService.getRecent(user.company_id),
   ])
 
   return (
     <AuthShell
       isAdmin={user.role === 'admin'}
-      userName={user.nome}
+      userName={user.name}
       alertCount={alerts.length}
     >
       <HealthBanner

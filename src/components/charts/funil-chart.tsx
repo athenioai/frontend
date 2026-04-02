@@ -2,29 +2,29 @@
 
 import { formatNumber, formatPercent } from '@/lib/utils/format'
 import { COLORS } from '@/lib/constants/theme'
-import type { FunilStats } from '@/lib/types'
+import type { FunnelStats } from '@/lib/types'
 
 interface FunilChartProps {
-  stats: FunilStats
+  stats: FunnelStats
   compact?: boolean
 }
 
 const STAGES = [
-  { key: 'captados', label: 'Captados', icon: '◉' },
-  { key: 'qualificados', label: 'Qualificados', icon: '◈' },
-  { key: 'negociacao', label: 'Negociação', icon: '◆' },
-  { key: 'convertidos', label: 'Convertidos', icon: '★' },
+  { key: 'captured', label: 'Captados', icon: '◉' },
+  { key: 'qualified', label: 'Qualificados', icon: '◈' },
+  { key: 'negotiation', label: 'Negociação', icon: '◆' },
+  { key: 'converted', label: 'Convertidos', icon: '★' },
 ] as const
 
 const STAGE_COLORS = [COLORS.accent, '#3BBEB2', COLORS.emerald, COLORS.gold]
 
 export function FunilChart({ stats, compact = false }: FunilChartProps) {
-  const max = stats.captados || 1
-  const totalConversion = stats.captados > 0 ? stats.convertidos / stats.captados : 0
-  const taxas = [
-    stats.taxas.captado_qualificado,
-    stats.taxas.qualificado_negociacao,
-    stats.taxas.negociacao_convertido,
+  const max = stats.captured || 1
+  const totalConversion = stats.captured > 0 ? stats.converted / stats.captured : 0
+  const rates = [
+    stats.rates.captured_to_qualified,
+    stats.rates.qualified_to_negotiation,
+    stats.rates.negotiation_to_converted,
   ]
 
   return (
@@ -76,11 +76,11 @@ export function FunilChart({ stats, compact = false }: FunilChartProps) {
               </div>
 
               {/* Conversion connector */}
-              {i < taxas.length && (
+              {i < rates.length && (
                 <div className="ml-2 mt-1 flex items-center gap-1.5">
                   <div className="h-3 w-[1px] bg-border-default" />
                   <span className="text-[10px] font-medium text-text-subtle">
-                    ↓ {formatPercent(taxas[i])}
+                    ↓ {formatPercent(rates[i])}
                   </span>
                 </div>
               )}

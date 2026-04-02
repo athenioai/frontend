@@ -16,28 +16,28 @@ export class MockAnalyticsService implements IAnalyticsService {
       ltv: 8450,
       cac: 185.76,
       historico: [
-        { lead_id: 'lead-004', nome: 'Fernanda Costa', valor_total: 11880, meses_ativo: 4 },
-        { lead_id: 'lead-009', nome: 'Ricardo Tavares', valor_total: 1988, meses_ativo: 4 },
-        { lead_id: 'l-old-1', nome: 'João Paulo', valor_total: 8910, meses_ativo: 6 },
-        { lead_id: 'l-old-2', nome: 'Maria Helena', valor_total: 5940, meses_ativo: 3 },
-        { lead_id: 'l-old-3', nome: 'André Lima', valor_total: 2985, meses_ativo: 2 },
+        { lead_id: 'lead-004', name: 'Fernanda Costa', valor_total: 11880, meses_ativo: 4 },
+        { lead_id: 'lead-009', name: 'Ricardo Tavares', valor_total: 1988, meses_ativo: 4 },
+        { lead_id: 'l-old-1', name: 'João Paulo', valor_total: 8910, meses_ativo: 6 },
+        { lead_id: 'l-old-2', name: 'Maria Helena', valor_total: 5940, meses_ativo: 3 },
+        { lead_id: 'l-old-3', name: 'André Lima', valor_total: 2985, meses_ativo: 2 },
       ],
     }
   }
 
-  async getEconomiaHoras(_empresaId: string): Promise<{ horas: number }> {
+  async getHoursSaved(_empresaId: string): Promise<{ horas: number }> {
     return { horas: 187 }
   }
 
-  async getAtividadeAgentes(_empresaId: string): Promise<AgentesAtividade> {
+  async getAgentsActivity(_empresaId: string): Promise<AgentesAtividade> {
     return {
-      hermes: {
+      ares: {
         campanhas_ativas: 2,
         leads_nutricao: 45,
         ultimo_criativo: 'Carrossel "5 motivos para começar agora"',
         proximo_ciclo: '15min',
       },
-      ares: {
+      kairos: {
         conversas_ativas: 3,
         vendas_hoje: 1,
         followups_agendados: 8,

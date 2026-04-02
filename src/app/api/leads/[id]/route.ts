@@ -17,8 +17,8 @@ export async function GET(
     .filter((p) => p.lead_id === id)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-  const campaign = lead.origem_utm.campaign
-    ? mockCampaigns.find((c) => c.id === lead.origem_utm.campaign) ?? null
+  const campaign = lead.utm_source.campaign
+    ? mockCampaigns.find((c) => c.id === lead.utm_source.campaign) ?? null
     : null
 
   return NextResponse.json({

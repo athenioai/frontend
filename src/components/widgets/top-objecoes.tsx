@@ -2,11 +2,11 @@
 
 import { AnimateIn } from '@/components/ui/animate-in'
 import { COLORS } from '@/lib/constants/theme'
-import type { ObjecaoCount } from '@/lib/types'
+import type { ObjectionCount } from '@/lib/types'
 
 const RANK_COLORS = [COLORS.accent, COLORS.emerald, COLORS.gold, COLORS.violet, COLORS.textMuted]
 
-export function TopObjecoesWidget({ data }: { data: ObjecaoCount[] }) {
+export function TopObjecoesWidget({ data }: { data: ObjectionCount[] }) {
   const max = data[0]?.count || 1
 
   return (
@@ -22,7 +22,7 @@ export function TopObjecoesWidget({ data }: { data: ObjecaoCount[] }) {
             const color = RANK_COLORS[i] || COLORS.textMuted
 
             return (
-              <div key={item.objecao} className="group">
+              <div key={item.objection} className="group">
                 <div className="mb-1.5 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <span
@@ -32,7 +32,7 @@ export function TopObjecoesWidget({ data }: { data: ObjecaoCount[] }) {
                       {i + 1}
                     </span>
                     <span className="text-[13px] text-text-muted group-hover:text-text-primary transition-colors">
-                      {item.objecao}
+                      {item.objection}
                     </span>
                   </div>
                   <span className="text-[13px] font-semibold text-text-primary">{item.count}</span>

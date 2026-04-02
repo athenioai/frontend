@@ -9,20 +9,20 @@ export class MockLeadService implements ILeadService {
     if (filters?.busca) {
       const q = filters.busca.toLowerCase()
       leads = leads.filter(
-        (l) => l.nome.toLowerCase().includes(q) || l.telefone.includes(q)
+        (l) => l.name.toLowerCase().includes(q) || l.phone.includes(q)
       )
     }
-    if (filters?.temperatura?.length) {
-      leads = leads.filter((l) => filters.temperatura!.includes(l.temperatura))
+    if (filters?.temperature?.length) {
+      leads = leads.filter((l) => filters.temperature!.includes(l.temperature))
     }
-    if (filters?.estagio_funil?.length) {
-      leads = leads.filter((l) => filters.estagio_funil!.includes(l.estagio_funil))
+    if (filters?.funnel_stage?.length) {
+      leads = leads.filter((l) => filters.funnel_stage!.includes(l.funnel_stage))
     }
-    if (filters?.agente_responsavel?.length) {
-      leads = leads.filter((l) => filters.agente_responsavel!.includes(l.agente_responsavel))
+    if (filters?.assigned_agent?.length) {
+      leads = leads.filter((l) => filters.assigned_agent!.includes(l.assigned_agent))
     }
-    if (filters?.sentimento?.length) {
-      leads = leads.filter((l) => filters.sentimento!.includes(l.sentimento))
+    if (filters?.sentiment?.length) {
+      leads = leads.filter((l) => filters.sentiment!.includes(l.sentiment))
     }
     if (filters?.sort_by) {
       const key = filters.sort_by
@@ -46,7 +46,7 @@ export class MockLeadService implements ILeadService {
     return mockLeads.find((l) => l.id === id) ?? null
   }
 
-  async getFunilStats(_empresaId: string, _periodo: '1d' | '7d' | '30d'): Promise<FunilStats> {
+  async getFunnelStats(_empresaId: string, _periodo: '1d' | '7d' | '30d'): Promise<FunilStats> {
     return {
       captados: 330,
       qualificados: 145,
@@ -60,7 +60,7 @@ export class MockLeadService implements ILeadService {
     }
   }
 
-  async getTopObjecoes(_empresaId: string): Promise<ObjecaoCount[]> {
+  async getTopObjections(_empresaId: string): Promise<ObjecaoCount[]> {
     return [
       { objecao: 'Preço', count: 42 },
       { objecao: 'Prazo', count: 28 },

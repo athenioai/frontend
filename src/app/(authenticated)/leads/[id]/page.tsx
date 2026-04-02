@@ -10,23 +10,23 @@ import {
 import { LeadDetailTabs } from '@/components/leads/lead-detail-tabs'
 
 const TEMP_CONFIG = {
-  quente: { color: TEMPERATURA_COLORS.quente, Icon: Flame, label: 'Quente' },
-  morno: { color: TEMPERATURA_COLORS.morno, Icon: Thermometer, label: 'Morno' },
-  frio: { color: TEMPERATURA_COLORS.frio, Icon: Snowflake, label: 'Frio' },
+  hot: { color: TEMPERATURA_COLORS.hot, Icon: Flame, label: 'Quente' },
+  warm: { color: TEMPERATURA_COLORS.warm, Icon: Thermometer, label: 'Morno' },
+  cold: { color: TEMPERATURA_COLORS.cold, Icon: Snowflake, label: 'Frio' },
 } as const
 
 const ESTAGIO_CONFIG: Record<string, { label: string; color: string }> = {
-  captado: { label: 'Captado', color: COLORS.accent },
-  qualificado: { label: 'Qualificado', color: '#3BBEB2' },
-  negociacao: { label: 'Negociação', color: COLORS.emerald },
-  convertido: { label: 'Convertido', color: COLORS.gold },
-  perdido: { label: 'Perdido', color: COLORS.danger },
+  captured: { label: 'Captado', color: COLORS.accent },
+  qualified: { label: 'Qualificado', color: '#3BBEB2' },
+  negotiation: { label: 'Negociação', color: COLORS.emerald },
+  converted: { label: 'Convertido', color: COLORS.gold },
+  lost: { label: 'Perdido', color: COLORS.danger },
 }
 
 const SENT_CONFIG = {
-  positivo: { Icon: SmilePlus, color: COLORS.emerald, label: 'Positivo' },
-  neutro: { Icon: Meh, color: COLORS.textMuted, label: 'Neutro' },
-  negativo: { Icon: Frown, color: COLORS.danger, label: 'Negativo' },
+  positive: { Icon: SmilePlus, color: COLORS.emerald, label: 'Positivo' },
+  neutral: { Icon: Meh, color: COLORS.textMuted, label: 'Neutro' },
+  negative: { Icon: Frown, color: COLORS.danger, label: 'Negativo' },
 } as const
 
 export default async function LeadDetailPage({
@@ -53,16 +53,16 @@ export default async function LeadDetailPage({
     .filter((p) => p.lead_id === id)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-  const campaign = lead.origem_utm.campaign
-    ? mockCampaigns.find((c) => c.id === lead.origem_utm.campaign) ?? null
+  const campaign = lead.utm_source.campaign
+    ? mockCampaigns.find((c) => c.id === lead.utm_source.campaign) ?? null
     : null
 
-  const temp = TEMP_CONFIG[lead.temperatura]
-  const estagio = ESTAGIO_CONFIG[lead.estagio_funil]
-  const sent = SENT_CONFIG[lead.sentimento]
+  const temp = TEMP_CONFIG[lead.temperature]
+  const estagio = ESTAGIO_CONFIG[lead.funnel_stage]
+  const sent = SENT_CONFIG[lead.sentiment]
   const scoreColor = lead.score >= 70 ? COLORS.emerald : lead.score >= 40 ? COLORS.gold : COLORS.danger
-  const initials = lead.nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
-  const totalPago = payments.filter(p => p.status === 'confirmado').reduce((s, p) => s + p.valor, 0)
+  const initials = lead.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+  const totalPago = payments.filter(p => p.status === 'confirmado').reduce((s, p) => s + p.amount, 0)
 
   return (
     <div className="space-y-6">
@@ -108,10 +108,10 @@ export default async function LeadDetailPage({
             </div>
 
             <div className="sm:hidden">
-              <h1 className="font-title text-[20px] font-bold text-text-primary">{lead.nome}</h1>
+              <h1 className="font-title text-[20px] font-bold text-text-primary">{lead.name}</h1>
               <div className="mt-1 flex items-center gap-1.5 text-[12px] text-text-muted">
                 <Phone className="h-3 w-3" />
-                {formatPhone(lead.telefone)}
+                {formatPhone(lead.phone)}
               </div>
             </div>
           </div>
@@ -119,10 +119,10 @@ export default async function LeadDetailPage({
           {/* Info section */}
           <div className="flex-1 space-y-3">
             <div className="hidden sm:block">
-              <h1 className="font-title text-[22px] font-bold text-text-primary">{lead.nome}</h1>
+              <h1 className="font-title text-[22px] font-bold text-text-primary">{lead.name}</h1>
               <div className="mt-1 flex items-center gap-1.5 text-[13px] text-text-muted">
                 <Phone className="h-3 w-3" />
-                {formatPhone(lead.telefone)}
+                {formatPhone(lead.phone)}
               </div>
             </div>
 
@@ -149,10 +149,10 @@ export default async function LeadDetailPage({
                 <sent.Icon className="h-3 w-3" />
                 {sent.label}
               </span>
-              {lead.agente_responsavel && (
+              {lead.assigned_agent && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(240,237,232,0.04)] px-2.5 py-1 text-[11px] font-medium text-text-muted">
-                  <User className="h-3 w-3" style={{ color: AGENT_COLORS[lead.agente_responsavel] }} />
-                  {lead.agente_responsavel === 'hermes' ? 'Hermes' : lead.agente_responsavel === 'ares' ? 'Ares' : 'Athena'}
+                  <User className="h-3 w-3" style={{ color: AGENT_COLORS[lead.assigned_agent] }} />
+                  {lead.assigned_agent === 'ares' ? 'Ares' : lead.assigned_agent === 'kairos' ? 'Kairos' : 'Athena'}
                 </span>
               )}
             </div>

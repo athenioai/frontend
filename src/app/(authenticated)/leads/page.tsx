@@ -7,13 +7,13 @@ export default async function LeadsPage() {
   const user = await authService.getSession()
   if (!user) redirect('/login')
 
-  const leads = await leadService.getAll(user.empresa_id)
+  const leads = await leadService.getAll(user.company_id)
 
   const kpis = {
     total: leads.length,
-    quente: leads.filter((l) => l.temperatura === 'quente').length,
-    morno: leads.filter((l) => l.temperatura === 'morno').length,
-    frio: leads.filter((l) => l.temperatura === 'frio').length,
+    hot: leads.filter((l) => l.temperature === 'hot').length,
+    warm: leads.filter((l) => l.temperature === 'warm').length,
+    cold: leads.filter((l) => l.temperature === 'cold').length,
   }
 
   return (
@@ -37,15 +37,15 @@ export default async function LeadsPage() {
         </div>
         <div className="card-surface p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">Quentes</p>
-          <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-[#F07070]">{kpis.quente}</p>
+          <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-[#F07070]">{kpis.hot}</p>
         </div>
         <div className="card-surface p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">Mornos</p>
-          <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-[#E8C872]">{kpis.morno}</p>
+          <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-[#E8C872]">{kpis.warm}</p>
         </div>
         <div className="card-surface p-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">Frios</p>
-          <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-[#60A5FA]">{kpis.frio}</p>
+          <p className="mt-1.5 font-title text-[24px] font-bold leading-none text-[#60A5FA]">{kpis.cold}</p>
         </div>
       </div>
 

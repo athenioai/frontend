@@ -9,26 +9,26 @@ import { formatPercent, formatNumber } from '@/lib/utils/format'
 import { getFunilData } from './actions'
 import { COLORS, TEMPERATURA_COLORS } from '@/lib/constants/theme'
 import { MOTION } from '@/lib/motion'
-import type { FunilStats, Lead } from '@/lib/types'
+import type { FunnelStats, Lead } from '@/lib/types'
 
 type Periodo = '1d' | '7d' | '30d'
 
 const STAGE_CONFIG = [
-  { key: 'captados', label: 'Leads Captados', filter: 'captado', color: COLORS.accent, icon: '◉' },
-  { key: 'qualificados', label: 'Qualificados', filter: 'qualificado', color: '#3BBEB2', icon: '◈' },
-  { key: 'negociacao', label: 'Em Negociação', filter: 'negociacao', color: COLORS.emerald, icon: '◆' },
-  { key: 'convertidos', label: 'Convertidos', filter: 'convertido', color: COLORS.gold, icon: '★' },
+  { key: 'captured', label: 'Leads Captados', filter: 'captured', color: COLORS.accent, icon: '◉' },
+  { key: 'qualified', label: 'Qualificados', filter: 'qualified', color: '#3BBEB2', icon: '◈' },
+  { key: 'negotiation', label: 'Em Negociação', filter: 'negotiation', color: COLORS.emerald, icon: '◆' },
+  { key: 'converted', label: 'Convertidos', filter: 'converted', color: COLORS.gold, icon: '★' },
 ] as const
 
 const TEMP_CONFIG = {
-  quente: { color: TEMPERATURA_COLORS.quente, icon: Flame, label: 'Quente' },
-  morno: { color: TEMPERATURA_COLORS.morno, icon: Thermometer, label: 'Morno' },
-  frio: { color: TEMPERATURA_COLORS.frio, icon: Snowflake, label: 'Frio' },
+  hot: { color: TEMPERATURA_COLORS.hot, icon: Flame, label: 'Quente' },
+  warm: { color: TEMPERATURA_COLORS.warm, icon: Thermometer, label: 'Morno' },
+  cold: { color: TEMPERATURA_COLORS.cold, icon: Snowflake, label: 'Frio' },
 } as const
 
 export default function FunilPage() {
   const [periodo, setPeriodo] = useState<Periodo>('30d')
-  const [stats, setStats] = useState<FunilStats | null>(null)
+  const [stats, setStats] = useState<FunnelStats | null>(null)
   const [leads, setLeads] = useState<Lead[]>([])
   const [expandido, setExpandido] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -50,12 +50,12 @@ export default function FunilPage() {
     </div>
   )
 
-  const totalConversion = stats.captados > 0 ? stats.convertidos / stats.captados : 0
-  const totalLost = stats.captados - stats.convertidos
-  const taxas = [
-    stats.taxas.captado_qualificado,
-    stats.taxas.qualificado_negociacao,
-    stats.taxas.negociacao_convertido,
+  const totalConversion = stats.captured > 0 ? stats.converted / stats.captured : 0
+  const totalLost = stats.captured - stats.converted
+  const rates = [
+    stats.rates.captured_to_qualified,
+    stats.rates.qualified_to_negotiation,
+    stats.rates.negotiation_to_converted,
   ]
 
   return (
@@ -102,9 +102,9 @@ export default function FunilPage() {
       {/* KPI Strip */}
       <div className={`grid gap-5 grid-cols-2 lg:grid-cols-4 transition-opacity duration-200 ${isPending ? 'opacity-50' : ''}`}>
         {[
-          { label: 'Total de Leads', value: formatNumber(stats.captados), color: COLORS.accent },
+          { label: 'Total de Leads', value: formatNumber(stats.captured), color: COLORS.accent },
           { label: 'Taxa Conversão', value: formatPercent(totalConversion), color: COLORS.emerald },
-          { label: 'Convertidos', value: formatNumber(stats.convertidos), color: COLORS.gold },
+          { label: 'Convertidos', value: formatNumber(stats.converted), color: COLORS.gold },
           { label: 'Perdidos', value: formatNumber(totalLost), color: COLORS.danger },
         ].map((kpi) => (
           <div key={kpi.label} className="card-surface p-5">
@@ -123,7 +123,7 @@ export default function FunilPage() {
         </p>
         <div className={`space-y-3 transition-opacity duration-200 ${isPending ? 'opacity-50 pointer-events-none' : ''}`}>
           {STAGE_CONFIG.map((stage, i) => {
-            const stageLeads = leads.filter((l) => l.estagio_funil === stage.filter)
+            const stageLeads = leads.filter((l) => l.funnel_stage === stage.filter)
             const isOpen = expandido === stage.key
             const count = stats[stage.key]
 
@@ -145,9 +145,9 @@ export default function FunilPage() {
                         <p className="text-[14px] font-semibold text-text-primary">{stage.label}</p>
                         <p className="text-[11px] text-text-subtle">
                           {count} {count === 1 ? 'lead' : 'leads'}
-                          {i < taxas.length && (
+                          {i < rates.length && (
                             <span className="ml-2">
-                              <span className="text-emerald">{formatPercent(taxas[i])} avança</span>
+                              <span className="text-emerald">{formatPercent(rates[i])} avança</span>
                             </span>
                           )}
                         </p>
@@ -176,7 +176,7 @@ export default function FunilPage() {
                     >
                       <div className="ml-4 mt-1 space-y-1 border-l border-border-default pl-4 pt-2 pb-1">
                         {stageLeads.slice(0, LEADS_PREVIEW).map((lead) => {
-                          const temp = TEMP_CONFIG[lead.temperatura]
+                          const temp = TEMP_CONFIG[lead.temperature]
                           const TempIcon = temp.icon
                           return (
                             <div
@@ -185,11 +185,11 @@ export default function FunilPage() {
                             >
                               <div className="flex items-center gap-3">
                                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[rgba(240,237,232,0.04)] text-[10px] font-bold text-text-subtle">
-                                  {lead.nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+                                  {lead.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
                                 </div>
                                 <div>
-                                  <p className="text-[13px] font-medium text-text-primary">{lead.nome}</p>
-                                  <p className="text-[11px] text-text-subtle">{lead.produto_interesse}</p>
+                                  <p className="text-[13px] font-medium text-text-primary">{lead.name}</p>
+                                  <p className="text-[11px] text-text-subtle">{lead.product_interest}</p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">

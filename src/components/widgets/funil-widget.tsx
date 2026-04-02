@@ -1,8 +1,8 @@
 import { FunilChart } from '@/components/charts/funil-chart'
 import { AnimateIn } from '@/components/ui/animate-in'
-import type { FunilStats } from '@/lib/types'
+import type { FunnelStats } from '@/lib/types'
 
-export function FunilWidget({ stats }: { stats: FunilStats }) {
+export function FunilWidget({ stats }: { stats: FunnelStats }) {
   return (
     <AnimateIn>
       <div className="card-surface h-full p-6">

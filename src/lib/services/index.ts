@@ -1,18 +1,15 @@
-import { MockLeadService } from './mock/lead-service'
-import { MockCampaignService } from './mock/campaign-service'
-import { MockAnalyticsService } from './mock/analytics-service'
-import { MockAlertService } from './mock/alert-service'
-import { MockEmpresaService } from './mock/empresa-service'
-import { MockAdminService } from './mock/admin-service'
-import { MockAuthService } from './mock/auth-service'
+import { SupabaseLeadService } from './supabase/lead-service'
+import { SupabaseCampaignService } from './supabase/campaign-service'
+import { SupabaseAnalyticsService } from './supabase/analytics-service'
+import { SupabaseAlertService } from './supabase/alert-service'
+import { SupabaseEmpresaService } from './supabase/company-service'
+import { SupabaseAdminService } from './supabase/admin-service'
+import { SupabaseAuthService } from './supabase/auth-service'
 
-// Swap these imports to Supabase implementations when ready.
-// Components that consume these services won't need any changes.
-
-export const leadService = new MockLeadService()
-export const campaignService = new MockCampaignService()
-export const analyticsService = new MockAnalyticsService()
-export const alertService = new MockAlertService()
-export const empresaService = new MockEmpresaService()
-export const adminService = new MockAdminService()
-export const authService = new MockAuthService()
+export const leadService = new SupabaseLeadService()
+export const campaignService = new SupabaseCampaignService()
+export const analyticsService = new SupabaseAnalyticsService()
+export const alertService = new SupabaseAlertService()
+export const companyService = new SupabaseEmpresaService()
+export const adminService = new SupabaseAdminService()
+export const authService = new SupabaseAuthService()

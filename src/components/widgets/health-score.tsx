@@ -11,23 +11,23 @@ export function HealthScoreWidget({ data }: { data: HealthScoreData }) {
     {
       icon: Activity,
       label: 'Mensagens',
-      value: `${data.volume_mensagens.atual}`,
-      change: `${data.volume_mensagens.variacao_percent > 0 ? '+' : ''}${data.volume_mensagens.variacao_percent.toFixed(1)}%`,
-      positive: data.volume_mensagens.variacao_percent > 0,
+      value: `${data.message_volume.current}`,
+      change: `${data.message_volume.change_percent > 0 ? '+' : ''}${data.message_volume.change_percent.toFixed(1)}%`,
+      positive: data.message_volume.change_percent > 0,
     },
     {
       icon: TrendingUp,
       label: 'Conversão',
-      value: formatPercent(data.taxa_conversao),
+      value: formatPercent(data.conversion_rate),
       change: null,
       positive: true,
     },
     {
       icon: Zap,
       label: 'Latência',
-      value: `${(data.latencia_media_ms / 1000).toFixed(1)}s`,
+      value: `${(data.avg_latency_ms / 1000).toFixed(1)}s`,
       change: null,
-      positive: data.latencia_media_ms < 2000,
+      positive: data.avg_latency_ms < 2000,
     },
   ]
 

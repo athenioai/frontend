@@ -1,5 +1,5 @@
-import type { EmpresaResumo } from '@/lib/types'
+import type { CompanySummary } from '@/lib/types'
 
 export interface IAdminService {
-  getAllEmpresas(): Promise<EmpresaResumo[]>
+  getAllCompanies(): Promise<CompanySummary[]>
 }

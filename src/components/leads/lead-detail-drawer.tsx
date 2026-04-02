@@ -13,23 +13,23 @@ import type { Lead, Conversation, Campaign } from '@/lib/types'
 import type { PaymentLog } from '@/lib/types'
 
 const TEMP_CONFIG = {
-  quente: { color: TEMPERATURA_COLORS.quente, icon: Flame, label: 'Quente' },
-  morno: { color: TEMPERATURA_COLORS.morno, icon: Thermometer, label: 'Morno' },
-  frio: { color: TEMPERATURA_COLORS.frio, icon: Snowflake, label: 'Frio' },
+  hot: { color: TEMPERATURA_COLORS.hot, icon: Flame, label: 'Quente' },
+  warm: { color: TEMPERATURA_COLORS.warm, icon: Thermometer, label: 'Morno' },
+  cold: { color: TEMPERATURA_COLORS.cold, icon: Snowflake, label: 'Frio' },
 } as const
 
 const ESTAGIO_CONFIG: Record<string, { label: string; color: string }> = {
-  captado: { label: 'Captado', color: COLORS.accent },
-  qualificado: { label: 'Qualificado', color: '#3BBEB2' },
-  negociacao: { label: 'Negociação', color: COLORS.emerald },
-  convertido: { label: 'Convertido', color: COLORS.gold },
-  perdido: { label: 'Perdido', color: COLORS.danger },
+  captured: { label: 'Captado', color: COLORS.accent },
+  qualified: { label: 'Qualificado', color: '#3BBEB2' },
+  negotiation: { label: 'Negociação', color: COLORS.emerald },
+  converted: { label: 'Convertido', color: COLORS.gold },
+  lost: { label: 'Perdido', color: COLORS.danger },
 }
 
 const SENT_CONFIG = {
-  positivo: { icon: SmilePlus, color: COLORS.emerald, label: 'Positivo' },
-  neutro: { icon: Meh, color: COLORS.textMuted, label: 'Neutro' },
-  negativo: { icon: Frown, color: COLORS.danger, label: 'Negativo' },
+  positive: { icon: SmilePlus, color: COLORS.emerald, label: 'Positivo' },
+  neutral: { icon: Meh, color: COLORS.textMuted, label: 'Neutro' },
+  negative: { icon: Frown, color: COLORS.danger, label: 'Negativo' },
 } as const
 
 interface LeadDetailDrawerProps {
@@ -58,9 +58,9 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
   }, [leadId])
 
   const lead = data?.lead
-  const temp = lead ? TEMP_CONFIG[lead.temperatura] : null
-  const estagio = lead ? ESTAGIO_CONFIG[lead.estagio_funil] : null
-  const sent = lead ? SENT_CONFIG[lead.sentimento] : null
+  const temp = lead ? TEMP_CONFIG[lead.temperature] : null
+  const estagio = lead ? ESTAGIO_CONFIG[lead.funnel_stage] : null
+  const sent = lead ? SENT_CONFIG[lead.sentiment] : null
 
   return (
     <Sheet open={!!leadId} onOpenChange={(open) => !open && onClose()}>
@@ -81,11 +81,11 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                 {/* Avatar + name */}
                 <div className="flex items-start gap-4">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 text-[18px] font-bold text-accent ring-1 ring-accent/10">
-                    {lead.nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+                    {lead.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
                   </div>
                   <div className="flex-1">
-                    <h2 className="font-title text-[22px] font-bold text-text-primary">{lead.nome}</h2>
-                    <p className="mt-1 text-[13px] text-text-muted">{formatPhone(lead.telefone)}</p>
+                    <h2 className="font-title text-[22px] font-bold text-text-primary">{lead.name}</h2>
+                    <p className="mt-1 text-[13px] text-text-muted">{formatPhone(lead.phone)}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {/* Temperatura badge */}
                       <span
@@ -137,7 +137,7 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                   <div className="h-8 w-[1px] bg-gradient-to-b from-transparent via-border-default to-transparent" />
                   <div>
                     <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-subtle">Produto</p>
-                    <p className="text-[13px] font-semibold text-text-primary">{lead.produto_interesse}</p>
+                    <p className="text-[13px] font-semibold text-text-primary">{lead.product_interest}</p>
                   </div>
                 </div>
               </div>
@@ -154,9 +154,9 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: 'Fonte', value: lead.origem_utm.source, icon: ExternalLink },
-                    { label: 'Meio', value: lead.origem_utm.medium, icon: MapPin },
-                    { label: 'Conteúdo', value: lead.origem_utm.content, icon: Tag },
+                    { label: 'Fonte', value: lead.utm_source.source, icon: ExternalLink },
+                    { label: 'Meio', value: lead.utm_source.medium, icon: MapPin },
+                    { label: 'Conteúdo', value: lead.utm_source.content, icon: Tag },
                     { label: 'Desde', value: formatDate(lead.created_at), icon: Calendar },
                   ].map((item) => (
                     <div key={item.label} className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-3">
@@ -187,7 +187,7 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                           <Megaphone className="h-4 w-4" style={{ color: COLORS.gold }} />
                         </div>
                         <div>
-                          <p className="text-[14px] font-semibold text-text-primary">{data.campaign.nome}</p>
+                          <p className="text-[14px] font-semibold text-text-primary">{data.campaign.name}</p>
                           <p className="text-[11px] text-text-subtle">
                             ROAS {data.campaign.roas.toFixed(1)}× · CPL {formatCurrency(data.campaign.cpl)}
                           </p>
@@ -196,8 +196,8 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                       <span
                         className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
                         style={{
-                          backgroundColor: data.campaign.status === 'ativa' ? `${COLORS.emerald}12` : `${COLORS.textSubtle}15`,
-                          color: data.campaign.status === 'ativa' ? COLORS.emerald : COLORS.textSubtle,
+                          backgroundColor: data.campaign.status === 'active' ? `${COLORS.emerald}12` : `${COLORS.textSubtle}15`,
+                          color: data.campaign.status === 'active' ? COLORS.emerald : COLORS.textSubtle,
                         }}
                       >
                         {data.campaign.status}
@@ -208,13 +208,13 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
               )}
 
               {/* Objeções */}
-              {lead.objecoes.length > 0 && (
+              {lead.objections.length > 0 && (
                 <div>
                   <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
                     Objeções Ativas
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {lead.objecoes.map((obj) => (
+                    {lead.objections.map((obj) => (
                       <span
                         key={obj}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-danger/20 bg-danger/5 px-3 py-1.5 text-[12px] font-medium text-danger"
@@ -237,8 +237,8 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                 {data.conversations.length > 0 ? (
                   <div className="space-y-3">
                     {data.conversations.map((conv) => {
-                      const agentColor = conv.agente === 'hermes' ? AGENT_COLORS.hermes : AGENT_COLORS.ares
-                      const agentLabel = conv.agente === 'hermes' ? 'Hermes (Marketing)' : 'Ares (Comercial)'
+                      const agentColor = conv.agente === 'ares' ? AGENT_COLORS.ares : AGENT_COLORS.kairos
+                      const agentLabel = conv.agente === 'ares' ? 'Ares (Marketing)' : 'Kairos (Comercial)'
                       return (
                         <div key={conv.id} className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
                           <div className="flex items-center justify-between">
@@ -292,7 +292,7 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                               <CreditCard className="h-3.5 w-3.5" style={{ color: COLORS.emerald }} />
                             </div>
                             <div>
-                              <p className="font-title text-[16px] font-bold text-emerald">{formatCurrency(pay.valor)}</p>
+                              <p className="font-title text-[16px] font-bold text-emerald">{formatCurrency(pay.amount)}</p>
                               <p className="text-[11px] text-text-subtle">{formatRelativeTime(pay.created_at)}</p>
                             </div>
                           </div>
@@ -318,7 +318,7 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
               </div>
 
               {/* Agente responsável */}
-              {lead.agente_responsavel && (
+              {lead.assigned_agent && (
                 <div>
                   <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
                     Agente Responsável
@@ -326,14 +326,14 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                   <div className="flex items-center gap-3 rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
                     <div
                       className="flex h-9 w-9 items-center justify-center rounded-lg"
-                      style={{ backgroundColor: `${AGENT_COLORS[lead.agente_responsavel]}12` }}
+                      style={{ backgroundColor: `${AGENT_COLORS[lead.assigned_agent]}12` }}
                     >
-                      <User className="h-4 w-4" style={{ color: AGENT_COLORS[lead.agente_responsavel] }} />
+                      <User className="h-4 w-4" style={{ color: AGENT_COLORS[lead.assigned_agent] }} />
                     </div>
                     <div>
-                      <p className="text-[14px] font-semibold capitalize text-text-primary">{lead.agente_responsavel}</p>
+                      <p className="text-[14px] font-semibold capitalize text-text-primary">{lead.assigned_agent}</p>
                       <p className="text-[11px] text-text-subtle">
-                        {lead.agente_responsavel === 'hermes' ? 'Agente de Marketing' : lead.agente_responsavel === 'ares' ? 'Agente Comercial' : 'Orquestrador'}
+                        {lead.assigned_agent === 'ares' ? 'Agente de Marketing' : lead.assigned_agent === 'kairos' ? 'Agente Comercial' : 'Orquestrador'}
                       </p>
                     </div>
                   </div>
