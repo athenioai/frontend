@@ -1,15 +1,15 @@
-export type AlertTipo =
-  | 'venda'
-  | 'campanha_pausada'
-  | 'campanha_escalada'
-  | 'baleia'
-  | 'humano_solicitado'
-  | 'anomalia'
+export type AlertType =
+  | 'sale'
+  | 'campaign_paused'
+  | 'campaign_scaled'
+  | 'whale'
+  | 'human_requested'
+  | 'anomaly'
 
 export interface Alert {
   id: string
-  empresa_id: string
-  tipo: AlertTipo
-  descricao: string
+  company_id: string
+  type: AlertType
+  description: string
   created_at: string
 }

@@ -237,8 +237,8 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                 {data.conversations.length > 0 ? (
                   <div className="space-y-3">
                     {data.conversations.map((conv) => {
-                      const agentColor = conv.agente === 'ares' ? AGENT_COLORS.ares : AGENT_COLORS.kairos
-                      const agentLabel = conv.agente === 'ares' ? 'Ares (Marketing)' : 'Kairos (Comercial)'
+                      const agentColor = conv.agent === 'hermes' ? AGENT_COLORS.hermes : AGENT_COLORS.ares
+                      const agentLabel = conv.agent === 'hermes' ? 'Hermes (Marketing)' : 'Ares (Comercial)'
                       return (
                         <div key={conv.id} className="rounded-xl border border-border-default bg-[rgba(240,237,232,0.02)] p-4">
                           <div className="flex items-center justify-between">
@@ -258,11 +258,11 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                           <div className="mt-3 flex gap-4">
                             <div className="flex items-center gap-1.5 text-[12px] text-text-muted">
                               <MessageSquare className="h-3 w-3 text-text-subtle" />
-                              {conv.mensagens_count} mensagens
+                              {conv.messages_count} mensagens
                             </div>
                             <div className="flex items-center gap-1.5 text-[12px] text-text-muted">
                               <Clock className="h-3 w-3 text-text-subtle" />
-                              {conv.duracao_minutos} min
+                              {conv.duration_minutes} min
                             </div>
                           </div>
                         </div>
@@ -299,8 +299,8 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                           <span
                             className="rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
                             style={{
-                              backgroundColor: pay.status === 'confirmado' ? `${COLORS.emerald}12` : `${COLORS.gold}12`,
-                              color: pay.status === 'confirmado' ? COLORS.emerald : COLORS.gold,
+                              backgroundColor: pay.status === 'confirmed' ? `${COLORS.emerald}12` : `${COLORS.gold}12`,
+                              color: pay.status === 'confirmed' ? COLORS.emerald : COLORS.gold,
                             }}
                           >
                             {pay.status}
@@ -333,7 +333,7 @@ export function LeadDetailDrawer({ leadId, onClose }: LeadDetailDrawerProps) {
                     <div>
                       <p className="text-[14px] font-semibold capitalize text-text-primary">{lead.assigned_agent}</p>
                       <p className="text-[11px] text-text-subtle">
-                        {lead.assigned_agent === 'ares' ? 'Agente de Marketing' : lead.assigned_agent === 'kairos' ? 'Agente Comercial' : 'Orquestrador'}
+                        {lead.assigned_agent === 'hermes' ? 'Agente de Marketing' : lead.assigned_agent === 'ares' ? 'Agente Comercial' : 'Orquestrador'}
                       </p>
                     </div>
                   </div>

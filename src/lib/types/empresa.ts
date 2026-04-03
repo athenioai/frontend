@@ -1,21 +1,21 @@
-export interface Empresa {
+export interface Company {
   id: string
-  nome: string
-  roas_meta: number
-  cpl_alvo: number
-  orcamento_diario: number
-  teto_cartao: number
-  tom_de_voz: string
-  whatsapp_alertas: string
+  name: string
+  target_roas: number
+  target_cpl: number
+  daily_budget: number
+  card_limit: number
+  tone_of_voice: string
+  whatsapp_alerts: string
   health_score: number
-  assinatura_status: 'ativa' | 'cancelada' | 'inadimplente'
+  subscription_status: 'active' | 'cancelled' | 'delinquent'
 }
 
-export interface EmpresaResumo {
+export interface CompanySummary {
   id: string
-  nome: string
+  name: string
   health_score: number
-  roas_mes: number
-  ultimo_alerta: string | null
-  assinatura_status: Empresa['assinatura_status']
+  monthly_roas: number
+  last_alert: string | null
+  subscription_status: Company['subscription_status']
 }

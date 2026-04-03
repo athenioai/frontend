@@ -1,16 +1,16 @@
 export interface Lead {
   id: string
-  empresa_id: string
-  nome: string
-  telefone: string
-  temperatura: 'frio' | 'morno' | 'quente'
+  company_id: string
+  name: string
+  phone: string
+  temperature: 'cold' | 'warm' | 'hot'
   score: number
-  estagio_funil: 'captado' | 'qualificado' | 'negociacao' | 'convertido' | 'perdido'
-  agente_responsavel: 'hermes' | 'ares' | null
-  sentimento: 'positivo' | 'neutro' | 'negativo'
-  produto_interesse: string
-  objecoes: string[]
-  origem_utm: UtmParams
+  funnel_stage: 'captured' | 'qualified' | 'negotiation' | 'converted' | 'lost'
+  assigned_agent: 'hermes' | 'ares' | null
+  sentiment: 'positive' | 'neutral' | 'negative'
+  product_interest: string
+  objections: string[]
+  utm_source: UtmParams
   created_at: string
   updated_at: string
 }
@@ -23,30 +23,30 @@ export interface UtmParams {
 }
 
 export interface LeadFilters {
-  temperatura?: Lead['temperatura'][]
-  estagio_funil?: Lead['estagio_funil'][]
-  agente_responsavel?: Lead['agente_responsavel'][]
-  sentimento?: Lead['sentimento'][]
-  busca?: string
+  temperature?: Lead['temperature'][]
+  funnel_stage?: Lead['funnel_stage'][]
+  assigned_agent?: Lead['assigned_agent'][]
+  sentiment?: Lead['sentiment'][]
+  search?: string
   page?: number
   per_page?: number
   sort_by?: keyof Lead
   sort_order?: 'asc' | 'desc'
 }
 
-export interface FunilStats {
-  captados: number
-  qualificados: number
-  negociacao: number
-  convertidos: number
-  taxas: {
-    captado_qualificado: number
-    qualificado_negociacao: number
-    negociacao_convertido: number
+export interface FunnelStats {
+  captured: number
+  qualified: number
+  negotiation: number
+  converted: number
+  rates: {
+    captured_to_qualified: number
+    qualified_to_negotiation: number
+    negotiation_to_converted: number
   }
 }
 
-export interface ObjecaoCount {
-  objecao: string
+export interface ObjectionCount {
+  objection: string
   count: number
 }

@@ -34,7 +34,7 @@ type TabKey = (typeof TABS)[number]['key']
 
 export function LeadDetailTabs({ lead, conversations, payments, campaign, scoreColor }: LeadDetailTabsProps) {
   const [active, setActive] = useState<TabKey>('geral')
-  const totalPago = payments.filter(p => p.status === 'confirmado').reduce((s, p) => s + p.amount, 0)
+  const totalPago = payments.filter(p => p.status === 'confirmed').reduce((s, p) => s + p.amount, 0)
 
   const counts: Record<TabKey, number | null> = {
     geral: null,
@@ -246,9 +246,9 @@ function TabConversas({ conversations }: { conversations: ConversationWithMessag
   return (
     <div className="space-y-5">
       {conversations.map((conv) => {
-        const agentColor = conv.agente === 'ares' ? AGENT_COLORS.ares : AGENT_COLORS.kairos
-        const agentLabel = conv.agente === 'ares' ? 'Ares (Marketing)' : 'Kairos (Comercial)'
-        const agentInitial = conv.agente === 'ares' ? 'A' : 'K'
+        const agentColor = conv.agent === 'hermes' ? AGENT_COLORS.hermes : AGENT_COLORS.ares
+        const agentLabel = conv.agent === 'hermes' ? 'Hermes (Marketing)' : 'Ares (Comercial)'
+        const agentInitial = conv.agent === 'hermes' ? 'H' : 'A'
 
         return (
           <div key={conv.id} className="card-surface overflow-hidden">
@@ -269,11 +269,11 @@ function TabConversas({ conversations }: { conversations: ConversationWithMessag
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5 rounded-lg bg-[rgba(240,237,232,0.04)] px-2.5 py-1.5">
                     <MessageSquare className="h-3 w-3 text-text-subtle" />
-                    <span className="text-[12px] font-semibold tabular-nums text-text-muted">{conv.mensagens_count}</span>
+                    <span className="text-[12px] font-semibold tabular-nums text-text-muted">{conv.messages_count}</span>
                   </div>
                   <div className="flex items-center gap-1.5 rounded-lg bg-[rgba(240,237,232,0.04)] px-2.5 py-1.5">
                     <Clock className="h-3 w-3 text-text-subtle" />
-                    <span className="text-[12px] font-semibold tabular-nums text-text-muted">{conv.duracao_minutos}m</span>
+                    <span className="text-[12px] font-semibold tabular-nums text-text-muted">{conv.duration_minutes}m</span>
                   </div>
                 </div>
               </div>
@@ -306,7 +306,7 @@ function TabConversas({ conversations }: { conversations: ConversationWithMessag
                           <p className="text-[13px] leading-relaxed text-text-primary">{msg.text}</p>
                           <p className={`mt-1.5 text-[10px] ${isAgent ? 'text-text-subtle' : ''}`} style={!isAgent ? { color: `${agentColor}80` } : {}}>
                             {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                            {isAgent && <span className="ml-1 opacity-60">· {conv.agente === 'ares' ? 'Ares' : 'Kairos'}</span>}
+                            {isAgent && <span className="ml-1 opacity-60">· {conv.agent === 'hermes' ? 'Hermes' : 'Ares'}</span>}
                           </p>
                         </div>
                       </div>
@@ -342,7 +342,7 @@ function TabPagamentos({ payments, totalPago }: { payments: PaymentLog[]; totalP
   return (
     <div className="space-y-3">
       {payments.map((pay) => {
-        const isConfirmed = pay.status === 'confirmado'
+        const isConfirmed = pay.status === 'confirmed'
         const statusColor = isConfirmed ? COLORS.emerald : COLORS.gold
         const StatusIcon = isConfirmed ? CheckCircle2 : Hourglass
 

@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Settings, Save, CheckCircle, AlertTriangle, Target, Wallet, MessageSquare, Building2 } from 'lucide-react'
+import { Settings, Save, CheckCircle, AlertTriangle, Target, Wallet, MessageSquare, Building2, Loader2 } from 'lucide-react'
 import { COLORS } from '@/lib/constants/theme'
-import { MOTION } from '@/lib/motion'
 import type { Company } from '@/lib/types'
 
 const INPUT_CLASS = "h-11 rounded-xl border-border-default bg-[rgba(240,237,232,0.04)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/30 focus:ring-2 focus:ring-accent/10"
@@ -40,16 +39,28 @@ function parsePhoneInput(raw: string): string {
 export default function ConfiguracoesPage() {
   const [config, setConfig] = useState<Partial<Company>>({})
   const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem('athenio-config')
-    if (stored) {
-      setConfig(JSON.parse(stored))
-    } else {
-      import('@/lib/services/mock/data').then(({ mockEmpresas }) => {
-        setConfig(mockEmpresas[0])
-      })
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/config')
+        if (res.ok) {
+          const data = await res.json()
+          setConfig(data)
+        }
+      } catch {
+        // Fallback: load from localStorage if API fails
+        const stored = localStorage.getItem('athenio-config')
+        if (stored) {
+          setConfig(JSON.parse(stored))
+        }
+      } finally {
+        setLoading(false)
+      }
     }
+    loadConfig()
   }, [])
 
   function handleChange(field: keyof Company, value: string | number) {
@@ -57,10 +68,38 @@ export default function ConfiguracoesPage() {
     setSaved(false)
   }
 
-  function handleSave() {
-    localStorage.setItem('athenio-config', JSON.stringify(config))
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  const handleSave = useCallback(async () => {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      })
+      if (res.ok) {
+        const updated = await res.json()
+        setConfig(updated)
+      }
+      // Also save to localStorage as fallback
+      localStorage.setItem('athenio-config', JSON.stringify(config))
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch {
+      // Fallback to localStorage
+      localStorage.setItem('athenio-config', JSON.stringify(config))
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } finally {
+      setSaving(false)
+    }
+  }, [config])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-accent" />
+      </div>
+    )
   }
 
   return (
@@ -80,10 +119,22 @@ export default function ConfiguracoesPage() {
         {/* Save button — top right */}
         <Button
           onClick={handleSave}
+          disabled={saving}
           className="h-11 rounded-xl bg-accent px-6 text-[14px] font-semibold text-primary-foreground shadow-[0_0_24px_rgba(79,209,197,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(79,209,197,0.18)] active:scale-[0.99]"
         >
           <AnimatePresence mode="wait">
-            {saved ? (
+            {saving ? (
+              <motion.span
+                key="saving"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex items-center gap-2"
+              >
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Salvando...
+              </motion.span>
+            ) : saved ? (
               <motion.span
                 key="saved"
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -114,7 +165,7 @@ export default function ConfiguracoesPage() {
       <div className="flex items-center gap-3 rounded-xl border border-gold/20 bg-gold/5 px-4 py-3">
         <AlertTriangle className="h-4 w-4 shrink-0 text-gold" />
         <p className="text-[13px] text-gold/90">
-          Alterações aqui impactam diretamente o comportamento dos agentes Ares, Kairos e Athena.
+          Alterações aqui impactam diretamente o comportamento dos agentes Hermes, Ares e Athena.
         </p>
       </div>
 

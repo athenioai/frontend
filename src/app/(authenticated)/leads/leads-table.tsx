@@ -252,7 +252,7 @@ export function LeadsTable({ leads: initialLeads }: { leads: Lead[] }) {
                       <span className="text-[12px] font-medium text-text-muted capitalize">
                         {lead.assigned_agent}
                         <span className="ml-1 text-text-subtle">
-                          ({lead.assigned_agent === 'ares' ? 'Marketing' : lead.assigned_agent === 'kairos' ? 'Comercial' : 'Orquestrador'})
+                          ({lead.assigned_agent === 'hermes' ? 'Marketing' : lead.assigned_agent === 'ares' ? 'Comercial' : 'Orquestrador'})
                         </span>
                       </span>
                     ) : (

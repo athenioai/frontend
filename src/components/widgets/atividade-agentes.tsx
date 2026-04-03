@@ -89,31 +89,31 @@ function AgentCard({
 export function AtividadeAgentesWidget({ data }: { data: AgentsActivity }) {
   return (
     <div className="space-y-5">
-      {/* Ares + Kairos — side by side */}
+      {/* Hermes + Ares — side by side */}
       <div className="grid gap-5 lg:grid-cols-2">
         <AgentCard
-          nome="Ares"
+          nome="Hermes"
           subtitulo="Marketing"
           icon={Megaphone}
-          color={AGENT_COLORS.ares}
-          highlight={{ label: 'Campanhas ativas', value: data.ares.active_campaigns }}
+          color={AGENT_COLORS.hermes}
+          highlight={{ label: 'Campanhas ativas', value: data.hermes.active_campaigns }}
           metricas={[
-            { label: 'Leads em nutrição', value: data.ares.nurturing_leads },
-            { label: 'Último criativo', value: data.ares.latest_creative },
-            { label: 'Próximo ciclo', value: data.ares.next_cycle },
+            { label: 'Leads em nutrição', value: data.hermes.nurturing_leads },
+            { label: 'Último criativo', value: data.hermes.latest_creative },
+            { label: 'Próximo ciclo', value: data.hermes.next_cycle },
           ]}
           delay={0}
         />
         <AgentCard
-          nome="Kairos"
+          nome="Ares"
           subtitulo="Comercial"
           icon={MessageSquare}
-          color={AGENT_COLORS.kairos}
-          highlight={{ label: 'Vendas hoje', value: data.kairos.sales_today }}
+          color={AGENT_COLORS.ares}
+          highlight={{ label: 'Vendas hoje', value: data.ares.sales_today }}
           metricas={[
-            { label: 'Conversas ativas', value: data.kairos.active_conversations },
-            { label: 'Follow-ups agendados', value: data.kairos.scheduled_followups },
-            { label: 'Aguardando resposta', value: data.kairos.waiting_leads },
+            { label: 'Conversas ativas', value: data.ares.active_conversations },
+            { label: 'Follow-ups agendados', value: data.ares.scheduled_followups },
+            { label: 'Aguardando resposta', value: data.ares.waiting_leads },
           ]}
           delay={0.08}
         />

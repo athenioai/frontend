@@ -34,9 +34,9 @@ export const AGENT_COLORS = {
 } as const
 
 export const TEMPERATURA_COLORS = {
-  frio: '#60A5FA',
-  morno: '#E8C872',
-  quente: '#F07070',
+  cold: '#60A5FA',
+  warm: '#E8C872',
+  hot: '#F07070',
 } as const
 
 export const HEALTH_SCORE_COLORS = {

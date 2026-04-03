@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useActionState } from 'react'
 import { motion } from 'motion/react'
 import { loginAction } from './actions'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,6 +27,18 @@ const fadeUp = {
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [resetSent, setResetSent] = useState(false)
+
+  const handleForgotPassword = async () => {
+    if (!email) return
+    const supabase = createClient()
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login`,
+    })
+    setResetSent(true)
+    setTimeout(() => setResetSent(false), 5000)
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -176,6 +189,8 @@ export default function LoginPage() {
                 placeholder="seu@empresa.com"
                 required
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
               />
             </motion.div>
@@ -189,8 +204,19 @@ export default function LoginPage() {
                 <Label htmlFor="password" className="text-[13px] font-medium text-text-muted">
                   Senha
                 </Label>
-                <button type="button" className="text-[12px] text-accent/70 transition-colors hover:text-accent">
-                  Esqueceu?
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-[12px] text-accent/70 transition-colors hover:text-accent"
+                >
+                  {resetSent ? (
+                    <span className="flex items-center gap-1 text-emerald">
+                      <CheckCircle className="h-3 w-3" />
+                      E-mail enviado
+                    </span>
+                  ) : (
+                    'Esqueceu?'
+                  )}
                 </button>
               </div>
               <div className="relative">

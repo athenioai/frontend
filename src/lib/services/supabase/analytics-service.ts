@@ -233,7 +233,7 @@ export class SupabaseAnalyticsService implements IAnalyticsService {
     const now = new Date()
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
 
-    // Ares data: active campaigns, leads in nurturing
+    // Hermes (marketing) data: active campaigns, leads in nurturing
     const supabaseMarketing = await createClient()
     const { data: activeCampaigns } = await supabaseMarketing
       .schema('marketing')
@@ -259,8 +259,8 @@ export class SupabaseAnalyticsService implements IAnalyticsService {
       .order('created_at', { ascending: false })
       .limit(1)
 
-    // Kairos data: active conversations today, sales today
-    const { data: kairosLeads } = await supabase
+    // Ares (sales) data: active conversations today, sales today
+    const { data: salesLeads } = await supabase
       .from('leads')
       .select('id, funnel_stage, updated_at')
       .eq('tenant_id', companyId)
@@ -299,7 +299,7 @@ export class SupabaseAnalyticsService implements IAnalyticsService {
     )
 
     return {
-      ares: {
+      hermes: {
         active_campaigns: activeCampaigns?.length ?? 0,
         nurturing_leads: nurturingCount ?? 0,
         latest_creative: latestAd?.[0]?.copy_text
@@ -307,10 +307,10 @@ export class SupabaseAnalyticsService implements IAnalyticsService {
           : 'No recent creative',
         next_cycle: '15min',
       },
-      kairos: {
-        active_conversations: kairosLeads?.length ?? 0,
+      ares: {
+        active_conversations: salesLeads?.length ?? 0,
         sales_today: salesToday?.length ?? 0,
-        scheduled_followups: kairosLeads?.filter(
+        scheduled_followups: salesLeads?.filter(
           (l) => ['negotiating', 'closing'].includes(l.funnel_stage)
         ).length ?? 0,
         waiting_leads: waitingLeads?.length ?? 0,

@@ -24,8 +24,8 @@ export default async function AuthenticatedLayout({
     >
       <HealthBanner
         score={health.score}
-        motivo={health.motivo_alerta}
-        acao={health.acao_recomendada}
+        alertReason={health.alert_reason}
+        recommendedAction={health.recommended_action}
       />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {children}

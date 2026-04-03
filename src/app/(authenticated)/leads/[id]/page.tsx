@@ -62,7 +62,7 @@ export default async function LeadDetailPage({
   const sent = SENT_CONFIG[lead.sentiment]
   const scoreColor = lead.score >= 70 ? COLORS.emerald : lead.score >= 40 ? COLORS.gold : COLORS.danger
   const initials = lead.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
-  const totalPago = payments.filter(p => p.status === 'confirmado').reduce((s, p) => s + p.amount, 0)
+  const totalPago = payments.filter(p => p.status === 'confirmed').reduce((s, p) => s + p.amount, 0)
 
   return (
     <div className="space-y-6">
@@ -152,7 +152,7 @@ export default async function LeadDetailPage({
               {lead.assigned_agent && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-[rgba(240,237,232,0.04)] px-2.5 py-1 text-[11px] font-medium text-text-muted">
                   <User className="h-3 w-3" style={{ color: AGENT_COLORS[lead.assigned_agent] }} />
-                  {lead.assigned_agent === 'ares' ? 'Ares' : lead.assigned_agent === 'kairos' ? 'Kairos' : 'Athena'}
+                  {lead.assigned_agent === 'hermes' ? 'Hermes' : lead.assigned_agent === 'ares' ? 'Ares' : 'Athena'}
                 </span>
               )}
             </div>

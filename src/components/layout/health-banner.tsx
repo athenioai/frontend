@@ -2,11 +2,11 @@ import { AlertTriangle } from 'lucide-react'
 
 interface HealthBannerProps {
   score: number
-  motivo?: string
-  acao?: string
+  alertReason?: string
+  recommendedAction?: string
 }
 
-export function HealthBanner({ score, motivo, acao }: HealthBannerProps) {
+export function HealthBanner({ score, alertReason, recommendedAction }: HealthBannerProps) {
   if (score >= 60) return null
 
   return (
@@ -17,8 +17,8 @@ export function HealthBanner({ score, motivo, acao }: HealthBannerProps) {
           <p className="text-sm font-semibold text-danger">
             Health Score em {score} — sua operação precisa de atenção
           </p>
-          {motivo && <p className="mt-1 text-xs text-text-muted">{motivo}</p>}
-          {acao && <p className="mt-0.5 text-xs text-accent">{acao}</p>}
+          {alertReason && <p className="mt-1 text-xs text-text-muted">{alertReason}</p>}
+          {recommendedAction && <p className="mt-0.5 text-xs text-accent">{recommendedAction}</p>}
         </div>
       </div>
     </div>

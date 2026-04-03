@@ -85,10 +85,10 @@ function computeScore(row: Record<string, unknown>): number {
   return Math.min(100, base + tempBonus * 0.5)
 }
 
-function inferAgent(funnelStage: string): 'ares' | 'kairos' | null {
-  // Marketing-stage leads belong to ares, sales-stage to kairos
-  if (['greeting', 'qualifying'].includes(funnelStage)) return 'ares'
-  if (['consulting', 'negotiating', 'closing', 'converted'].includes(funnelStage)) return 'kairos'
+function inferAgent(funnelStage: string): 'hermes' | 'ares' | null {
+  // Marketing-stage leads belong to hermes, sales-stage to ares
+  if (['greeting', 'qualifying'].includes(funnelStage)) return 'hermes'
+  if (['consulting', 'negotiating', 'closing', 'converted'].includes(funnelStage)) return 'ares'
   return null
 }
 

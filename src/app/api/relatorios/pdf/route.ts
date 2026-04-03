@@ -3,6 +3,7 @@ import ReactPDF from '@react-pdf/renderer'
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
 import React from 'react'
 import path from 'path'
+import { authService, campaignService, analyticsService, leadService } from '@/lib/services'
 
 const styles = StyleSheet.create({
   page: { padding: 40, backgroundColor: '#0E1012', color: '#F0EDE8', fontFamily: 'Helvetica' },
@@ -35,96 +36,88 @@ const styles = StyleSheet.create({
 
 const logoPath = path.join(process.cwd(), 'public', 'logo', 'athenio-dark.png')
 
-function ReportDocument({ mes, ano }: { mes: string; ano: string }) {
+interface ReportData {
+  mes: string
+  ano: string
+  roas: string
+  totalLeads: number
+  convertedLeads: number
+  healthScore: number
+  hoursSaved: number
+  topCampaigns: { name: string; roas: number }[]
+  topObjections: { objection: string; count: number }[]
+}
+
+function ReportDocument({ data }: { data: ReportData }) {
+  const { mes, ano, roas, totalLeads, convertedLeads, healthScore, hoursSaved, topCampaigns, topObjections } = data
+
   return React.createElement(Document, null,
     React.createElement(Page, { size: 'A4', style: styles.page },
 
-      // ─── Logo header ───
+      // --- Logo header ---
       React.createElement(View, { style: styles.logoRow },
         React.createElement(Image, { src: logoPath, style: { width: 140, height: 35 } }),
       ),
       React.createElement(Text, { style: styles.subtitle }, `Relatório de Resultados — ${mes}/${ano}`),
       React.createElement(View, { style: styles.divider }),
 
-      // ─── KPI Strip ───
+      // --- KPI Strip ---
       React.createElement(View, { style: styles.kpiRow },
         React.createElement(View, { style: styles.kpiCard },
           React.createElement(Text, { style: styles.kpiLabel }, 'ROAS'),
-          React.createElement(Text, { style: { ...styles.kpiValue, color: '#4FD1C5' } }, '3.55x'),
+          React.createElement(Text, { style: { ...styles.kpiValue, color: '#4FD1C5' } }, roas),
         ),
         React.createElement(View, { style: styles.kpiCard },
           React.createElement(Text, { style: styles.kpiLabel }, 'Leads'),
-          React.createElement(Text, { style: { ...styles.kpiValue, color: '#A78BFA' } }, '330'),
+          React.createElement(Text, { style: { ...styles.kpiValue, color: '#A78BFA' } }, String(totalLeads)),
         ),
         React.createElement(View, { style: styles.kpiCard },
           React.createElement(Text, { style: styles.kpiLabel }, 'Conversões'),
-          React.createElement(Text, { style: { ...styles.kpiValue, color: '#34D399' } }, '28'),
+          React.createElement(Text, { style: { ...styles.kpiValue, color: '#34D399' } }, String(convertedLeads)),
         ),
         React.createElement(View, { style: styles.kpiCard },
           React.createElement(Text, { style: styles.kpiLabel }, 'Health Score'),
-          React.createElement(Text, { style: { ...styles.kpiValue, color: '#E8C872' } }, '78'),
+          React.createElement(Text, { style: { ...styles.kpiValue, color: '#E8C872' } }, String(healthScore)),
         ),
       ),
 
-      // ─── Resumo Executivo ───
+      // --- Resumo Executivo ---
       React.createElement(View, { style: styles.section },
         React.createElement(Text, { style: styles.sectionTitle }, 'Resumo Executivo'),
         React.createElement(View, { style: styles.sectionDivider }),
-        React.createElement(Text, { style: styles.body }, '330 leads captados, 28 conversões confirmadas. A operação está saudável com Health Score médio de 78. ROAS médio de 3.55x no período.'),
+        React.createElement(Text, { style: styles.body }, `${totalLeads} leads captados, ${convertedLeads} conversões confirmadas. A operação está ${healthScore >= 60 ? 'saudável' : 'precisando de atenção'} com Health Score médio de ${healthScore}. ROAS médio de ${roas} no período.`),
       ),
 
-      // ─── ROI Evolução ───
+      // --- Top Campanhas ---
       React.createElement(View, { style: styles.section },
-        React.createElement(Text, { style: styles.sectionTitle }, 'ROI — Evolução 3 Meses'),
+        React.createElement(Text, { style: styles.sectionTitle }, `Top ${topCampaigns.length} Campanhas por ROAS`),
         React.createElement(View, { style: styles.sectionDivider }),
-        React.createElement(View, { style: styles.row },
-          React.createElement(Text, { style: styles.label }, 'Janeiro'),
-          React.createElement(Text, { style: styles.value }, '2.8x'),
-        ),
-        React.createElement(View, { style: styles.row },
-          React.createElement(Text, { style: styles.label }, 'Fevereiro'),
-          React.createElement(Text, { style: styles.value }, '3.1x'),
-        ),
-        React.createElement(View, { style: styles.row },
-          React.createElement(Text, { style: styles.label }, 'Março'),
-          React.createElement(Text, { style: { ...styles.value, color: '#4FD1C5' } }, '3.55x'),
+        ...topCampaigns.map((campaign, i) =>
+          React.createElement(View, { key: `camp-${i}`, style: styles.row },
+            React.createElement(Text, { style: styles.label }, `${i + 1}. ${campaign.name}`),
+            React.createElement(Text, { style: i === 0 ? { ...styles.value, color: '#34D399' } : styles.value }, `${campaign.roas.toFixed(1)}x`),
+          )
         ),
       ),
 
-      // ─── Top 3 Campanhas ───
+      // --- Top Objeções ---
       React.createElement(View, { style: styles.section },
-        React.createElement(Text, { style: styles.sectionTitle }, 'Top 3 Campanhas por ROAS'),
+        React.createElement(Text, { style: styles.sectionTitle }, `Top ${topObjections.length} Objeções do Período`),
         React.createElement(View, { style: styles.sectionDivider }),
-        React.createElement(View, { style: styles.row },
-          React.createElement(Text, { style: styles.label }, '1. Video Depoimentos - Premium'),
-          React.createElement(Text, { style: { ...styles.value, color: '#34D399' } }, '4.2x'),
-        ),
-        React.createElement(View, { style: styles.row },
-          React.createElement(Text, { style: styles.label }, '2. Carrossel Benefícios - Multi'),
-          React.createElement(Text, { style: styles.value }, '2.8x'),
-        ),
-        React.createElement(View, { style: styles.row },
-          React.createElement(Text, { style: styles.label }, '3. Imagem Promo - Básico'),
-          React.createElement(Text, { style: styles.value }, '1.1x'),
+        React.createElement(Text, { style: styles.body },
+          topObjections.map((obj, i) => `${i + 1}. ${obj.objection} (${obj.count} ocorrências)`).join('\n')
         ),
       ),
 
-      // ─── Top 3 Objeções ───
-      React.createElement(View, { style: styles.section },
-        React.createElement(Text, { style: styles.sectionTitle }, 'Top 3 Objeções do Período'),
-        React.createElement(View, { style: styles.sectionDivider }),
-        React.createElement(Text, { style: styles.body }, '1. Preço (42 ocorrências) — leads comparam com alternativas mais baratas\n2. Prazo (28) — insegurança sobre quando verão resultado\n3. Desconfiança (19) — pedem garantias adicionais'),
-      ),
-
-      // ─── Economia de Tempo ───
+      // --- Economia de Tempo ---
       React.createElement(View, { style: styles.section },
         React.createElement(Text, { style: styles.sectionTitle }, 'Economia de Tempo'),
         React.createElement(View, { style: styles.sectionDivider }),
-        React.createElement(Text, { style: styles.highlightGold }, '187 horas'),
-        React.createElement(Text, { style: styles.body }, 'de trabalho humano economizadas neste mês pela automação dos agentes Ares, Kairos e Athena.'),
+        React.createElement(Text, { style: styles.highlightGold }, `${hoursSaved} horas`),
+        React.createElement(Text, { style: styles.body }, 'de trabalho humano economizadas neste mês pela automação dos agentes Hermes, Ares e Athena.'),
       ),
 
-      // ─── Footer ───
+      // --- Footer ---
       React.createElement(View, { style: styles.footer },
         React.createElement(Text, { style: styles.footerText }, 'Athenio.ai — Relatório gerado automaticamente'),
         React.createElement(Text, { style: styles.footerText }, `${mes}/${ano}`),
@@ -138,9 +131,54 @@ export async function GET(request: Request) {
   const mes = searchParams.get('mes') || '03'
   const ano = searchParams.get('ano') || '2026'
 
+  // Load real data
+  const user = await authService.getSession()
+  let reportData: ReportData
+
+  if (user) {
+    const [roi, health, funnel, hoursSavedData, campaigns, objections] = await Promise.all([
+      campaignService.getTotalRoi(user.company_id),
+      analyticsService.getHealthScore(user.company_id),
+      leadService.getFunnelStats(user.company_id, '30d'),
+      analyticsService.getHoursSaved(user.company_id),
+      campaignService.getAll(user.company_id),
+      leadService.getTopObjections(user.company_id),
+    ])
+
+    const topCampaigns = [...campaigns]
+      .sort((a, b) => b.roas - a.roas)
+      .slice(0, 3)
+      .map((c) => ({ name: c.name, roas: c.roas }))
+
+    reportData = {
+      mes,
+      ano,
+      roas: `${roi.roas.toFixed(2)}x`,
+      totalLeads: funnel.captured + funnel.qualified + funnel.negotiation + funnel.converted,
+      convertedLeads: funnel.converted,
+      healthScore: health.score,
+      hoursSaved: hoursSavedData.hours,
+      topCampaigns: topCampaigns.length > 0 ? topCampaigns : [{ name: 'Sem campanhas no período', roas: 0 }],
+      topObjections: objections.slice(0, 5),
+    }
+  } else {
+    // Fallback with placeholder data
+    reportData = {
+      mes,
+      ano,
+      roas: '0.0x',
+      totalLeads: 0,
+      convertedLeads: 0,
+      healthScore: 0,
+      hoursSaved: 0,
+      topCampaigns: [{ name: 'Sem dados disponíveis', roas: 0 }],
+      topObjections: [],
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pdfStream = await ReactPDF.renderToStream(
-    React.createElement(ReportDocument, { mes, ano }) as any
+    React.createElement(ReportDocument, { data: reportData }) as any
   )
 
   return new NextResponse(pdfStream as unknown as ReadableStream, {

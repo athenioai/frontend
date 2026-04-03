@@ -8,6 +8,8 @@ import { TopObjecoesWidget } from '@/components/widgets/top-objecoes'
 import { AtividadeAgentesWidget } from '@/components/widgets/atividade-agentes'
 import { FeedAlertasWidget } from '@/components/widgets/feed-alertas'
 import { DashboardGreeting } from '@/components/widgets/dashboard-greeting'
+import { LtvCacWidget } from '@/components/widgets/ltv-cac-widget'
+import { TimeSavedWidget } from '@/components/widgets/time-saved-widget'
 
 export default async function DashboardPage() {
   const user = await authService.getSession()
@@ -99,6 +101,27 @@ export default async function DashboardPage() {
           </div>
           <div className="col-span-12 lg:col-span-4">
             <TopObjecoesWidget data={objections} />
+          </div>
+        </div>
+      </div>
+
+      {/* Section: LTV/CAC + Economia de Tempo */}
+      <div>
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
+          Eficiência
+        </p>
+        <div className="grid gap-6 grid-cols-12">
+          <div className="col-span-12 lg:col-span-8">
+            <LtvCacWidget
+              data={ltvCac.history.map((entry) => ({ name: entry.name, ltv: entry.total_amount }))}
+              ltvCacRatio={ltvCac.cac > 0 ? ltvCac.ltv / ltvCac.cac : 0}
+            />
+          </div>
+          <div className="col-span-12 lg:col-span-4">
+            <TimeSavedWidget
+              hoursSaved={hoursSaved.hours}
+              tasksAutomated={Math.round(hoursSaved.hours * 20)}
+            />
           </div>
         </div>
       </div>

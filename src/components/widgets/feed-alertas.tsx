@@ -49,7 +49,7 @@ export function FeedAlertasWidget({ alerts }: { alerts: Alert[] }) {
               </p>
               <div className="space-y-1">
                 {group.items.map((alert) => {
-                  const config = ALERT_CONFIG[alert.tipo] ?? ALERT_CONFIG.anomaly
+                  const config = ALERT_CONFIG[alert.type] ?? ALERT_CONFIG.anomaly
                   const Icon = config.icon
                   return (
                     <div

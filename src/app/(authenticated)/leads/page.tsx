@@ -3,11 +3,21 @@ import { authService, leadService } from '@/lib/services'
 import { Users } from 'lucide-react'
 import { LeadsTable } from './leads-table'
 
-export default async function LeadsPage() {
+export default async function LeadsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const user = await authService.getSession()
   if (!user) redirect('/login')
 
-  const leads = await leadService.getAll(user.company_id)
+  const params = await searchParams
+  const estagioParam = typeof params.estagio === 'string' ? params.estagio : undefined
+
+  // Pass funnel_stage filter if estagio query param is present
+  const leads = await leadService.getAll(user.company_id, estagioParam ? {
+    funnel_stage: [estagioParam as 'captured' | 'qualified' | 'negotiation' | 'converted' | 'lost'],
+  } : undefined)
 
   const kpis = {
     total: leads.length,

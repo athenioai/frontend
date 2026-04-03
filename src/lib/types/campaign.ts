@@ -1,27 +1,27 @@
 export interface Campaign {
   id: string
-  empresa_id: string
-  nome: string
-  status: 'ativa' | 'pausada'
-  gasto_total: number
+  company_id: string
+  name: string
+  status: 'active' | 'paused'
+  total_spent: number
   cpl: number
   roas: number
-  leads_gerados: number
-  vendas_confirmadas: number
+  leads_generated: number
+  confirmed_sales: number
   created_at: string
 }
 
 export interface CampaignPerformance {
-  data: string
-  gasto: number
+  date: string
+  spent: number
   leads: number
-  vendas: number
+  sales: number
   roas: number
 }
 
 export interface RoiTotal {
-  investido: number
-  retorno: number
+  invested: number
+  revenue: number
   roas: number
-  historico_7d: number[]
+  history_7d: number[]
 }

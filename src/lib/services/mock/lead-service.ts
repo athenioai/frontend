@@ -1,13 +1,13 @@
 import type { ILeadService } from '../interfaces/lead-service'
-import type { Lead, LeadFilters, FunilStats, ObjecaoCount } from '@/lib/types'
+import type { Lead, LeadFilters, FunnelStats, ObjectionCount } from '@/lib/types'
 import { mockLeads } from './data'
 
 export class MockLeadService implements ILeadService {
-  async getAll(empresaId: string, filters?: LeadFilters): Promise<Lead[]> {
-    let leads = mockLeads.filter((l) => l.empresa_id === empresaId)
+  async getAll(companyId: string, filters?: LeadFilters): Promise<Lead[]> {
+    let leads = mockLeads.filter((l) => l.company_id === companyId)
 
-    if (filters?.busca) {
-      const q = filters.busca.toLowerCase()
+    if (filters?.search) {
+      const q = filters.search.toLowerCase()
       leads = leads.filter(
         (l) => l.name.toLowerCase().includes(q) || l.phone.includes(q)
       )
@@ -46,27 +46,27 @@ export class MockLeadService implements ILeadService {
     return mockLeads.find((l) => l.id === id) ?? null
   }
 
-  async getFunnelStats(_empresaId: string, _periodo: '1d' | '7d' | '30d'): Promise<FunilStats> {
+  async getFunnelStats(_companyId: string, _period: '1d' | '7d' | '30d'): Promise<FunnelStats> {
     return {
-      captados: 330,
-      qualificados: 145,
-      negociacao: 58,
-      convertidos: 28,
-      taxas: {
-        captado_qualificado: 0.439,
-        qualificado_negociacao: 0.4,
-        negociacao_convertido: 0.483,
+      captured: 330,
+      qualified: 145,
+      negotiation: 58,
+      converted: 28,
+      rates: {
+        captured_to_qualified: 0.439,
+        qualified_to_negotiation: 0.4,
+        negotiation_to_converted: 0.483,
       },
     }
   }
 
-  async getTopObjections(_empresaId: string): Promise<ObjecaoCount[]> {
+  async getTopObjections(_companyId: string): Promise<ObjectionCount[]> {
     return [
-      { objecao: 'Preço', count: 42 },
-      { objecao: 'Prazo', count: 28 },
-      { objecao: 'Desconfiança', count: 19 },
-      { objecao: 'Não entendeu o produto', count: 15 },
-      { objecao: 'Concorrente', count: 11 },
+      { objection: 'Preço', count: 42 },
+      { objection: 'Prazo', count: 28 },
+      { objection: 'Desconfiança', count: 19 },
+      { objection: 'Não entendeu o produto', count: 15 },
+      { objection: 'Concorrente', count: 11 },
     ]
   }
 }

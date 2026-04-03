@@ -5,8 +5,8 @@ import { MOCK_COMPANY_ID } from './data'
 const COOKIE_NAME = 'athenio-session'
 
 const mockUsers: AuthUser[] = [
-  { id: 'user-001', email: 'cliente@techfit.com', empresa_id: MOCK_COMPANY_ID, role: 'client', name: 'João TechFit' },
-  { id: 'user-admin', email: 'admin@athenio.ai', empresa_id: MOCK_COMPANY_ID, role: 'admin', name: 'Admin Athenio' },
+  { id: 'user-001', email: 'cliente@techfit.com', company_id: MOCK_COMPANY_ID, role: 'client', name: 'João TechFit' },
+  { id: 'user-admin', email: 'admin@athenio.ai', company_id: MOCK_COMPANY_ID, role: 'admin', name: 'Admin Athenio' },
 ]
 
 export class MockAuthService implements IAuthService {

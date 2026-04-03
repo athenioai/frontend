@@ -19,7 +19,7 @@ export function SupportChat({ tickets: initialTickets, messages: initialMessages
   const [tickets, setTickets] = useState(initialTickets)
   const [allMessages, setAllMessages] = useState(initialMessages)
   const [activeTicketId, setActiveTicketId] = useState<string | null>(
-    initialTickets.find(t => t.status === 'aberto')?.id ?? initialTickets[0]?.id ?? null
+    initialTickets.find(t => t.status === 'open')?.id ?? initialTickets[0]?.id ?? null
   )
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -47,9 +47,9 @@ export function SupportChat({ tickets: initialTickets, messages: initialMessages
     const id = `ticket-${String(tickets.length + 1).padStart(3, '0')}-new`
     const newTicket: SupportTicket = {
       id,
-      empresa_id: 'emp-001',
-      assunto: 'Novo chamado',
-      status: 'aberto',
+      company_id: 'emp-001',
+      subject: 'Novo chamado',
+      status: 'open',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }
@@ -149,7 +149,7 @@ export function SupportChat({ tickets: initialTickets, messages: initialMessages
               {tickets.map((ticket, i) => {
                 const isActive = ticket.id === activeTicketId
                 const lastMsg = allMessages.filter(m => m.ticket_id === ticket.id).at(-1)
-                const isResolved = ticket.status === 'resolvido'
+                const isResolved = ticket.status === 'resolved'
 
                 return (
                   <motion.button
@@ -175,7 +175,7 @@ export function SupportChat({ tickets: initialTickets, messages: initialMessages
 
                     <div className="flex items-start justify-between gap-2">
                       <p className={`line-clamp-1 text-[13px] font-medium ${isActive ? 'text-accent' : 'text-text-primary'}`}>
-                        {ticket.assunto}
+                        {ticket.subject}
                       </p>
                       {isResolved ? (
                         <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald" />
@@ -217,14 +217,14 @@ export function SupportChat({ tickets: initialTickets, messages: initialMessages
                 <Sparkles className="h-[18px] w-[18px] text-violet" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="truncate text-[14px] font-semibold text-text-primary">{activeTicket.assunto}</p>
+                <p className="truncate text-[14px] font-semibold text-text-primary">{activeTicket.subject}</p>
                 <div className="flex items-center gap-1.5">
                   <span
                     className="h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: activeTicket.status === 'aberto' ? COLORS.emerald : COLORS.textSubtle }}
+                    style={{ backgroundColor: activeTicket.status === 'open' ? COLORS.emerald : COLORS.textSubtle }}
                   />
                   <p className="text-[11px] text-text-subtle">
-                    {activeTicket.status === 'aberto' ? 'Athenio IA · Online' : 'Chamado resolvido'}
+                    {activeTicket.status === 'open' ? 'Athenio IA · Online' : 'Chamado resolvido'}
                   </p>
                 </div>
               </div>
@@ -316,17 +316,17 @@ export function SupportChat({ tickets: initialTickets, messages: initialMessages
                     }}
                     placeholder="Digite sua mensagem..."
                     className="flex-1 bg-transparent text-[14px] text-text-primary placeholder:text-text-subtle/50 outline-none"
-                    disabled={activeTicket.status === 'resolvido'}
+                    disabled={activeTicket.status === 'resolved'}
                   />
                   <button
                     onClick={sendMessage}
-                    disabled={!input.trim() || activeTicket.status === 'resolvido'}
+                    disabled={!input.trim() || activeTicket.status === 'resolved'}
                     className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent transition-all duration-200 hover:bg-accent/20 disabled:opacity-30 disabled:hover:bg-accent/10 hover:scale-105 active:scale-95"
                   >
                     <Send className="h-4 w-4" />
                   </button>
                 </div>
-                {activeTicket.status === 'resolvido' && (
+                {activeTicket.status === 'resolved' && (
                   <p className="mt-2 text-center text-[11px] text-text-subtle">
                     Este chamado foi resolvido. Abra um novo chamado para continuar.
                   </p>

@@ -1,4 +1,4 @@
-import type { ICompanyService } from '../interfaces/company-service'
+import type { ICompanyService } from '../interfaces/empresa-service'
 import type { Company } from '@/lib/types'
 import { createClient } from '@/lib/supabase/server'
 

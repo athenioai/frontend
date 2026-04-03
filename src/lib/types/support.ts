@@ -1,8 +1,8 @@
 export interface SupportTicket {
   id: string
-  empresa_id: string
-  assunto: string
-  status: 'aberto' | 'resolvido'
+  company_id: string
+  subject: string
+  status: 'open' | 'resolved'
   created_at: string
   updated_at: string
 }

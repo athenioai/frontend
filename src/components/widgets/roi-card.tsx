@@ -5,20 +5,44 @@ import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts'
 import { formatCurrency } from '@/lib/utils/format'
 import { CountUp } from '@/components/ui/count-up'
 import { AnimateIn } from '@/components/ui/animate-in'
+import { createClient } from '@/lib/supabase/client'
 import type { RoiTotal } from '@/lib/types'
 
 export function RoiCard({ initial }: { initial: RoiTotal }) {
   const [roi, setRoi] = useState(initial)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRoi((prev) => ({
-        ...prev,
-        revenue: prev.revenue + Math.random() * 50,
-        roas: (prev.revenue + Math.random() * 50) / prev.invested,
-      }))
-    }, 8000)
-    return () => clearInterval(interval)
+    const supabase = createClient()
+
+    const channel = supabase
+      .channel('dashboard-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
+        // When leads change, refresh the ROI data
+        setRoi((prev) => ({
+          ...prev,
+          // The actual data will be refreshed on next page load or via revalidation
+          // This provides a visual indicator that something changed
+        }))
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'commercial', table: 'payments' }, (payload) => {
+        // When a new payment comes in, update revenue in real-time
+        const newAmount = Number((payload.new as Record<string, unknown>).amount_cents ?? 0) / 100
+        if (newAmount > 0) {
+          setRoi((prev) => {
+            const newRevenue = prev.revenue + newAmount
+            return {
+              ...prev,
+              revenue: newRevenue,
+              roas: prev.invested > 0 ? newRevenue / prev.invested : 0,
+            }
+          })
+        }
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const sparkData = roi.history_7d.map((v, i) => ({ day: i, value: v }))

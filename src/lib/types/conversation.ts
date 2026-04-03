@@ -1,10 +1,10 @@
 export interface Conversation {
   id: string
-  empresa_id: string
+  company_id: string
   lead_id: string
-  mensagens_count: number
-  duracao_minutos: number
-  agente: 'hermes' | 'ares'
+  messages_count: number
+  duration_minutes: number
+  agent: 'hermes' | 'ares'
   created_at: string
 }
 
@@ -18,11 +18,11 @@ export interface Message {
 
 export interface ConversationSummary {
   id: string
-  empresa_id: string
+  company_id: string
   lead_id: string
-  resumo: string
-  ultima_dor: string
-  estagio_funil: string
-  objecoes_ativas: string[]
+  summary: string
+  last_pain_point: string
+  funnel_stage: string
+  active_objections: string[]
   created_at: string
 }
