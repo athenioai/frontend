@@ -116,7 +116,7 @@ src/
 - [ ] **Step 1: Create Next.js project**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm
 ```
 
@@ -125,7 +125,7 @@ Select defaults when prompted. This creates the full project scaffold.
 - [ ] **Step 2: Install dependencies**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm install recharts lucide-react @react-pdf/renderer
 npm install -D @types/node
 ```
@@ -133,7 +133,7 @@ npm install -D @types/node
 - [ ] **Step 3: Initialize shadcn/ui**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npx shadcn@latest init
 ```
 
@@ -145,7 +145,7 @@ When prompted:
 - [ ] **Step 4: Install shadcn/ui components**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npx shadcn@latest add button card input label badge table select dropdown-menu separator sheet dialog tabs toggle-group textarea toast
 ```
 
@@ -291,7 +291,7 @@ export default function Home() {
 - [ ] **Step 8: Verify dev server starts**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm run dev
 ```
 
@@ -300,7 +300,7 @@ Open `http://localhost:3000` — should redirect to `/dashboard` (404 is expecte
 - [ ] **Step 9: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git init
 echo "node_modules/\n.next/\n.env*.local" > .gitignore
 git add .
@@ -569,7 +569,7 @@ export * from './analytics'
 - [ ] **Step 9: Verify types compile**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npx tsc --noEmit
 ```
 
@@ -578,7 +578,7 @@ Expected: no errors.
 - [ ] **Step 10: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/lib/types/
 git commit -m "feat: add domain types for all entities"
 ```
@@ -594,7 +594,7 @@ git commit -m "feat: add domain types for all entities"
 - [ ] **Step 1: Install test runner**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm install -D vitest @testing-library/react @testing-library/jest-dom
 ```
 
@@ -694,7 +694,7 @@ describe('formatNumber', () => {
 - [ ] **Step 3: Run tests to verify they fail**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm test -- --run
 ```
 
@@ -759,7 +759,7 @@ export function formatRelativeTime(iso: string): string {
 - [ ] **Step 5: Run tests to verify they pass**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm test -- --run
 ```
 
@@ -825,7 +825,7 @@ export function getHealthScoreColor(score: number): string {
 - [ ] **Step 7: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/lib/utils/ src/lib/constants/ vitest.config.ts
 git commit -m "feat: add format utilities and theme constants with tests"
 ```
@@ -941,7 +941,7 @@ export interface IAuthService {
 - [ ] **Step 8: Verify types compile**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npx tsc --noEmit
 ```
 
@@ -950,7 +950,7 @@ Expected: no errors.
 - [ ] **Step 9: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/lib/services/interfaces/
 git commit -m "feat: add service layer interfaces"
 ```
@@ -1449,7 +1449,7 @@ export const authService = new MockAuthService()
 - [ ] **Step 10: Verify types compile**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npx tsc --noEmit
 ```
 
@@ -1458,7 +1458,7 @@ Expected: no errors.
 - [ ] **Step 11: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/lib/services/
 git commit -m "feat: add mock service layer with realistic data"
 ```
@@ -1629,7 +1629,7 @@ export default function LoginPage() {
 - [ ] **Step 4: Verify login flow works**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm run dev
 ```
 
@@ -1641,7 +1641,7 @@ npm run dev
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/middleware.ts src/app/login/
 git commit -m "feat: add login page with mock auth and middleware"
 ```
@@ -1872,7 +1872,7 @@ export default async function AuthenticatedLayout({
 - [ ] **Step 6: Verify layout renders**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm run dev
 ```
 
@@ -1891,7 +1891,7 @@ export default function DashboardPage() {
 - [ ] **Step 7: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/components/layout/ src/app/\(authenticated\)/layout.tsx src/app/api/auth/
 git commit -m "feat: add authenticated layout with sidebar, topbar, health banner"
 ```
@@ -2126,7 +2126,7 @@ export function LineChartSimple({ data, xKey, yKey, height = 250 }: LineChartSim
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/components/charts/
 git commit -m "feat: add reusable chart components (gauge, funil, bar, line)"
 ```
@@ -2508,7 +2508,7 @@ export function FeedAlertasWidget({ alerts }: { alerts: Alert[] }) {
 - [ ] **Step 9: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/components/widgets/
 git commit -m "feat: add all 8 dashboard widgets"
 ```
@@ -2586,7 +2586,7 @@ export default async function DashboardPage() {
 - [ ] **Step 2: Verify dashboard renders**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm run dev
 ```
 
@@ -2598,7 +2598,7 @@ npm run dev
 - [ ] **Step 3: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/app/\(authenticated\)/dashboard/
 git commit -m "feat: implement dashboard page with all 8 widgets"
 ```
@@ -2746,7 +2746,7 @@ Navigate to `/funil`. Toggle between periods. Click on stages to expand and see 
 - [ ] **Step 3: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/app/\(authenticated\)/funil/
 git commit -m "feat: implement funil page with period filter and expandable stages"
 ```
@@ -2999,7 +2999,7 @@ Navigate to `/leads`. Test search, filters, sorting, pagination. Resize for mobi
 - [ ] **Step 4: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/app/\(authenticated\)/leads/
 git commit -m "feat: implement leads page with table, search, filters, pagination"
 ```
@@ -3172,7 +3172,7 @@ Navigate to `/campanhas`. Click a card to open the drawer. Check inactive campai
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/app/\(authenticated\)/campanhas/ src/app/api/campanhas/
 git commit -m "feat: implement campanhas page with grid and performance drawer"
 ```
@@ -3416,7 +3416,7 @@ Navigate to `/relatorios`. Select a month. Click "Baixar PDF". Verify PDF downlo
 - [ ] **Step 4: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/app/\(authenticated\)/relatorios/ src/app/api/relatorios/
 git commit -m "feat: implement relatorios page with PDF generation"
 ```
@@ -3600,7 +3600,7 @@ Navigate to `/configuracoes`. Change values. Save. Reload the page — values sh
 - [ ] **Step 3: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/app/\(authenticated\)/configuracoes/
 git commit -m "feat: implement configuracoes page with localStorage persistence"
 ```
@@ -3796,7 +3796,7 @@ export default async function AdminEmpresaPage({
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add src/app/admin/
 git commit -m "feat: implement admin panel with empresa list and read-only dashboard"
 ```
@@ -3811,7 +3811,7 @@ git commit -m "feat: implement admin panel with empresa list and read-only dashb
 - [ ] **Step 1: Run TypeScript check**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npx tsc --noEmit
 ```
 
@@ -3820,7 +3820,7 @@ Expected: no type errors.
 - [ ] **Step 2: Run tests**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm test -- --run
 ```
 
@@ -3829,7 +3829,7 @@ Expected: all tests pass.
 - [ ] **Step 3: Run production build**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm run build
 ```
 
@@ -3845,7 +3845,7 @@ If the build fails, fix the issues. Common ones:
 - [ ] **Step 5: Smoke test all pages**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 npm run dev
 ```
 
@@ -3862,7 +3862,7 @@ Test each page:
 - [ ] **Step 6: Final commit**
 
 ```bash
-cd /Users/lucas-couto/www/athenio/olympius/olympius-frontend
+cd /Users/lucas-couto/www/athenio/olympus/olympus-frontend
 git add .
 git commit -m "chore: verify build and polish"
 ```

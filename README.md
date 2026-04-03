@@ -334,7 +334,7 @@ Dataset ficticio de uma academia digital (TechFit) com dados coerentes:
 
 ```bash
 git clone <repo-url>
-cd olympius-frontend
+cd olympus-frontend
 npm install
 npm run dev
 ```
