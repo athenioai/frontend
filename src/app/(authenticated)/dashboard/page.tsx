@@ -1,4 +1,4 @@
-import { authService, campaignService, analyticsService, leadService, alertService } from '@/lib/services'
+import { authService, campaignService, analyticsService, leadService, alertService, readinessService } from '@/lib/services'
 import { redirect } from 'next/navigation'
 import { RoiCard } from '@/components/widgets/roi-card'
 import { HealthScoreWidget } from '@/components/widgets/health-score'
@@ -8,6 +8,7 @@ import { TopObjecoesWidget } from '@/components/widgets/top-objecoes'
 import { AtividadeAgentesWidget } from '@/components/widgets/atividade-agentes'
 import { FeedAlertasWidget } from '@/components/widgets/feed-alertas'
 import { DashboardGreeting } from '@/components/widgets/dashboard-greeting'
+import { ReadinessBanner } from '@/components/widgets/readiness-banner'
 import { LtvCacWidget } from '@/components/widgets/ltv-cac-widget'
 import { TimeSavedWidget } from '@/components/widgets/time-saved-widget'
 
@@ -15,7 +16,7 @@ export default async function DashboardPage() {
   const user = await authService.getSession()
   if (!user) redirect('/login')
 
-  const [roi, health, funnel, ltvCac, objections, hoursSaved, agents, alerts] = await Promise.all([
+  const [roi, health, funnel, ltvCac, objections, hoursSaved, agents, alerts, readiness] = await Promise.all([
     campaignService.getTotalRoi(user.company_id),
     analyticsService.getHealthScore(user.company_id),
     leadService.getFunnelStats(user.company_id, '30d'),
@@ -24,10 +25,13 @@ export default async function DashboardPage() {
     analyticsService.getHoursSaved(user.company_id),
     analyticsService.getAgentsActivity(user.company_id),
     alertService.getRecent(user.company_id),
+    readinessService.check(),
   ])
 
   return (
     <div className="space-y-8">
+      {/* Readiness Banner */}
+      <ReadinessBanner readiness={readiness} />
       {/* Greeting */}
       <DashboardGreeting userName={user.name} healthScore={health.score} />
 
