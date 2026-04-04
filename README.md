@@ -8,6 +8,9 @@ Painel de controle em tempo real para gerenciamento de agentes de IA que operam 
 
 O Athenio e uma plataforma onde agentes de IA autonomos gerenciam todo o ciclo comercial de um negocio — desde a criacao de campanhas de anuncios ate o fechamento de vendas pelo WhatsApp. Este frontend e o **centro de comando** do empresario:
 
+- Wizard de onboarding guiado (perfil da empresa, produtos, knowledge base, checklist de prontidao)
+- Gerenciar produtos e variantes com precos e ciclos de cobranca
+- Visualizar e editar knowledge base (Q&A geradas por IA + manuais)
 - Visualizar metricas de ROI, ROAS e health score em tempo real
 - Acompanhar conversas dos agentes com leads
 - Monitorar funil de vendas com taxas de conversao
@@ -53,13 +56,19 @@ src/
 │   │   ├── page.tsx
 │   │   └── actions.ts                # Server action de autenticacao
 │   │
+│   ├── onboarding/                   # Wizard de onboarding (fullscreen, sem sidebar)
+│   │   ├── layout.tsx                # Layout fullscreen com grid background
+│   │   └── page.tsx                  # Wizard 4 steps (perfil, produtos, KB, checklist)
+│   │
 │   ├── (authenticated)/              # Route group protegido por sessao
 │   │   ├── layout.tsx                # AuthShell (sidebar + topbar + health banner)
-│   │   ├── dashboard/page.tsx        # Dashboard bento grid
+│   │   ├── dashboard/page.tsx        # Dashboard bento grid + readiness banner
 │   │   ├── funil/page.tsx            # Funil de vendas com filtros de periodo
 │   │   ├── leads/
 │   │   │   ├── page.tsx              # Tabela de leads com filtros/busca
 │   │   │   └── [id]/page.tsx         # Detalhe do lead com tabs
+│   │   ├── produtos/page.tsx         # CRUD de produtos e variantes
+│   │   ├── knowledge-base/page.tsx   # CRUD de knowledge base (Q&A)
 │   │   ├── campanhas/page.tsx        # Grid de campanhas
 │   │   ├── relatorios/page.tsx       # Preview + download PDF
 │   │   ├── suporte/page.tsx          # Chat de suporte com IA
@@ -84,6 +93,15 @@ src/
 │   │   ├── logo.tsx                  # Logo SVG (dark/light)
 │   │   └── ...                       # button, card, input, select, sheet, tabs, etc.
 │   │
+│   ├── onboarding/                   # Componentes de onboarding (compartilhados)
+│   │   ├── onboarding-stepper.tsx    # Stepper horizontal 4 passos
+│   │   ├── company-profile-form.tsx  # Form perfil da empresa
+│   │   ├── product-form.tsx          # Form produto + variantes
+│   │   ├── product-card.tsx          # Card de produto com precos
+│   │   ├── knowledge-entry-list.tsx  # Lista de Q&A (auto/manual)
+│   │   ├── knowledge-entry-form.tsx  # Form para criar/editar entry
+│   │   └── readiness-checklist.tsx   # Checklist de prontidao
+│   │
 │   ├── layout/                       # Shell da aplicacao
 │   │   ├── auth-shell.tsx            # Wrapper client (sidebar + topbar + cmd palette)
 │   │   ├── sidebar.tsx               # Navegacao lateral colapsavel + mobile
@@ -106,7 +124,8 @@ src/
 │   │   ├── top-objecoes.tsx          # Ranking de objecoes com barras
 │   │   ├── atividade-agentes.tsx     # Status Hermes/Ares/Athena
 │   │   ├── feed-alertas.tsx          # Feed cronologico de alertas
-│   │   └── dashboard-greeting.tsx    # Saudacao personalizada
+│   │   ├── dashboard-greeting.tsx    # Saudacao personalizada
+│   │   └── readiness-banner.tsx      # Banner de onboarding incompleto
 │   │
 │   ├── leads/                        # Componentes de leads
 │   │   ├── leads-table.tsx           # Tabela desktop + cards mobile
@@ -128,7 +147,11 @@ src/
     │   ├── analytics.ts              # HealthScoreData, AgentesAtividade
     │   ├── alert.ts                  # Alert
     │   ├── empresa.ts                # Empresa
-    │   └── support.ts                # SupportTicket, SupportMessage
+    │   ├── support.ts                # SupportTicket, SupportMessage
+    │   ├── company-profile.ts        # CompanyProfile, ToneOfVoice
+    │   ├── product.ts                # Product, Variant, BillingCycle
+    │   ├── knowledge.ts              # KnowledgeEntry
+    │   └── readiness.ts              # ReadinessCheck, ReadinessResult
     │
     ├── services/
     │   ├── interfaces/               # Contratos de servico
@@ -138,11 +161,15 @@ src/
     │   │   ├── analytics-service.ts  # IAnalyticsService
     │   │   ├── alert-service.ts      # IAlertService
     │   │   ├── empresa-service.ts    # IEmpresaService
-    │   │   └── admin-service.ts      # IAdminService
+    │   │   ├── admin-service.ts      # IAdminService
+    │   │   ├── company-profile-service.ts  # ICompanyProfileService
+    │   │   ├── product-service.ts    # IProductService
+    │   │   ├── knowledge-service.ts  # IKnowledgeService
+    │   │   └── readiness-service.ts  # IReadinessService
     │   ├── mock/                     # Implementacoes mock para desenvolvimento
     │   │   ├── data.ts               # Dataset ficticio completo
     │   │   └── *.ts                  # Um mock por interface
-    │   └── index.ts                  # Exports ativos (swap mock ↔ real aqui)
+    │   └── index.ts                  # Exports ativos (11 service singletons)
     │
     ├── constants/
     │   └── theme.ts                  # Paleta de cores, helpers de cor
@@ -164,18 +191,15 @@ Componente (UI) → Service Interface → Mock Implementation (dev)
 ```
 
 ```typescript
-// src/lib/services/index.ts
-import { MockLeadService } from './mock/lead-service'
-export const leadService = new MockLeadService()
-
-// Para trocar para Supabase, basta mudar o import:
-// import { SupabaseLeadService } from './supabase/lead-service'
-// export const leadService = new SupabaseLeadService()
+// src/lib/services/index.ts — server-side (usa apiClient com Supabase server)
+export const leadService = new LeadService()
+export const productService = new ProductService()
+// ...11 services no total
 ```
 
-Nenhum componente precisa de mudanca ao trocar de backend.
+Para paginas client-side (`'use client'`), existe o `clientApi` em `src/lib/api/client-api.ts` que usa o Supabase browser client.
 
-**Interfaces disponiveis:** `IAuthService`, `ILeadService`, `ICampaignService`, `IAnalyticsService`, `IAlertService`, `IEmpresaService`, `IAdminService`
+**Interfaces disponiveis (11):** `IAuthService`, `ILeadService`, `ICampaignService`, `IAnalyticsService`, `IAlertService`, `ICompanyService`, `IAdminService`, `ICompanyProfileService`, `IProductService`, `IKnowledgeService`, `IReadinessService`
 
 ### Autenticacao
 
@@ -197,13 +221,32 @@ Nenhum componente precisa de mudanca ao trocar de backend.
 
 ## Paginas
 
+### `/onboarding`
+
+Wizard fullscreen de 4 etapas para configuracao inicial do cliente, sem sidebar:
+
+1. **Perfil da Empresa** — nome, descricao, segmento, publico-alvo, tom de voz, diferenciais
+2. **Produtos & Variantes** — CRUD de produtos com variantes (nome, preco em centavos, ciclo de cobranca, features)
+3. **Knowledge Base** — revisao das Q&A geradas automaticamente pela IA + adicao manual. Polling automatico enquanto entries estao sendo geradas
+4. **Checklist de Prontidao** — verifica 3 checks do cliente (perfil, produtos, knowledge base). Quando tudo verde, redireciona ao dashboard
+
+O wizard determina automaticamente em qual step o usuario deve comecar baseado no endpoint `/api/company/readiness`. Componentes de formulario sao compartilhados com as paginas `/produtos` e `/knowledge-base`.
+
+### `/produtos`
+
+Pagina de gerenciamento de produtos no sidebar. Grid de ProductCards (2 colunas desktop, 1 mobile) com preco range, badges de ciclo de cobranca, e acoes de editar/excluir. Formulario inline para criacao com secao de variantes.
+
+### `/knowledge-base`
+
+Pagina de gerenciamento do knowledge base no sidebar. Lista de cards Q&A com badges "Auto" (teal, gerado por IA) e "Manual" (violet). CRUD completo com formulario inline.
+
 ### `/login`
 
 Split layout com branding animado (orbs de gradiente, aneis orbitais, stats) na esquerda e formulario de login na direita. Mobile: formulario full-width com logo no topo.
 
 ### `/dashboard`
 
-Bento grid de 12 colunas com 5 zonas:
+Bento grid de 12 colunas com banner de readiness (quando onboarding incompleto) e 5 zonas:
 
 1. **Hero Zone** — ROI (8 cols, gradiente, sparkline 7d, count-up) + Health Score (4 cols, gauge semicircular)
 2. **KPI Strip** — 4 cards: Revenue, Conversao, LTV/CAC, Horas Salvas
@@ -413,15 +456,18 @@ npm run start
 | Rota | Descricao |
 |------|-----------|
 | `/login` | Tela de login com branding animado |
+| `/onboarding` | Wizard fullscreen de configuracao inicial (4 steps) |
 
 ### Protegidas (Cliente)
 
 | Rota | Descricao |
 |------|-----------|
-| `/dashboard` | Bento grid com ROI, health score, KPIs, funil, agentes, alertas |
+| `/dashboard` | Bento grid com ROI, health score, KPIs, funil, agentes, alertas + readiness banner |
 | `/funil` | Funil de vendas com taxas de conversao |
 | `/leads` | Tabela filtravel de leads |
 | `/leads/[id]` | Detalhe do lead com tabs |
+| `/produtos` | CRUD de produtos e variantes |
+| `/knowledge-base` | CRUD de knowledge base (Q&A) |
 | `/campanhas` | Grid de campanhas com performance |
 | `/relatorios` | Relatorio PDF |
 | `/suporte` | Chat com IA de suporte |
