@@ -487,7 +487,6 @@ export function TenantForm({
               Budget diario
             </Label>
             <PriceInput
-              id="daily_budget"
               value={dailyBudget}
               onChange={setDailyBudget}
               placeholder="0,00"
@@ -499,7 +498,6 @@ export function TenantForm({
               Limite do cartao
             </Label>
             <PriceInput
-              id="card_limit"
               value={cardLimit}
               onChange={setCardLimit}
               placeholder="0,00"
