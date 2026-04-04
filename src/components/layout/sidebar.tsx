@@ -16,6 +16,10 @@ import {
   ChevronsLeft,
   ChevronsRight,
   LogOut,
+  MessageSquare,
+  Bell,
+  Building2,
+  AlertTriangle,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { MOTION } from '@/lib/motion'
@@ -26,6 +30,14 @@ const NAV_MAIN = [
   { href: '/funil', label: 'Funil', icon: GitBranch },
   { href: '/leads', label: 'Leads', icon: Users },
   { href: '/campanhas', label: 'Campanhas', icon: Megaphone },
+  { href: '/conversas', label: 'Conversas', icon: MessageSquare },
+  { href: '/alertas', label: 'Alertas', icon: Bell },
+]
+
+const NAV_ADMIN = [
+  { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/tenants', label: 'Clientes', icon: Building2 },
+  { href: '/admin/dlq', label: 'DLQ', icon: AlertTriangle },
 ]
 
 const NAV_SECONDARY = [
@@ -75,7 +87,7 @@ export function Sidebar({ isAdmin, userName, mobile = false }: SidebarProps) {
   const allItems = [
     ...NAV_MAIN.map((item) => ({ ...item, section: 'main' })),
     ...NAV_SECONDARY.map((item) => ({ ...item, section: 'secondary' })),
-    ...(isAdmin ? [{ href: '/admin', label: 'Admin', icon: Shield, section: 'admin' }] : []),
+    ...(isAdmin ? NAV_ADMIN.map((item) => ({ ...item, section: 'admin' })) : []),
   ]
 
   function NavItem({
@@ -226,7 +238,23 @@ export function Sidebar({ isAdmin, userName, mobile = false }: SidebarProps) {
         {isAdmin && (
           <>
             <div className="my-4 mx-3 h-[1px] bg-gradient-to-r from-transparent via-border-default to-transparent" />
-            <NavItem href="/admin" label="Admin" icon={Shield} index={itemIndex++} />
+            <AnimatePresence>
+              {!effectiveCollapsed && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-text-subtle/40"
+                >
+                  Admin
+                </motion.p>
+              )}
+            </AnimatePresence>
+            <div className="space-y-0.5">
+              {NAV_ADMIN.map((item) => (
+                <NavItem key={item.href} {...item} index={itemIndex++} />
+              ))}
+            </div>
           </>
         )}
       </nav>
