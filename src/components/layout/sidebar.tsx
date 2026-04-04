@@ -16,6 +16,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
   LogOut,
+  Package,
+  BookOpen,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { MOTION } from '@/lib/motion'
@@ -29,6 +31,8 @@ const NAV_MAIN = [
 ]
 
 const NAV_SECONDARY = [
+  { href: '/produtos', label: 'Produtos', icon: Package },
+  { href: '/knowledge-base', label: 'Knowledge Base', icon: BookOpen },
   { href: '/relatorios', label: 'Relatórios', icon: FileText },
   { href: '/suporte', label: 'Suporte', icon: Headset },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
