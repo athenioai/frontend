@@ -2,7 +2,6 @@
 
 import { motion } from 'motion/react'
 import { fadeInUp, MOTION } from '@/lib/motion'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 
@@ -29,9 +28,12 @@ export function EmptyState({ icon: Icon, title, description, actionLabel, action
       <h3 className="mb-1 font-title text-[16px] font-bold text-text-primary">{title}</h3>
       <p className="mb-6 max-w-sm text-[13px] text-text-muted">{description}</p>
       {actionLabel && actionHref && (
-        <Button asChild className="h-9 rounded-xl bg-accent px-5 text-[13px] font-semibold text-primary-foreground hover:brightness-110">
-          <Link href={actionHref}>{actionLabel}</Link>
-        </Button>
+        <Link
+          href={actionHref}
+          className="inline-flex h-9 items-center justify-center rounded-xl bg-accent px-5 text-[13px] font-semibold text-primary-foreground hover:brightness-110 transition-all"
+        >
+          {actionLabel}
+        </Link>
       )}
     </motion.div>
   )

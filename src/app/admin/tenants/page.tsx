@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { adminService } from '@/lib/services'
 import { formatDate } from '@/lib/utils/format'
-import { Button } from '@/components/ui/button'
 import { Building2, Plus } from 'lucide-react'
 import { EmptyState } from '@/components/common/empty-state'
 
@@ -24,15 +23,13 @@ export default async function TenantsPage() {
             </p>
           </div>
         </div>
-        <Button
-          asChild
-          className="h-10 rounded-xl bg-accent px-5 text-[13px] font-semibold text-primary-foreground hover:brightness-110"
+        <Link
+          href="/admin/tenants/new"
+          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-accent px-5 text-[13px] font-semibold text-primary-foreground hover:brightness-110 transition-all"
         >
-          <Link href="/admin/tenants/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Cliente
-          </Link>
-        </Button>
+          <Plus className="mr-1 h-4 w-4" />
+          Novo Cliente
+        </Link>
       </div>
 
       {tenants.length === 0 ? (
