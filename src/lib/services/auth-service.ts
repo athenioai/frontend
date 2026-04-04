@@ -1,7 +1,7 @@
-import type { IAuthService, AuthUser } from '../interfaces/auth-service'
+import type { IAuthService, AuthUser } from './interfaces/auth-service'
 import { createClient } from '@/lib/supabase/server'
 
-export class SupabaseAuthService implements IAuthService {
+export class AuthService implements IAuthService {
   async login(email: string, password: string): Promise<AuthUser> {
     const supabase = await createClient()
 
