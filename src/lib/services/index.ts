@@ -9,6 +9,9 @@ import { CompanyProfileService } from './company-profile-service'
 import { ProductService } from './product-service'
 import { KnowledgeService } from './knowledge-service'
 import { ReadinessService } from './readiness-service'
+import { ConversationService } from './conversation-service'
+import { AgentService } from './agent-service'
+import { HealthService } from './health-service'
 
 export const leadService = new LeadService()
 export const campaignService = new CampaignService()
@@ -21,3 +24,6 @@ export const companyProfileService = new CompanyProfileService()
 export const productService = new ProductService()
 export const knowledgeService = new KnowledgeService()
 export const readinessService = new ReadinessService()
+export const conversationService = new ConversationService()
+export const agentService = new AgentService()
+export const healthService = new HealthService()
