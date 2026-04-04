@@ -32,9 +32,12 @@ export function EmptyState({ icon: Icon, title, description, actionLabel, action
       {actionLabel && (actionHref || onAction) && (
         <div className="mt-5">
           {actionHref ? (
-            <Button asChild className="h-10 rounded-xl bg-accent px-5 text-[13px] font-semibold text-primary-foreground hover:brightness-110">
-              <Link href={actionHref}>{actionLabel}</Link>
-            </Button>
+            <Link
+              href={actionHref}
+              className="inline-flex h-10 items-center justify-center rounded-xl bg-accent px-5 text-[13px] font-semibold text-primary-foreground hover:brightness-110 transition-all"
+            >
+              {actionLabel}
+            </Link>
           ) : (
             <Button onClick={onAction} className="h-10 rounded-xl bg-accent px-5 text-[13px] font-semibold text-primary-foreground hover:brightness-110">
               {actionLabel}

@@ -7,11 +7,14 @@ import type { Alert, AlertType } from '@/lib/types'
 
 const ALERT_CONFIG: Record<AlertType, { icon: typeof DollarSign; color: string; label: string }> = {
   sale: { icon: DollarSign, color: '#34D399', label: 'Venda' },
+  sale_confirmed: { icon: DollarSign, color: '#34D399', label: 'Venda Confirmada' },
   campaign_paused: { icon: Pause, color: '#E8C872', label: 'Campanha' },
   campaign_scaled: { icon: TrendingUp, color: '#4FD1C5', label: 'Escala' },
   whale: { icon: Star, color: '#A78BFA', label: 'Baleia' },
+  whale_detected: { icon: Star, color: '#A78BFA', label: 'Baleia Detectada' },
   human_requested: { icon: User, color: '#E8C872', label: 'Humano' },
   anomaly: { icon: Shield, color: '#F07070', label: 'Alerta' },
+  sensor_failure: { icon: Shield, color: '#F07070', label: 'Falha Sensor' },
 }
 
 function groupByTime(alerts: Alert[]): { label: string; items: Alert[] }[] {
