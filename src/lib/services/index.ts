@@ -5,6 +5,10 @@ import { AlertService } from './alert-service'
 import { CompanyService } from './company-service'
 import { AdminService } from './admin-service'
 import { AuthService } from './auth-service'
+import { CompanyProfileService } from './company-profile-service'
+import { ProductService } from './product-service'
+import { KnowledgeService } from './knowledge-service'
+import { ReadinessService } from './readiness-service'
 
 export const leadService = new LeadService()
 export const campaignService = new CampaignService()
@@ -13,3 +17,7 @@ export const alertService = new AlertService()
 export const companyService = new CompanyService()
 export const adminService = new AdminService()
 export const authService = new AuthService()
+export const companyProfileService = new CompanyProfileService()
+export const productService = new ProductService()
+export const knowledgeService = new KnowledgeService()
+export const readinessService = new ReadinessService()
