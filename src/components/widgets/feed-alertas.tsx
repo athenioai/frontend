@@ -1,17 +1,20 @@
 'use client'
 
-import { DollarSign, Pause, TrendingUp, Star, User, Shield } from 'lucide-react'
+import { DollarSign, Pause, TrendingUp, Star, User, Shield, AlertTriangle } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils/format'
 import { AnimateIn } from '@/components/ui/animate-in'
 import type { Alert, AlertType } from '@/lib/types'
 
 const ALERT_CONFIG: Record<AlertType, { icon: typeof DollarSign; color: string; label: string }> = {
   sale: { icon: DollarSign, color: '#34D399', label: 'Venda' },
+  sale_confirmed: { icon: DollarSign, color: '#34D399', label: 'Venda Confirmada' },
   campaign_paused: { icon: Pause, color: '#E8C872', label: 'Campanha' },
   campaign_scaled: { icon: TrendingUp, color: '#4FD1C5', label: 'Escala' },
   whale: { icon: Star, color: '#A78BFA', label: 'Baleia' },
+  whale_detected: { icon: Star, color: '#4FD1C5', label: 'Whale' },
   human_requested: { icon: User, color: '#E8C872', label: 'Humano' },
   anomaly: { icon: Shield, color: '#F07070', label: 'Alerta' },
+  sensor_failure: { icon: AlertTriangle, color: '#F07070', label: 'Falha' },
 }
 
 function groupByTime(alerts: Alert[]): { label: string; items: Alert[] }[] {

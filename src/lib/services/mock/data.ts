@@ -139,11 +139,11 @@ export const mockPayments: PaymentLog[] = [
 ]
 
 export const mockConversations: Conversation[] = [
-  { id: 'conv-001', company_id: 'emp-001', lead_id: 'lead-001', messages_count: 24, duration_minutes: 35, agent: 'ares', created_at: '2026-03-31T10:00:00Z' },
-  { id: 'conv-002', company_id: 'emp-001', lead_id: 'lead-002', messages_count: 8, duration_minutes: 12, agent: 'hermes', created_at: '2026-03-30T18:00:00Z' },
-  { id: 'conv-003', company_id: 'emp-001', lead_id: 'lead-004', messages_count: 32, duration_minutes: 55, agent: 'ares', created_at: '2026-03-25T16:00:00Z' },
-  { id: 'conv-004', company_id: 'emp-001', lead_id: 'lead-005', messages_count: 15, duration_minutes: 20, agent: 'ares', created_at: '2026-03-31T08:00:00Z' },
-  { id: 'conv-005', company_id: 'emp-001', lead_id: 'lead-006', messages_count: 28, duration_minutes: 45, agent: 'ares', created_at: '2026-03-31T11:00:00Z' },
+  { id: 'conv-001', company_id: 'emp-001', lead_id: 'lead-001', lead_name: 'Carlos Silva', lead_phone: '5511999887766', messages_count: 24, duration_minutes: 35, agent: 'ares', is_human_takeover: false, is_whale: false, funnel_stage: 'negotiating', temperature: 'warm', last_message_preview: 'Pode liberar, vou testar.', last_message_at: '2026-03-31T10:10:00Z', created_at: '2026-03-31T10:00:00Z' },
+  { id: 'conv-002', company_id: 'emp-001', lead_id: 'lead-002', lead_name: 'Ana Beatriz', lead_phone: '5511988776655', messages_count: 8, duration_minutes: 12, agent: 'hermes', is_human_takeover: false, is_whale: false, funnel_stage: 'qualifying', temperature: 'cold', last_message_preview: 'Quanto tempo leva pra ver resultado?', last_message_at: '2026-03-30T18:05:00Z', created_at: '2026-03-30T18:00:00Z' },
+  { id: 'conv-003', company_id: 'emp-001', lead_id: 'lead-004', lead_name: 'Fernanda Costa', lead_phone: '5511977665544', messages_count: 32, duration_minutes: 55, agent: 'ares', is_human_takeover: false, is_whale: true, funnel_stage: 'closing', temperature: 'hot', last_message_preview: 'Fechado! Manda o link de pagamento.', last_message_at: '2026-03-25T16:30:00Z', created_at: '2026-03-25T16:00:00Z' },
+  { id: 'conv-004', company_id: 'emp-001', lead_id: 'lead-005', lead_name: 'Pedro Henrique', lead_phone: '5511966554433', messages_count: 15, duration_minutes: 20, agent: 'ares', is_human_takeover: true, is_whale: false, funnel_stage: 'consulting', temperature: 'warm', last_message_preview: 'Preciso falar com alguem da equipe.', last_message_at: '2026-03-31T08:20:00Z', created_at: '2026-03-31T08:00:00Z' },
+  { id: 'conv-005', company_id: 'emp-001', lead_id: 'lead-006', lead_name: 'Julia Santos', lead_phone: '5511955443322', messages_count: 28, duration_minutes: 45, agent: 'ares', is_human_takeover: false, is_whale: false, funnel_stage: 'negotiating', temperature: 'hot', last_message_preview: 'Vou pensar e volto amanha.', last_message_at: '2026-03-31T11:45:00Z', created_at: '2026-03-31T11:00:00Z' },
 ]
 
 export const mockMessages: Message[] = [
