@@ -1,4 +1,4 @@
-import { authService, campaignService, analyticsService, leadService, alertService, readinessService } from '@/lib/services'
+import { authService, campaignService, analyticsService, leadService, alertService, readinessService, agentService, conversationService } from '@/lib/services'
 import { redirect } from 'next/navigation'
 import { RoiCard } from '@/components/widgets/roi-card'
 import { HealthScoreWidget } from '@/components/widgets/health-score'
@@ -11,12 +11,14 @@ import { DashboardGreeting } from '@/components/widgets/dashboard-greeting'
 import { ReadinessBanner } from '@/components/widgets/readiness-banner'
 import { LtvCacWidget } from '@/components/widgets/ltv-cac-widget'
 import { TimeSavedWidget } from '@/components/widgets/time-saved-widget'
+import { AgentStatusCard } from '@/components/widgets/agent-status-card'
+import { RecentActivity } from '@/components/widgets/recent-activity'
 
 export default async function DashboardPage() {
   const user = await authService.getSession()
   if (!user) redirect('/login')
 
-  const [roi, health, funnel, ltvCac, objections, hoursSaved, agents, alerts, readiness] = await Promise.all([
+  const [roi, health, funnel, ltvCac, objections, hoursSaved, agents, alerts, readiness, agentStatus, conversations] = await Promise.all([
     campaignService.getTotalRoi(user.company_id),
     analyticsService.getHealthScore(user.company_id),
     leadService.getFunnelStats(user.company_id, '30d'),
@@ -26,6 +28,8 @@ export default async function DashboardPage() {
     analyticsService.getAgentsActivity(user.company_id),
     alertService.getRecent(user.company_id),
     readinessService.check(),
+    agentService.getStatus(user.company_id),
+    conversationService.list(user.company_id),
   ])
 
   return (
@@ -128,6 +132,26 @@ export default async function DashboardPage() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Section: Status dos Agentes */}
+      <div>
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
+          Status dos Agentes
+        </p>
+        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
+          {agentStatus.map((agent, i) => (
+            <AgentStatusCard key={agent.name} agent={agent} delay={i * 0.06} />
+          ))}
+        </div>
+      </div>
+
+      {/* Section: Atividade Recente */}
+      <div>
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-text-subtle">
+          Atividade Recente
+        </p>
+        <RecentActivity conversations={conversations} alerts={alerts} />
       </div>
 
       {/* Section: Agentes */}

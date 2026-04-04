@@ -87,6 +87,13 @@ export function Sidebar({ isAdmin, userName, mobile = false }: SidebarProps) {
     window.dispatchEvent(new Event('sidebar-collapse'))
   }, [collapsed])
 
+  const allItems = [
+    ...NAV_MAIN.map((item) => ({ ...item, section: 'main' })),
+    ...NAV_SECONDARY.map((item) => ({ ...item, section: 'secondary' })),
+    ...(isAdmin ? NAV_ADMIN.map((item) => ({ ...item, section: 'admin' })) : []),
+  ]
+
+
   function NavItem({
     href,
     label,
