@@ -1,4 +1,5 @@
 import { authService, campaignService, analyticsService, leadService, alertService, readinessService, agentService, conversationService } from '@/lib/services'
+import type { HealthScoreData, AgentsActivity } from '@/lib/types'
 import { redirect } from 'next/navigation'
 import { RoiCard } from '@/components/widgets/roi-card'
 import { HealthScoreWidget } from '@/components/widgets/health-score'
@@ -19,17 +20,17 @@ export default async function DashboardPage() {
   if (!user) redirect('/login')
 
   const [roi, health, funnel, ltvCac, objections, hoursSaved, agents, alerts, readiness, agentStatus, conversations] = await Promise.all([
-    campaignService.getTotalRoi(user.company_id),
-    analyticsService.getHealthScore(user.company_id),
-    leadService.getFunnelStats(user.company_id, '30d'),
-    analyticsService.getLtvCac(user.company_id),
-    leadService.getTopObjections(user.company_id),
-    analyticsService.getHoursSaved(user.company_id),
-    analyticsService.getAgentsActivity(user.company_id),
-    alertService.getRecent(user.company_id),
-    readinessService.check(),
-    agentService.getStatus(user.company_id),
-    conversationService.list(user.company_id),
+    campaignService.getTotalRoi(user.company_id).catch(() => ({ invested: 0, revenue: 0, roas: 0, history_7d: [] })),
+    analyticsService.getHealthScore(user.company_id).catch((): HealthScoreData => ({ score: 0, message_volume: { current: 0, previous: 0, change_percent: 0 }, conversion_rate: 0, avg_latency_ms: 0 })),
+    leadService.getFunnelStats(user.company_id, '30d').catch(() => ({ captured: 0, qualified: 0, negotiation: 0, converted: 0, rates: { captured_to_qualified: 0, qualified_to_negotiation: 0, negotiation_to_converted: 0 } })),
+    analyticsService.getLtvCac(user.company_id).catch(() => ({ ltv: 0, cac: 1, history: [] })),
+    leadService.getTopObjections(user.company_id).catch(() => []),
+    analyticsService.getHoursSaved(user.company_id).catch(() => ({ hours: 0 })),
+    analyticsService.getAgentsActivity(user.company_id).catch((): AgentsActivity => ({ hermes: { active_campaigns: 0, nurturing_leads: 0, latest_creative: '', next_cycle: '' }, ares: { active_conversations: 0, sales_today: 0, scheduled_followups: 0, waiting_leads: 0 }, athena: { last_cycle: '', last_cycle_summary: '', last_decision: '', alerts_fired: 0 } })),
+    alertService.getRecent(user.company_id).catch(() => []),
+    readinessService.check().catch(() => ({ ready: false, checks: [] })),
+    agentService.getStatus(user.company_id).catch(() => []),
+    conversationService.list(user.company_id).catch(() => []),
   ])
 
   return (

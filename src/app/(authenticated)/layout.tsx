@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { authService, analyticsService, alertService } from '@/lib/services'
+import type { HealthScoreData } from '@/lib/types'
 import { AuthShell } from '@/components/layout/auth-shell'
 import { HealthBanner } from '@/components/layout/health-banner'
 
@@ -12,8 +13,8 @@ export default async function AuthenticatedLayout({
   if (!user) redirect('/login')
 
   const [health, alerts] = await Promise.all([
-    analyticsService.getHealthScore(user.company_id),
-    alertService.getRecent(user.company_id),
+    analyticsService.getHealthScore(user.company_id).catch((): HealthScoreData => ({ score: 0, message_volume: { current: 0, previous: 0, change_percent: 0 }, conversion_rate: 0, avg_latency_ms: 0 })),
+    alertService.getRecent(user.company_id).catch(() => []),
   ])
 
   return (
