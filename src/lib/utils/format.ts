@@ -30,7 +30,10 @@ export function formatPercent(value: number): string {
 }
 
 export function formatDate(iso: string): string {
-  return dateFormatter.format(new Date(iso))
+  if (!iso) return '—'
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return '—'
+  return dateFormatter.format(d)
 }
 
 export function formatPhone(phone: string): string {
@@ -49,8 +52,10 @@ export function formatPhone(phone: string): string {
 }
 
 export function formatRelativeTime(iso: string): string {
+  if (!iso) return '—'
   const now = Date.now()
   const then = new Date(iso).getTime()
+  if (isNaN(then)) return '—'
   const diffMs = now - then
   const diffMin = Math.floor(diffMs / 60_000)
   const diffHours = Math.floor(diffMs / 3_600_000)
