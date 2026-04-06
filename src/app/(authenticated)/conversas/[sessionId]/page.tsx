@@ -9,9 +9,23 @@ async function fetchMessages(sessionId: string) {
   let notFoundError = false
 
   try {
-    const result = await chatService.getMessages(sessionId)
-    messages = result.data
-    pagination = result.pagination
+    // First fetch to discover total count
+    const initial = await chatService.getMessages(sessionId, { limit: 50 })
+    const lastPage =
+      Math.ceil(initial.pagination.total / initial.pagination.limit) || 1
+
+    if (lastPage <= 1) {
+      messages = initial.data
+      pagination = initial.pagination
+    } else {
+      // Fetch the last page (most recent messages)
+      const latest = await chatService.getMessages(sessionId, {
+        page: lastPage,
+        limit: 50,
+      })
+      messages = latest.data
+      pagination = latest.pagination
+    }
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       notFoundError = true
