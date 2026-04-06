@@ -90,27 +90,35 @@ export class AuthService implements IAuthService {
     })
 
     if (!res.ok) {
-      cookieStore.delete('access_token')
-      cookieStore.delete('refresh_token')
+      try {
+        cookieStore.delete('access_token')
+        cookieStore.delete('refresh_token')
+      } catch {
+        // Cookies can only be modified in Server Actions or Route Handlers
+      }
       return null
     }
 
     const data: { accessToken: string; refreshToken: string } = await res.json()
 
-    cookieStore.set('access_token', data.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60,
-    })
-    cookieStore.set('refresh_token', data.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    })
+    try {
+      cookieStore.set('access_token', data.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60,
+      })
+      cookieStore.set('refresh_token', data.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7,
+      })
+    } catch {
+      // Cookies can only be modified in Server Actions or Route Handlers
+    }
 
     return data.accessToken
   }
