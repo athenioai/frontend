@@ -4,13 +4,13 @@ import { useState } from 'react'
 import { useActionState } from 'react'
 import { motion } from 'motion/react'
 import { loginAction } from './actions'
-import { Eye, EyeOff, CheckCircle } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/ui/logo'
 import { MOTION } from '@/lib/motion'
+import Link from 'next/link'
 
 const stagger = {
   hidden: {},
@@ -28,17 +28,6 @@ export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
-  const [resetSent, setResetSent] = useState(false)
-
-  const handleForgotPassword = async () => {
-    if (!email) return
-    const supabase = createClient()
-    await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
-    })
-    setResetSent(true)
-    setTimeout(() => setResetSent(false), 5000)
-  }
 
   return (
     <div className="flex min-h-screen">
@@ -200,25 +189,9 @@ export default function LoginPage() {
               transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
               className="space-y-1.5"
             >
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-[13px] font-medium text-text-muted">
-                  Senha
-                </Label>
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  className="text-[12px] text-accent/70 transition-colors hover:text-accent"
-                >
-                  {resetSent ? (
-                    <span className="flex items-center gap-1 text-emerald">
-                      <CheckCircle className="h-3 w-3" />
-                      E-mail enviado
-                    </span>
-                  ) : (
-                    'Esqueceu?'
-                  )}
-                </button>
-              </div>
+              <Label htmlFor="password" className="text-[13px] font-medium text-text-muted">
+                Senha
+              </Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -243,6 +216,7 @@ export default function LoginPage() {
             <motion.div
               variants={fadeUp}
               transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+              className="flex items-center justify-between"
             >
               <label className="inline-flex items-center gap-2.5 cursor-pointer group">
                 <span className="relative flex h-[18px] w-[18px] items-center justify-center">
@@ -266,6 +240,12 @@ export default function LoginPage() {
                 </span>
                 <span className="text-[13px] text-text-muted group-hover:text-text-primary transition-colors">Lembrar-me</span>
               </label>
+              <Link
+                href="/forgot-password"
+                className="text-[12px] text-accent/70 transition-colors hover:text-accent"
+              >
+                Esqueceu a senha?
+              </Link>
             </motion.div>
 
             {state?.error && (

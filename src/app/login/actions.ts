@@ -13,8 +13,9 @@ export async function loginAction(_prevState: unknown, formData: FormData) {
 
   try {
     await authService.login(email, password)
-  } catch {
-    return { error: 'Credenciais não conferem. Tente novamente.' }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erro ao fazer login.'
+    return { error: message }
   }
 
   redirect('/dashboard')
