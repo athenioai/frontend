@@ -1,43 +1,17 @@
-import { authService, chatService } from '@/lib/services'
-import { redirect } from 'next/navigation'
-import { SessionList } from './_components/session-list'
-import type { ChatSession, Pagination } from '@/lib/services/interfaces/chat-service'
+import { MessagesSquare } from 'lucide-react'
 
-async function fetchSessions(page: number, agent?: string) {
-  let sessions: ChatSession[] = []
-  let pagination: Pagination = { page: 1, limit: 20, total: 0 }
-
-  try {
-    const result = await chatService.listSessions({ page, agent })
-    sessions = result.data
-    pagination = result.pagination
-  } catch {
-    // Falls back to empty state
-  }
-
-  return { sessions, pagination }
-}
-
-export default async function ConversasPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string; agent?: string }>
-}) {
-  const user = await authService.getSession()
-  if (!user) redirect('/login')
-
-  const params = await searchParams
-  const page = Number(params.page) || 1
-  const agent = params.agent || undefined
-  const { sessions, pagination } = await fetchSessions(page, agent)
-
+export default function ConversasPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <SessionList
-        sessions={sessions}
-        pagination={pagination}
-        currentAgent={agent}
-      />
+    <div className="flex h-full flex-col items-center justify-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-2">
+        <MessagesSquare className="h-8 w-8 text-text-subtle/50" />
+      </div>
+      <p className="mt-4 font-title text-lg font-semibold text-text-muted">
+        Selecione uma conversa
+      </p>
+      <p className="mt-1 text-sm text-text-subtle">
+        Escolha uma conversa ao lado para ver as mensagens
+      </p>
     </div>
   )
 }

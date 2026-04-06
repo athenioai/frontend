@@ -9,20 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/ui/logo'
-import { MOTION } from '@/lib/motion'
 import Link from 'next/link'
-
-const stagger = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
-  },
-}
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0 },
-}
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null)
@@ -60,33 +47,18 @@ export default function LoginPage() {
           }}
         />
 
-        {/* Content — staggered entry */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={stagger}
-          className="relative z-10 flex flex-col items-center px-12 text-center"
-        >
-          <motion.div variants={fadeUp} transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}>
-            <Logo width={200} height={50} />
-          </motion.div>
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center px-12 text-center">
+          <Logo width={200} height={50} />
 
-          <motion.p
-            variants={fadeUp}
-            transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-            className="mt-6 max-w-[320px] text-[15px] leading-relaxed text-[rgba(240,237,232,0.7)]"
-          >
+          <p className="mt-6 max-w-[320px] text-[15px] leading-relaxed text-[rgba(240,237,232,0.7)]">
             Seus agentes de IA trabalhando 24/7.
             <br />
             Acompanhe tudo em tempo real.
-          </motion.p>
+          </p>
 
           {/* Stats with separators */}
-          <motion.div
-            variants={fadeUp}
-            transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-            className="mt-12 flex items-center gap-0"
-          >
+          <div className="mt-12 flex items-center gap-0">
             {[
               { value: '3', label: 'Agentes IA' },
               { value: '24/7', label: 'Operação' },
@@ -104,8 +76,8 @@ export default function LoginPage() {
                 </div>
               </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#080A0E] to-transparent" />
@@ -142,32 +114,19 @@ export default function LoginPage() {
           <Logo width={160} height={40} />
         </div>
 
-        {/* Form — staggered entry */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={stagger}
-          className="relative z-10 w-full max-w-[380px]"
-        >
-          <motion.div
-            variants={fadeUp}
-            transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-            className="mb-8 text-center"
-          >
+        {/* Form */}
+        <div className="relative z-10 w-full max-w-[380px]">
+          <div className="mb-8 text-center">
             <h2 className="font-title text-[24px] font-bold text-text-primary">
               Bem-vindo de volta
             </h2>
             <p className="mt-1.5 text-[14px] text-text-muted">
               Acesse o painel da sua operação
             </p>
-          </motion.div>
+          </div>
 
           <form action={formAction} className="space-y-5">
-            <motion.div
-              variants={fadeUp}
-              transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-              className="space-y-1.5"
-            >
+            <div className="space-y-1.5">
               <Label htmlFor="email" className="text-[13px] font-medium text-text-muted">
                 E-mail
               </Label>
@@ -182,12 +141,9 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
               />
-            </motion.div>
+            </div>
 
-            <motion.div
-              variants={fadeUp}
-              transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-              className="space-y-1.5"
+            <div className="space-y-1.5"
             >
               <Label htmlFor="password" className="text-[13px] font-medium text-text-muted">
                 Senha
@@ -211,12 +167,9 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              variants={fadeUp}
-              transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-              className="flex items-center justify-between"
+            <div className="flex items-center justify-between"
             >
               <label className="inline-flex items-center gap-2.5 cursor-pointer group">
                 <span className="relative flex h-[18px] w-[18px] items-center justify-center">
@@ -246,7 +199,7 @@ export default function LoginPage() {
               >
                 Esqueceu a senha?
               </Link>
-            </motion.div>
+            </div>
 
             {state?.error && (
               <motion.div
@@ -258,10 +211,7 @@ export default function LoginPage() {
               </motion.div>
             )}
 
-            <motion.div
-              variants={fadeUp}
-              transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-            >
+            <div>
               <Button
                 type="submit"
                 disabled={isPending}
@@ -276,14 +226,10 @@ export default function LoginPage() {
                   'Acessar painel'
                 )}
               </Button>
-            </motion.div>
+            </div>
           </form>
 
-          <motion.div
-            variants={fadeUp}
-            transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-            className="mt-10 flex flex-col items-center gap-3"
-          >
+          <div className="mt-10 flex flex-col items-center gap-3">
             <p className="text-[13px] text-text-subtle">
               Ainda não é cliente?
             </p>
@@ -298,8 +244,8 @@ export default function LoginPage() {
               </svg>
               Falar com a equipe
             </a>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   )

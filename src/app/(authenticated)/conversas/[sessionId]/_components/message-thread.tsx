@@ -51,21 +51,14 @@ export function MessageThread({
   }
 
   return (
-    <>
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-        className="mb-8 flex items-center gap-3"
-      >
-        <Link href="/conversas">
+    <div className="flex h-full flex-col">
+      {/* Header bar */}
+      <div className="flex shrink-0 items-center gap-3 border-b border-border-default bg-surface-1 px-4 py-3">
+        <Link href="/conversas" className="lg:hidden">
           <Button variant="ghost" size="icon-sm">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-
-        <div className="h-5 w-px bg-border-default" />
 
         <span
           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${getAgentBadgeStyle(agent)}`}
@@ -79,102 +72,98 @@ export function MessageThread({
             Iniciada em {startDate}
           </span>
         )}
-      </motion.div>
+      </div>
 
-      {/* Load more (older messages) */}
-      {hasMore && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15 }}
-          className="mb-6 flex justify-center"
-        >
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLoadMore}
-            disabled={isLoadingMore}
-            className="text-text-muted"
-          >
-            {isLoadingMore ? (
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 animate-spin rounded-full border-2 border-text-subtle/30 border-t-text-muted" />
-                Carregando...
-              </span>
-            ) : (
-              <>
-                <ChevronUp className="h-3.5 w-3.5" />
-                Carregar mais mensagens
-              </>
-            )}
-          </Button>
-        </motion.div>
-      )}
-
-      {/* Messages */}
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
-        className="space-y-3"
-      >
-        {messages.map((message) => {
-          const isAssistant = message.role === 'assistant'
-
-          return (
-            <motion.div
-              key={message.id}
-              variants={fadeInUp}
-              transition={{
-                duration: MOTION.duration.normal,
-                ease: MOTION.ease.out,
-              }}
-              className={`flex ${isAssistant ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[75%] px-4 py-3 ${
-                  isAssistant
-                    ? 'rounded-tl-xl rounded-tr-sm rounded-bl-xl rounded-br-xl bg-accent/[0.08] ring-1 ring-accent/[0.06]'
-                    : 'rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-xl bg-surface-2'
-                }`}
+      {/* Messages — scrollable */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-2xl px-4 py-6 lg:px-6">
+          {/* Load more */}
+          {hasMore && (
+            <div className="mb-6 flex justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+                className="text-text-muted"
               >
-                {/* Role label */}
-                <p
-                  className={`mb-1 text-[10px] font-semibold uppercase tracking-wider ${
-                    isAssistant ? 'text-accent/50' : 'text-text-subtle'
-                  }`}
-                >
-                  {isAssistant ? agentLabel : 'Cliente'}
-                </p>
-
-                {/* Content */}
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-text-primary">
-                  {message.content}
-                </p>
-
-                {/* Appointment badge */}
-                {message.appointmentId && (
-                  <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-success/10 px-2.5 py-1.5 ring-1 ring-success/10">
-                    <Calendar className="h-3 w-3 text-success" />
-                    <span className="text-[11px] font-medium text-success">
-                      Agendamento criado
-                    </span>
-                  </div>
+                {isLoadingMore ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-3 w-3 animate-spin rounded-full border-2 border-text-subtle/30 border-t-text-muted" />
+                    Carregando...
+                  </span>
+                ) : (
+                  <>
+                    <ChevronUp className="h-3.5 w-3.5" />
+                    Carregar mais mensagens
+                  </>
                 )}
+              </Button>
+            </div>
+          )}
 
-                {/* Timestamp */}
-                <p
-                  className={`mt-1.5 text-[10px] ${
-                    isAssistant ? 'text-accent/35' : 'text-text-subtle/70'
-                  }`}
+          {/* Messages */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            className="space-y-3"
+          >
+            {messages.map((message) => {
+              const isAssistant = message.role === 'assistant'
+
+              return (
+                <motion.div
+                  key={message.id}
+                  variants={fadeInUp}
+                  transition={{
+                    duration: MOTION.duration.normal,
+                    ease: MOTION.ease.out,
+                  }}
+                  className={`flex ${isAssistant ? 'justify-end' : 'justify-start'}`}
                 >
-                  {formatTime(message.createdAt)}
-                </p>
-              </div>
-            </motion.div>
-          )
-        })}
-      </motion.div>
-    </>
+                  <div
+                    className={`max-w-[75%] px-4 py-3 ${
+                      isAssistant
+                        ? 'rounded-tl-xl rounded-tr-sm rounded-bl-xl rounded-br-xl bg-accent/[0.08] ring-1 ring-accent/[0.06]'
+                        : 'rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-xl bg-surface-2'
+                    }`}
+                  >
+                    <p
+                      className={`mb-1 text-[10px] font-semibold uppercase tracking-wider ${
+                        isAssistant ? 'text-accent/50' : 'text-text-subtle'
+                      }`}
+                    >
+                      {isAssistant ? agentLabel : 'Cliente'}
+                    </p>
+
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-text-primary">
+                      {message.content}
+                    </p>
+
+                    {message.appointmentId && (
+                      <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-success/10 px-2.5 py-1.5 ring-1 ring-success/10">
+                        <Calendar className="h-3 w-3 text-success" />
+                        <span className="text-[11px] font-medium text-success">
+                          Agendamento criado
+                        </span>
+                      </div>
+                    )}
+
+                    <p
+                      className={`mt-1.5 text-[10px] ${
+                        isAssistant ? 'text-accent/35' : 'text-text-subtle/70'
+                      }`}
+                    >
+                      {formatTime(message.createdAt)}
+                    </p>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </motion.div>
+        </div>
+      </div>
+    </div>
   )
 }

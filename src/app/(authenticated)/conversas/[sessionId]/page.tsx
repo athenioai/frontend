@@ -1,5 +1,5 @@
-import { authService, chatService } from '@/lib/services'
-import { redirect, notFound } from 'next/navigation'
+import { chatService } from '@/lib/services'
+import { notFound } from 'next/navigation'
 import { MessageThread } from './_components/message-thread'
 import type { ChatMessage, Pagination } from '@/lib/services/interfaces/chat-service'
 
@@ -28,21 +28,16 @@ export default async function ChatDetailPage({
 }: {
   params: Promise<{ sessionId: string }>
 }) {
-  const user = await authService.getSession()
-  if (!user) redirect('/login')
-
   const { sessionId } = await params
   const { messages, pagination, notFoundError } = await fetchMessages(sessionId)
 
   if (notFoundError) notFound()
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <MessageThread
-        sessionId={sessionId}
-        initialMessages={messages}
-        initialPagination={pagination}
-      />
-    </div>
+    <MessageThread
+      sessionId={sessionId}
+      initialMessages={messages}
+      initialPagination={pagination}
+    />
   )
 }
