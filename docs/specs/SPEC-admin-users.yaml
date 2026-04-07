@@ -1,0 +1,64 @@
+feature: admin-users-management
+version: 1.0
+status: approved
+
+entity:
+  name: AdminUser
+  fields:
+    - { name: id, type: string (UUID), source: server }
+    - { name: name, type: "string | null", source: server, note: "null = pendente onboarding" }
+    - { name: email, type: string (email), required: true }
+    - { name: role, type: "'admin' | 'user'", source: server }
+    - { name: planId, type: string (UUID), required: true }
+    - { name: contractUrl, type: string (signed URL), source: server }
+    - { name: createdAt, type: string (ISO 8601), source: server }
+
+endpoints:
+  - method: POST
+    path: /admin/users
+    auth: JWT Bearer (admin)
+    content_type: multipart/form-data
+    body: { email, plan_id (UUID), contract (PDF file, max 10MB) }
+    response: AdminUser (201)
+    errors: [400, 403, 409, 422]
+
+  - method: GET
+    path: /admin/users
+    auth: JWT Bearer (admin)
+    params: [page, limit, role, search]
+    response: { data: AdminUser[], pagination }
+
+  - method: GET
+    path: /admin/users/:id
+    auth: JWT Bearer (admin)
+    response: AdminUser
+    errors: [404]
+
+invariants:
+  - Admin-only access (403)
+  - Email uniqueness (409)
+  - Plan must exist (422)
+  - Contract must be PDF, max 10MB (400)
+  - name=null means pending onboarding
+
+screens:
+  - route: /admin/usuarios
+    components:
+      - Table: Status badge, Nome/Pendente, Email, Plano (name via lookup), Criado em, Contrato (download)
+      - Search input (nome/email)
+      - Role filter tabs (Todos/Admin/User)
+      - "Novo Usuário" button opens create modal
+      - Create modal: email, plan select (from GET /admin/plans), contract file upload (PDF)
+      - Inline errors (409, 422)
+      - Pagination
+
+acceptance_criteria:
+  - AC-01: Admin can list users with pagination
+  - AC-02: Admin can search users by name/email
+  - AC-03: Admin can filter by role (admin/user)
+  - AC-04: Admin can create user with email + plan + PDF contract
+  - AC-05: 409 error shown inline when email exists
+  - AC-06: 422 error shown inline when plan is invalid
+  - AC-07: Badge shows "Ativo" (name set) or "Pendente" (name null)
+  - AC-08: Contract downloadable via signed URL
+  - AC-09: Plan dropdown populated from GET /admin/plans

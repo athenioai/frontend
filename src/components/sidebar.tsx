@@ -16,8 +16,9 @@ import {
   ChevronsLeft,
   ChevronsRight,
   User,
+  Users,
 } from 'lucide-react'
-import { Logo, LogoMark } from '@/components/ui/logo'
+import { Logo } from '@/components/ui/logo'
 import { cn } from '@/lib/utils'
 import { MOTION } from '@/lib/motion'
 import { logoutAction } from '@/app/(authenticated)/actions'
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
 
 const ADMIN_ITEMS = [
   { href: '/admin/planos', label: 'Planos', icon: CreditCard },
+  { href: '/admin/usuarios', label: 'Usuários', icon: Users },
 ]
 
 interface SidebarProps {
