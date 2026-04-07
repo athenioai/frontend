@@ -78,6 +78,9 @@ export class AuthService implements IAuthService {
   }
 
   private async tryRefresh(): Promise<string | null> {
+    // Token refresh and cookie persistence is handled by the middleware.
+    // This method only attempts a refresh for the current request's use
+    // (e.g., when middleware already ran but the token expired mid-render).
     const cookieStore = await cookies()
     const refreshToken = cookieStore.get('refresh_token')?.value
 
@@ -89,37 +92,9 @@ export class AuthService implements IAuthService {
       body: JSON.stringify({ refreshToken }),
     })
 
-    if (!res.ok) {
-      try {
-        cookieStore.delete('access_token')
-        cookieStore.delete('refresh_token')
-      } catch {
-        // Cookies can only be modified in Server Actions or Route Handlers
-      }
-      return null
-    }
+    if (!res.ok) return null
 
     const data: { accessToken: string; refreshToken: string } = await res.json()
-
-    try {
-      cookieStore.set('access_token', data.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60,
-      })
-      cookieStore.set('refresh_token', data.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7,
-      })
-    } catch {
-      // Cookies can only be modified in Server Actions or Route Handlers
-    }
-
     return data.accessToken
   }
 }
