@@ -9,6 +9,7 @@ import {
   CalendarDays,
   Settings,
   CreditCard,
+  BarChart3,
   LogOut,
   Menu,
   X,
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
 ]
 
 const ADMIN_ITEMS = [
+  { href: '/admin/dashboard', label: 'Dashboard', icon: BarChart3 },
   { href: '/admin/planos', label: 'Planos', icon: CreditCard },
   { href: '/admin/usuarios', label: 'Usuários', icon: Users },
 ]

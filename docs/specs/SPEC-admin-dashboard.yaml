@@ -1,0 +1,51 @@
+feature: admin-dashboard
+version: 1.0
+status: approved
+
+endpoint:
+  method: GET
+  path: /admin/dashboard
+  auth: JWT Bearer (admin)
+  response:
+    users: { total, newThisMonth, pendingOnboarding }
+    revenue: { mrr, planBreakdown[] }
+    appointments: { totalThisMonth, cancelledThisMonth }
+    leads: { totalThisMonth, conversionRate }
+    chats: { totalMessagesThisMonth, activeSessionsThisMonth }
+
+screens:
+  - route: /admin/dashboard
+    components:
+      - 6 stat cards in 3x2 grid
+      - Donut chart for planBreakdown (recharts PieChart)
+      - Error/empty state fallback
+
+cards:
+  - label: Usuários
+    value: users.total
+    sub: "+X novos este mês" badge (accent)
+  - label: Pendentes
+    value: users.pendingOnboarding
+    sub: alert icon if > 0 (gold)
+  - label: MRR
+    value: revenue.mrr
+    format: "R$ X.XXX,XX"
+  - label: Agendamentos
+    value: appointments.totalThisMonth
+    sub: "X cancelados" (danger)
+  - label: Leads
+    value: leads.totalThisMonth
+    sub: "X% conversão" badge
+  - label: Chats
+    value: chats.totalMessagesThisMonth
+    sub: "X sessões ativas"
+
+acceptance_criteria:
+  - AC-01: Fetch and display all 6 stat cards from GET /admin/dashboard
+  - AC-02: Users card shows total + newThisMonth badge
+  - AC-03: Pendentes card shows alert styling when > 0
+  - AC-04: MRR formatted as R$ currency
+  - AC-05: Appointments card shows total + cancelled subtitle
+  - AC-06: Leads card shows total + conversionRate as percentage
+  - AC-07: Chats card shows messages + sessions subtitle
+  - AC-08: Donut chart renders planBreakdown with legend
