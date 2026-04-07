@@ -1,7 +1,9 @@
 'use server'
 
 import { adminUserDataService } from '@/lib/services'
+import { revalidatePath } from 'next/cache'
 import type { ChatMessage } from '@/lib/services/interfaces/chat-service'
+import type { UpdateCalendarConfigParams } from '@/lib/services/interfaces/calendar-config-service'
 
 export async function loadUserMessages(
   userId: string,
@@ -44,5 +46,18 @@ export async function loadMoreUserMessages(
     return { success: true, data: result.data, pagination: result.pagination }
   } catch {
     return { success: false }
+  }
+}
+
+export async function updateUserCalendarConfig(
+  userId: string,
+  params: UpdateCalendarConfigParams,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await adminUserDataService.updateCalendarConfig(userId, params)
+    revalidatePath(`/admin/usuarios/${userId}`)
+    return { success: true }
+  } catch {
+    return { success: false, error: 'Erro ao salvar configuração.' }
   }
 }

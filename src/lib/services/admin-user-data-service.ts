@@ -5,7 +5,7 @@ import type {
   PaginatedMessages,
   PaginatedAppointments,
 } from './interfaces/admin-user-data-service'
-import type { CalendarConfig } from './interfaces/calendar-config-service'
+import type { CalendarConfig, UpdateCalendarConfigParams } from './interfaces/calendar-config-service'
 import { cookies } from 'next/headers'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
@@ -114,5 +114,31 @@ export class AdminUserDataService implements IAdminUserDataService {
     // Backend returns { message: "Calendar not configured" } when not set
     if (data.message) return null
     return data
+  }
+
+  async updateCalendarConfig(
+    userId: string,
+    params: UpdateCalendarConfigParams,
+  ): Promise<CalendarConfig> {
+    const token = await this.getToken()
+    if (!token) throw new Error('NOT_AUTHENTICATED')
+
+    const res = await fetch(
+      `${API_URL}/admin/users/${userId}/calendar-config`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      },
+    )
+
+    if (!res.ok) {
+      if (res.status === 404) throw new Error('NOT_FOUND')
+      throw new Error('Failed to update calendar config')
+    }
+    return res.json()
   }
 }
