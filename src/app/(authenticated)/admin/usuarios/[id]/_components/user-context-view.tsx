@@ -12,7 +12,6 @@ import {
   Settings,
   MessageSquare,
   CalendarCheck,
-  CalendarX2,
   Target,
   Clock,
   FileDown,
@@ -203,195 +202,189 @@ function DashboardTab({ dashboard }: { dashboard: UserDashboardData | null }) {
     )
   }
 
-  const cards = [
-    {
-      label: 'Agendamentos',
-      value: String(dashboard.appointments.total),
-      sub: `${dashboard.appointments.thisMonth} este mês`,
-      icon: CalendarCheck,
-      color: 'violet',
-    },
-    {
-      label: 'Cancelamentos',
-      value: String(dashboard.appointments.cancelledThisMonth),
-      sub: 'este mês',
-      icon: CalendarX2,
-      color: 'danger',
-    },
-    {
-      label: 'Leads',
-      value: String(dashboard.leads.total),
-      sub: `${dashboard.leads.thisMonth} este mês · ${Math.round(dashboard.leads.conversionRate * 100)}% conversão`,
-      icon: Target,
-      color: 'emerald',
-    },
-    {
-      label: 'Mensagens',
-      value: String(dashboard.chats.totalMessages),
-      sub: `${dashboard.chats.messagesThisMonth} este mês · ${dashboard.chats.activeSessionsThisMonth} sessões`,
-      icon: MessageSquare,
-      color: 'gold',
-    },
-  ]
+  const appointmentSuccessRate =
+    dashboard.appointments.thisMonth > 0
+      ? Math.round(
+          ((dashboard.appointments.thisMonth - dashboard.appointments.cancelledThisMonth) /
+            dashboard.appointments.thisMonth) *
+            100,
+        )
+      : 100
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => (
-        <StatCard key={card.label} {...card} />
-      ))}
-    </div>
-  )
-}
-
-function StatCard({
-  label,
-  value,
-  sub,
-  icon: Icon,
-  color,
-}: {
-  label: string
-  value: string
-  sub: string
-  icon: React.ComponentType<{ className?: string }>
-  color: string
-}) {
-  const colorMap: Record<string, { bg: string; text: string }> = {
-    accent: { bg: 'from-accent/20 to-accent/5', text: 'text-accent' },
-    violet: { bg: 'from-violet/20 to-violet/5', text: 'text-violet' },
-    danger: { bg: 'from-danger/20 to-danger/5', text: 'text-danger' },
-    gold: { bg: 'from-gold/20 to-gold/5', text: 'text-gold' },
-    emerald: { bg: 'from-emerald/20 to-emerald/5', text: 'text-emerald' },
-  }
-  const c = colorMap[color] ?? colorMap.accent
-
-  return (
-    <div className="card-surface p-5">
-      <div className="flex items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
-          {label}
-        </p>
-        <div
-          className={cn(
-            'flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br',
-            c.bg,
-          )}
-        >
-          <Icon className={cn('h-4 w-4', c.text)} />
+    <div className="space-y-6">
+      {/* Stat cards */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="card-surface p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
+            Conversas este mês
+          </p>
+          <p className="mt-2 font-title text-2xl font-bold text-accent">
+            {dashboard.chats.activeSessionsThisMonth}
+          </p>
+          <p className="mt-1 text-xs text-text-subtle">
+            {dashboard.chats.messagesThisMonth} mensagens
+          </p>
+        </div>
+        <div className="card-surface p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
+            Agendamentos este mês
+          </p>
+          <p className="mt-2 font-title text-2xl font-bold text-emerald">
+            {dashboard.appointments.thisMonth}
+          </p>
+          <div className="mt-2">
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="text-text-subtle">{appointmentSuccessRate}% confirmados</span>
+              <span className="text-danger">{dashboard.appointments.cancelledThisMonth} cancelados</span>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-2">
+              <div className="h-full rounded-full bg-emerald" style={{ width: `${appointmentSuccessRate}%` }} />
+            </div>
+          </div>
+        </div>
+        <div className="card-surface p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
+            Taxa de conversão
+          </p>
+          <p className="mt-2 font-title text-2xl font-bold text-gold">
+            {Math.round(dashboard.leads.conversionRate * 100)}%
+          </p>
+          <div className="mt-2">
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="text-text-subtle">{dashboard.leads.thisMonth} leads este mês</span>
+              <span className="text-text-subtle">{dashboard.leads.total} total</span>
+            </div>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-2">
+              <div className="h-full rounded-full bg-gold" style={{ width: `${Math.round(dashboard.leads.conversionRate * 100)}%` }} />
+            </div>
+          </div>
         </div>
       </div>
-      <p className="mt-3 font-title text-3xl font-bold text-text-primary">
-        {value}
-      </p>
-      <p className="mt-1 text-xs text-text-subtle">{sub}</p>
+
+      {/* Totals */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="card-surface p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">Total agendamentos</p>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet/20 to-violet/5">
+              <CalendarCheck className="h-4 w-4 text-violet" />
+            </div>
+          </div>
+          <p className="mt-3 font-title text-3xl font-bold text-text-primary">{dashboard.appointments.total}</p>
+        </div>
+        <div className="card-surface p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">Total leads</p>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald/20 to-emerald/5">
+              <Target className="h-4 w-4 text-emerald" />
+            </div>
+          </div>
+          <p className="mt-3 font-title text-3xl font-bold text-text-primary">{dashboard.leads.total}</p>
+        </div>
+        <div className="card-surface p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">Total mensagens</p>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-gold/20 to-gold/5">
+              <MessageSquare className="h-4 w-4 text-gold" />
+            </div>
+          </div>
+          <p className="mt-3 font-title text-3xl font-bold text-text-primary">{dashboard.chats.totalMessages.toLocaleString('pt-BR')}</p>
+          <p className="mt-1 text-xs text-text-subtle">{dashboard.chats.activeSessionsThisMonth} sessões ativas</p>
+        </div>
+      </div>
     </div>
   )
 }
 
-// ── Agenda tab ──
-
-// ── Config tab (matches settings page layout) ──
+// ── Config tab (matches /configuracoes layout with tabs) ──
 
 function ConfigTab({ config }: { config: CalendarConfig | null }) {
-  if (!config) {
-    return (
-      <EmptyState
-        icon={Settings}
-        title="Sem configuração"
-        sub="Este usuário ainda não configurou a agenda"
-      />
-    )
-  }
-
   return (
-    <div className="max-w-3xl">
-      <div className="card-surface overflow-hidden">
-        {/* Section header */}
-        <div className="flex items-center gap-3 px-5 py-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-            <CalendarDays className="h-4 w-4 text-accent" />
+    <div>
+      {/* Tabs (same as /configuracoes) */}
+      <div className="border-b border-border-default">
+        <nav className="-mb-px flex gap-1">
+          <div className="relative flex items-center gap-2 px-4 py-3 text-sm font-medium text-accent">
+            <CalendarDays className="h-4 w-4" />
+            Agenda
+            <div className="absolute inset-x-0 -bottom-px h-0.5 bg-accent" />
           </div>
-          <div>
-            <p className="text-sm font-semibold text-text-primary">Agenda</p>
-            <p className="text-xs text-text-muted">
-              Horários de funcionamento e regras de agendamento
-            </p>
-          </div>
-        </div>
+        </nav>
+      </div>
 
-        <div className="border-t border-border-default px-5 pb-5 pt-4">
-          {/* Business hours */}
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
-            Horários de funcionamento
-          </h3>
-          <div className="mt-3 space-y-1.5">
-            {config.business_hours.map((bh) => {
-              const isOpen = bh.horario !== 'Fechado'
-              return (
-                <div
-                  key={bh.dia}
-                  className="flex items-center gap-4 rounded-lg bg-surface-2/50 px-3 py-2.5"
-                >
-                  <span className="w-20 shrink-0 text-sm font-medium text-text-primary">
-                    {bh.dia}
-                  </span>
+      {/* Content */}
+      <div className="mt-8 max-w-3xl">
+        {!config ? (
+          <EmptyState
+            icon={Settings}
+            title="Sem configuração"
+            sub="Este usuário ainda não configurou a agenda"
+          />
+        ) : (
+          <form>
+            {/* Business hours */}
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-text-subtle">
+              Horários de funcionamento
+            </h3>
+            <div className="mt-4 space-y-1.5">
+              {config.business_hours.map((bh) => {
+                const isOpen = bh.horario !== 'Fechado'
+                return (
                   <div
-                    className={cn(
-                      'relative h-5 w-9 shrink-0 rounded-full',
-                      isOpen ? 'bg-accent' : 'bg-surface-2',
-                    )}
+                    key={bh.dia}
+                    className="flex items-center gap-4 rounded-xl bg-surface-1 px-4 py-3 ring-1 ring-border-default/50"
                   >
-                    <span
+                    <span className="w-20 shrink-0 text-sm font-medium text-text-primary">
+                      {bh.dia}
+                    </span>
+                    <div
                       className={cn(
-                        'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm',
-                        isOpen && 'translate-x-4',
+                        'relative h-5 w-9 shrink-0 rounded-full',
+                        isOpen ? 'bg-accent' : 'bg-surface-2',
                       )}
-                    />
-                  </div>
-                  {isOpen ? (
-                    <div className="flex items-center gap-1.5 text-sm text-text-muted">
-                      <Clock className="h-3.5 w-3.5 text-text-subtle" />
-                      {bh.horario.replace(' as ', ' às ')}
+                    >
+                      <span
+                        className={cn(
+                          'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm',
+                          isOpen && 'translate-x-4',
+                        )}
+                      />
                     </div>
-                  ) : (
-                    <span className="text-xs text-text-subtle">Fechado</span>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+                    {isOpen ? (
+                      <div className="flex items-center gap-1.5 text-sm text-text-muted">
+                        <Clock className="h-3.5 w-3.5 text-text-subtle" />
+                        {bh.horario.replace(' as ', ' às ')}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-text-subtle">Fechado</span>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
 
-          {/* Rules */}
-          <h3 className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
-            Regras de agendamento
-          </h3>
-          <div className="mt-3 space-y-1.5">
-            <ConfigRow
-              label="Duração do slot"
-              value={`${config.slot_duration_minutes} min`}
-            />
-            <ConfigRow
-              label="Antecedência para agendar"
-              value={`${config.min_advance_hours}h`}
-            />
-            <ConfigRow
-              label="Antecedência para cancelar"
-              value={`${config.min_cancel_advance_hours}h`}
-            />
-          </div>
-        </div>
+            {/* Rules */}
+            <h3 className="mt-8 text-xs font-semibold uppercase tracking-wider text-text-subtle">
+              Regras de agendamento
+            </h3>
+            <div className="mt-4 space-y-1.5">
+              <ConfigRow label="Duração do slot" hint={`${config.slot_duration_minutes} min`} />
+              <ConfigRow label="Antecedência para agendar" hint={`${config.min_advance_hours}h`} />
+              <ConfigRow label="Antecedência para cancelar" hint={`${config.min_cancel_advance_hours}h`} />
+            </div>
+          </form>
+        )}
       </div>
     </div>
   )
 }
 
-function ConfigRow({ label, value }: { label: string; value: string }) {
+function ConfigRow({ label, hint }: { label: string; hint: string }) {
   return (
-    <div className="flex items-center justify-between rounded-lg bg-surface-2/50 px-3 py-2.5">
-      <div>
-        <p className="text-sm font-medium text-text-primary">{label}</p>
-      </div>
-      <span className="text-sm font-semibold text-text-primary">{value}</span>
+    <div className="flex items-center justify-between rounded-xl bg-surface-1 px-4 py-3 ring-1 ring-border-default/50">
+      <p className="text-sm font-medium text-text-primary">{label}</p>
+      <span className="text-sm font-semibold text-text-primary">{hint}</span>
     </div>
   )
 }
