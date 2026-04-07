@@ -13,6 +13,9 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION } from '@/lib/motion'
@@ -22,17 +25,19 @@ import { createUser } from '../actions'
 import type { AdminUser, AdminUserPagination } from '@/lib/services/interfaces/admin-user-service'
 import type { Plan } from '@/lib/services/interfaces/plan-service'
 
-const ROLE_TABS = [
+const STATUS_TABS = [
   { value: '', label: 'Todos' },
-  { value: 'admin', label: 'Admin' },
-  { value: 'user', label: 'Usuário' },
+  { value: 'active', label: 'Ativos' },
+  { value: 'pending', label: 'Pendentes' },
 ] as const
+
+type SortKey = 'status' | 'name' | 'email' | 'cnpj' | 'plan' | 'createdAt'
+type SortDir = 'asc' | 'desc'
 
 interface UsersTableProps {
   users: AdminUser[]
   pagination: AdminUserPagination
   plans: Plan[]
-  currentRole?: 'admin' | 'user'
   currentSearch?: string
 }
 
@@ -40,7 +45,6 @@ export function UsersTable({
   users,
   pagination,
   plans,
-  currentRole,
   currentSearch,
 }: UsersTableProps) {
   const router = useRouter()
@@ -55,14 +59,66 @@ export function UsersTable({
   const [isCreating, startCreate] = useTransition()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Filter state
+  const [statusFilter, setStatusFilter] = useState('')
+  const [planFilter, setPlanFilter] = useState('')
+
+  // Sort state
+  const [sortKey, setSortKey] = useState<SortKey>('createdAt')
+  const [sortDir, setSortDir] = useState<SortDir>('desc')
+
   const totalPages = Math.ceil(pagination.total / pagination.limit)
   const planMap = new Map(plans.map((p) => [p.id, p.name]))
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortKey(key)
+      setSortDir('asc')
+    }
+  }
+
+  // Client-side filtering
+  const filteredUsers = users.filter((u) => {
+    if (statusFilter === 'active' && u.name === null) return false
+    if (statusFilter === 'pending' && u.name !== null) return false
+    if (planFilter && u.planId !== planFilter) return false
+    return true
+  })
+
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    let cmp = 0
+    switch (sortKey) {
+      case 'status':
+        cmp = (a.name ? 1 : 0) - (b.name ? 1 : 0)
+        break
+      case 'name':
+        cmp = (a.name ?? '').localeCompare(b.name ?? '')
+        break
+      case 'email':
+        cmp = a.email.localeCompare(b.email)
+        break
+      case 'cnpj':
+        cmp = (a.cnpj ?? '').localeCompare(b.cnpj ?? '')
+        break
+      case 'plan':
+        cmp = (planMap.get(a.planId) ?? '').localeCompare(
+          planMap.get(b.planId) ?? '',
+        )
+        break
+      case 'createdAt':
+        cmp = a.createdAt.localeCompare(b.createdAt)
+        break
+    }
+    return sortDir === 'asc' ? cmp : -cmp
+  })
 
   // ── Navigation ──
 
   function buildUrl(overrides: Record<string, string | undefined>) {
     const params = new URLSearchParams()
-    const merged = { role: currentRole, search: currentSearch, ...overrides }
+    const merged = { search: currentSearch, ...overrides }
     Object.entries(merged).forEach(([k, v]) => {
       if (v) params.set(k, v)
     })
@@ -75,10 +131,6 @@ export function UsersTable({
     router.push(
       buildUrl({ search: searchValue.trim() || undefined, page: undefined }),
     )
-  }
-
-  function handleRoleChange(role: string) {
-    router.push(buildUrl({ role: role || undefined, page: undefined }))
   }
 
   function handlePageChange(page: number) {
@@ -183,20 +235,21 @@ export function UsersTable({
               type="text"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Buscar por nome ou email..."
+              placeholder="Buscar por nome, email ou CNPJ..."
               className="h-10 w-full rounded-xl border border-border-default bg-surface-1 pl-10 pr-4 text-sm text-text-primary outline-none placeholder:text-text-subtle transition-colors hover:border-border-hover focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
             />
           </div>
         </form>
 
+        {/* Status filter */}
         <div className="flex gap-0.5 rounded-lg bg-surface-2 p-0.5">
-          {ROLE_TABS.map((tab) => (
+          {STATUS_TABS.map((tab) => (
             <button
               key={tab.value}
-              onClick={() => handleRoleChange(tab.value)}
+              onClick={() => setStatusFilter(tab.value)}
               className={cn(
                 'rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-150',
-                (currentRole ?? '') === tab.value
+                statusFilter === tab.value
                   ? 'bg-accent text-primary-foreground shadow-sm'
                   : 'text-text-muted hover:text-text-primary',
               )}
@@ -205,10 +258,24 @@ export function UsersTable({
             </button>
           ))}
         </div>
+
+        {/* Plan filter */}
+        <select
+          value={planFilter}
+          onChange={(e) => setPlanFilter(e.target.value)}
+          className="h-8 rounded-lg border border-border-default bg-surface-2 px-2.5 text-xs text-text-primary outline-none transition-colors hover:border-border-hover focus:border-accent/40"
+        >
+          <option value="">Todos os planos</option>
+          {plans.map((plan) => (
+            <option key={plan.id} value={plan.id}>
+              {plan.name}
+            </option>
+          ))}
+        </select>
       </motion.div>
 
       {/* Table */}
-      {users.length === 0 ? (
+      {sortedUsers.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -236,28 +303,16 @@ export function UsersTable({
           <table className="w-full">
             <thead>
               <tr className="border-b border-border-default bg-surface-1">
-                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
-                  Nome
-                </th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
-                  Email
-                </th>
-                <th className="hidden px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle lg:table-cell">
-                  CNPJ
-                </th>
-                <th className="hidden px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle md:table-cell">
-                  Plano
-                </th>
-                <th className="hidden px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle sm:table-cell">
-                  Criado em
-                </th>
+                <SortHeader label="Status" sortKey="status" current={sortKey} dir={sortDir} onSort={toggleSort} />
+                <SortHeader label="Nome" sortKey="name" current={sortKey} dir={sortDir} onSort={toggleSort} />
+                <SortHeader label="Email" sortKey="email" current={sortKey} dir={sortDir} onSort={toggleSort} />
+                <SortHeader label="CNPJ" sortKey="cnpj" current={sortKey} dir={sortDir} onSort={toggleSort} className="hidden lg:table-cell" />
+                <SortHeader label="Plano" sortKey="plan" current={sortKey} dir={sortDir} onSort={toggleSort} className="hidden md:table-cell" />
+                <SortHeader label="Criado em" sortKey="createdAt" current={sortKey} dir={sortDir} onSort={toggleSort} className="hidden sm:table-cell" />
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => {
+              {sortedUsers.map((user) => {
                 const isActive = user.name !== null
 
                 return (
@@ -477,5 +532,42 @@ export function UsersTable({
         </Dialog.Portal>
       </Dialog.Root>
     </>
+  )
+}
+
+function SortHeader({
+  label,
+  sortKey: key,
+  current,
+  dir,
+  onSort,
+  className,
+}: {
+  label: string
+  sortKey: SortKey
+  current: SortKey
+  dir: SortDir
+  onSort: (key: SortKey) => void
+  className?: string
+}) {
+  const active = current === key
+  return (
+    <th className={cn('px-4 py-3 text-left', className)}>
+      <button
+        onClick={() => onSort(key)}
+        className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-text-subtle transition-colors hover:text-text-muted"
+      >
+        {label}
+        {active ? (
+          dir === 'asc' ? (
+            <ArrowUp className="h-3 w-3 text-accent" />
+          ) : (
+            <ArrowDown className="h-3 w-3 text-accent" />
+          )
+        ) : (
+          <ArrowUpDown className="h-3 w-3 opacity-30" />
+        )}
+      </button>
+    </th>
   )
 }

@@ -3,16 +3,12 @@ import { UsersTable } from './_components/users-table'
 import type { AdminUser, AdminUserPagination } from '@/lib/services/interfaces/admin-user-service'
 import type { Plan } from '@/lib/services/interfaces/plan-service'
 
-async function fetchUsers(
-  page: number,
-  role?: 'admin' | 'user',
-  search?: string,
-) {
+async function fetchUsers(page: number, search?: string) {
   let users: AdminUser[] = []
   let pagination: AdminUserPagination = { page: 1, limit: 20, total: 0 }
 
   try {
-    const result = await adminUserService.list({ page, role, search })
+    const result = await adminUserService.list({ page, search })
     users = result.data
     pagination = result.pagination
   } catch {
@@ -36,18 +32,14 @@ async function fetchPlans() {
 export default async function UsuariosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; role?: string; search?: string }>
+  searchParams: Promise<{ page?: string; search?: string }>
 }) {
   const params = await searchParams
   const page = Number(params.page) || 1
-  const role =
-    params.role === 'admin' || params.role === 'user'
-      ? params.role
-      : undefined
   const search = params.search || undefined
 
   const [{ users, pagination }, plans] = await Promise.all([
-    fetchUsers(page, role, search),
+    fetchUsers(page, search),
     fetchPlans(),
   ])
 
@@ -57,7 +49,6 @@ export default async function UsuariosPage({
         users={users}
         pagination={pagination}
         plans={plans}
-        currentRole={role}
         currentSearch={search}
       />
     </div>
