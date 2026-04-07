@@ -70,7 +70,13 @@ export function Sidebar({ userName }: SidebarProps) {
 
   const desktopNav = (
     <nav className="flex-1 space-y-1 px-2 pt-5">
-      {NAV_ITEMS.map((item) => (
+      {/* Admin section */}
+      {!collapsed && (
+        <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
+          Admin
+        </p>
+      )}
+      {ADMIN_ITEMS.map((item) => (
         <NavLink
           key={item.href}
           item={item}
@@ -79,16 +85,11 @@ export function Sidebar({ userName }: SidebarProps) {
         />
       ))}
 
-      {/* Admin section */}
       <div className="pt-4 pb-1">
         <div className="mx-1 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
-        {!collapsed && (
-          <p className="mt-3 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
-            Admin
-          </p>
-        )}
       </div>
-      {ADMIN_ITEMS.map((item) => (
+
+      {NAV_ITEMS.map((item) => (
         <NavLink
           key={item.href}
           item={item}
@@ -103,7 +104,10 @@ export function Sidebar({ userName }: SidebarProps) {
 
   const mobileNav = (
     <nav className="flex-1 space-y-1 px-3 pt-5">
-      {NAV_ITEMS.map((item) => (
+      <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
+        Admin
+      </p>
+      {ADMIN_ITEMS.map((item) => (
         <NavLink
           key={item.href}
           item={item}
@@ -114,11 +118,8 @@ export function Sidebar({ userName }: SidebarProps) {
       ))}
       <div className="pt-4 pb-1">
         <div className="mx-2 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
-        <p className="mt-3 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
-          Admin
-        </p>
       </div>
-      {ADMIN_ITEMS.map((item) => (
+      {NAV_ITEMS.map((item) => (
         <NavLink
           key={item.href}
           item={item}
