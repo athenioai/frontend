@@ -1,0 +1,75 @@
+feature: admin-plans-crud
+version: 1.0
+status: approved
+
+entity:
+  name: Plan
+  fields:
+    - { name: id, type: string (UUID), source: server }
+    - { name: name, type: string, required: true, min: 1, max: 255, unique: true (case-insensitive) }
+    - { name: cost, type: number, required: true, min: 0, max: 999999.99, precision: 2 }
+    - { name: createdAt, type: string (ISO 8601), source: server }
+    - { name: updatedAt, type: string (ISO 8601), source: server }
+
+endpoints:
+  - method: GET
+    path: /admin/plans
+    auth: JWT Bearer (admin)
+    params: [page, limit, search]
+    response: { data: Plan[], pagination: { page, limit, total } }
+
+  - method: GET
+    path: /admin/plans/:id
+    auth: JWT Bearer (admin)
+    response: Plan
+    errors: [404]
+
+  - method: POST
+    path: /admin/plans
+    auth: JWT Bearer (admin)
+    body: { name, cost }
+    response: Plan (201)
+    errors: [400, 403, 409]
+
+  - method: PATCH
+    path: /admin/plans/:id
+    auth: JWT Bearer (admin)
+    body: { name?, cost? }
+    response: Plan
+    errors: [404, 409]
+
+  - method: DELETE
+    path: /admin/plans/:id
+    auth: JWT Bearer (admin)
+    response: { message: string }
+    errors: [404]
+
+invariants:
+  - Admin-only access (API returns 403 for non-admin)
+  - Plan name uniqueness enforced server-side (409)
+  - Soft delete (plan disappears from listings)
+  - Cost displayed as BRL currency (R$ X,XX)
+
+screens:
+  - route: /admin/planos
+    components:
+      - Table with columns: Nome, Custo (R$), Criado em, Ações
+      - Search input (filters by name)
+      - "Novo Plano" button opens create modal
+      - Edit action opens modal pre-filled
+      - Delete action with confirmation dialog
+      - Pagination
+    modal:
+      - Fields: name (text), cost (number step 0.01)
+      - Inline error for 409 conflict
+      - Save / Cancel buttons
+
+acceptance_criteria:
+  - AC-01: Admin can list plans with pagination
+  - AC-02: Admin can search plans by name
+  - AC-03: Admin can create a plan with name + cost
+  - AC-04: Admin can edit plan name and/or cost
+  - AC-05: Admin can delete a plan with confirmation
+  - AC-06: 409 error shown inline when name conflicts
+  - AC-07: Cost displayed formatted as R$ X,XX
+  - AC-08: Table shows empty state when no plans exist

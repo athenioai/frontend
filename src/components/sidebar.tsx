@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'motion/react'
-import { LayoutDashboard, MessagesSquare, CalendarDays, Settings, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, MessagesSquare, CalendarDays, Settings, CreditCard, LogOut, Menu, X } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { cn } from '@/lib/utils'
 import { MOTION } from '@/lib/motion'
@@ -15,6 +15,10 @@ const NAV_ITEMS = [
   { href: '/conversas', label: 'Conversas', icon: MessagesSquare },
   { href: '/agenda', label: 'Agenda', icon: CalendarDays },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
+]
+
+const ADMIN_ITEMS = [
+  { href: '/admin/planos', label: 'Planos', icon: CreditCard },
 ]
 
 interface SidebarProps {
@@ -38,60 +42,20 @@ export function Sidebar({ userName }: SidebarProps) {
 
   const navItems = (
     <nav className="flex-1 space-y-1 px-3 pt-5">
-      {NAV_ITEMS.map((item) => {
-        const active = isActive(item.href)
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={() => setMobileOpen(false)}
-            className={cn(
-              'group relative flex h-10 items-center gap-3 rounded-xl px-3 text-[13px] font-medium transition-all duration-200',
-              active
-                ? 'text-accent'
-                : 'text-text-muted hover:text-text-primary',
-            )}
-          >
-            {/* Animated active background */}
-            {active && (
-              <motion.div
-                layoutId="sidebar-active-bg"
-                className="absolute inset-0 rounded-xl bg-accent/[0.12]"
-                style={{
-                  boxShadow:
-                    '0 0 20px rgba(79, 209, 197, 0.06), inset 0 1px 0 rgba(79, 209, 197, 0.08)',
-                }}
-                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-              />
-            )}
+      {NAV_ITEMS.map((item) => (
+        <NavLink key={item.href} item={item} isActive={isActive(item.href)} onClick={() => setMobileOpen(false)} />
+      ))}
 
-            {/* Hover background (only when not active) */}
-            {!active && (
-              <div className="absolute inset-0 rounded-xl bg-[rgba(255,255,255,0.04)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-            )}
-
-            {/* Active left bar */}
-            {active && (
-              <motion.div
-                layoutId="sidebar-active-bar"
-                className="absolute -left-3 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-accent"
-                style={{ boxShadow: '2px 0 8px rgba(79, 209, 197, 0.3)' }}
-                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-              />
-            )}
-
-            <item.icon
-              className={cn(
-                'relative h-[18px] w-[18px] shrink-0 transition-colors duration-200',
-                active
-                  ? 'text-accent'
-                  : 'text-text-subtle group-hover:text-text-muted',
-              )}
-            />
-            <span className="relative">{item.label}</span>
-          </Link>
-        )
-      })}
+      {/* Admin section */}
+      <div className="pt-4 pb-1">
+        <div className="mx-2 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
+        <p className="mt-3 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
+          Admin
+        </p>
+      </div>
+      {ADMIN_ITEMS.map((item) => (
+        <NavLink key={item.href} item={item} isActive={isActive(item.href)} onClick={() => setMobileOpen(false)} />
+      ))}
     </nav>
   )
 
@@ -206,5 +170,56 @@ export function Sidebar({ userName }: SidebarProps) {
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+function NavLink({
+  item,
+  isActive: active,
+  onClick,
+}: {
+  item: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }
+  isActive: boolean
+  onClick: () => void
+}) {
+  return (
+    <Link
+      href={item.href}
+      onClick={onClick}
+      className={cn(
+        'group relative flex h-10 items-center gap-3 rounded-xl px-3 text-[13px] font-medium transition-all duration-200',
+        active ? 'text-accent' : 'text-text-muted hover:text-text-primary',
+      )}
+    >
+      {active && (
+        <motion.div
+          layoutId="sidebar-active-bg"
+          className="absolute inset-0 rounded-xl bg-accent/[0.12]"
+          style={{
+            boxShadow:
+              '0 0 20px rgba(79, 209, 197, 0.06), inset 0 1px 0 rgba(79, 209, 197, 0.08)',
+          }}
+          transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+        />
+      )}
+      {!active && (
+        <div className="absolute inset-0 rounded-xl bg-[rgba(255,255,255,0.04)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+      )}
+      {active && (
+        <motion.div
+          layoutId="sidebar-active-bar"
+          className="absolute -left-3 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-accent"
+          style={{ boxShadow: '2px 0 8px rgba(79, 209, 197, 0.3)' }}
+          transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+        />
+      )}
+      <item.icon
+        className={cn(
+          'relative h-[18px] w-[18px] shrink-0 transition-colors duration-200',
+          active ? 'text-accent' : 'text-text-subtle group-hover:text-text-muted',
+        )}
+      />
+      <span className="relative">{item.label}</span>
+    </Link>
   )
 }
