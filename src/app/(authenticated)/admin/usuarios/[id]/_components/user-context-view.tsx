@@ -2,13 +2,13 @@
 
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
+import { UserConversasPanel } from './user-conversas-panel'
 import {
   ArrowLeft,
   BarChart3,
   MessagesSquare,
   CalendarDays,
   Settings,
-  Bot,
   MessageSquare,
   CalendarCheck,
   CalendarX2,
@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { MOTION, fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
-import { formatDate, formatRelativeTime } from '@/lib/format'
+import { formatDate } from '@/lib/format'
 import type { AdminUser } from '@/lib/services/interfaces/admin-user-service'
 import type { ChatSession } from '@/lib/services/interfaces/chat-service'
 import type { Appointment } from '@/lib/services/interfaces/appointment-service'
@@ -171,7 +171,7 @@ export function UserContextView({
             cancelledAppointments={cancelledAppointments}
           />
         )}
-        {activeTab === 'conversas' && <ConversasTab sessions={sessions} />}
+        {activeTab === 'conversas' && <UserConversasPanel sessions={sessions} />}
         {activeTab === 'agenda' && <AgendaTab appointments={appointments} />}
         {activeTab === 'configuracoes' && (
           <ConfigTab config={calendarConfig} />
@@ -281,55 +281,6 @@ function StatCard({
 
 // ── Conversas tab ──
 
-function ConversasTab({ sessions }: { sessions: ChatSession[] }) {
-  if (sessions.length === 0) {
-    return (
-      <EmptyState
-        icon={MessagesSquare}
-        title="Nenhuma conversa"
-        sub="Este usuário ainda não tem conversas registradas"
-      />
-    )
-  }
-
-  return (
-    <div className="space-y-2">
-      {sessions.map((session) => {
-        const agentLabel =
-          session.agent.charAt(0).toUpperCase() + session.agent.slice(1)
-        return (
-          <Link
-            key={session.sessionId}
-            href={`/conversas/${session.sessionId}`}
-            className="card-surface card-surface-interactive group relative flex items-start gap-4 overflow-hidden p-4 pl-5"
-          >
-            <div className="absolute inset-y-0 left-0 w-0.5 bg-accent" />
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
-              <Bot className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-semibold text-text-primary">
-                  {agentLabel}
-                </span>
-                <span className="shrink-0 text-[11px] text-text-subtle">
-                  {formatRelativeTime(session.lastMessageAt)}
-                </span>
-              </div>
-              <p className="mt-0.5 truncate text-xs text-text-muted">
-                {session.lastMessage}
-              </p>
-              <div className="mt-1 flex items-center gap-1.5 text-[10px] text-text-subtle">
-                <MessageSquare className="h-2.5 w-2.5" />
-                <span>{session.messageCount} mensagens</span>
-              </div>
-            </div>
-          </Link>
-        )
-      })}
-    </div>
-  )
-}
 
 // ── Agenda tab ──
 
