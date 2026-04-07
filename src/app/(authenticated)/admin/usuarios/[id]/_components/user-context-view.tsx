@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
 import { UserConversasPanel } from './user-conversas-panel'
+import { UserAgendaCalendar } from './user-agenda-calendar'
 import {
   ArrowLeft,
   BarChart3,
@@ -180,7 +181,7 @@ export function UserContextView({
         {activeTab === 'conversas' && (
           <UserConversasPanel sessions={sessions} userId={user.id} />
         )}
-        {activeTab === 'agenda' && <AgendaTab appointments={appointments} />}
+        {activeTab === 'agenda' && <UserAgendaCalendar appointments={appointments} />}
         {activeTab === 'configuracoes' && (
           <ConfigTab config={calendarConfig} />
         )}
@@ -289,67 +290,7 @@ function StatCard({
 
 // ── Agenda tab ──
 
-function AgendaTab({ appointments }: { appointments: Appointment[] }) {
-  if (appointments.length === 0) {
-    return (
-      <EmptyState
-        icon={CalendarDays}
-        title="Nenhum agendamento"
-        sub="Este usuário ainda não tem agendamentos registrados"
-      />
-    )
-  }
-
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {appointments.map((apt) => {
-        const confirmed = apt.status === 'confirmed'
-        return (
-          <div
-            key={apt.id}
-            className="card-surface relative overflow-hidden p-4 pl-5"
-          >
-            <div
-              className={cn(
-                'absolute inset-y-0 left-0 w-0.5',
-                confirmed ? 'bg-success' : 'bg-danger',
-              )}
-            />
-            <div className="flex items-center justify-between gap-2">
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold',
-                  confirmed
-                    ? 'bg-success/10 text-success'
-                    : 'bg-danger/10 text-danger',
-                )}
-              >
-                {confirmed ? (
-                  <CalendarCheck className="h-3 w-3" />
-                ) : (
-                  <CalendarX2 className="h-3 w-3" />
-                )}
-                {confirmed ? 'Confirmado' : 'Cancelado'}
-              </span>
-              <span className="text-[11px] text-text-subtle">
-                {formatDate(apt.date)}
-              </span>
-            </div>
-            <p className="mt-2 text-sm font-semibold text-text-primary">
-              {apt.leadName}
-            </p>
-            <p className="mt-0.5 text-xs text-text-muted">{apt.serviceType}</p>
-            <p className="mt-1.5 text-xs tabular-nums text-text-subtle">
-              {apt.startTime.slice(0, 5)} – {apt.endTime.slice(0, 5)}
-            </p>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-// ── Config tab ──
+// ── Config tab (matches settings page layout) ──
 
 function ConfigTab({ config }: { config: CalendarConfig | null }) {
   if (!config) {
@@ -363,50 +304,81 @@ function ConfigTab({ config }: { config: CalendarConfig | null }) {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-text-subtle">
-          Horários de funcionamento
-        </h3>
-        <div className="mt-3 space-y-1.5">
-          {config.business_hours.map((bh) => (
-            <div
-              key={bh.dia}
-              className="flex items-center gap-4 rounded-xl bg-surface-1 px-4 py-3 ring-1 ring-border-default/50"
-            >
-              <span className="w-20 shrink-0 text-sm font-medium text-text-primary">
-                {bh.dia}
-              </span>
-              {bh.horario === 'Fechado' ? (
-                <span className="text-xs text-text-subtle">Fechado</span>
-              ) : (
-                <div className="flex items-center gap-1.5 text-sm text-text-muted">
-                  <Clock className="h-3.5 w-3.5 text-text-subtle" />
-                  {bh.horario.replace(' as ', ' às ')}
-                </div>
-              )}
-            </div>
-          ))}
+    <div className="max-w-3xl">
+      <div className="card-surface overflow-hidden">
+        {/* Section header */}
+        <div className="flex items-center gap-3 px-5 py-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent/10">
+            <CalendarDays className="h-4 w-4 text-accent" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-text-primary">Agenda</p>
+            <p className="text-xs text-text-muted">
+              Horários de funcionamento e regras de agendamento
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-text-subtle">
-          Regras de agendamento
-        </h3>
-        <div className="mt-3 space-y-1.5">
-          <ConfigRow
-            label="Duração do slot"
-            value={`${config.slot_duration_minutes} min`}
-          />
-          <ConfigRow
-            label="Antecedência para agendar"
-            value={`${config.min_advance_hours}h`}
-          />
-          <ConfigRow
-            label="Antecedência para cancelar"
-            value={`${config.min_cancel_advance_hours}h`}
-          />
+        <div className="border-t border-border-default px-5 pb-5 pt-4">
+          {/* Business hours */}
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
+            Horários de funcionamento
+          </h3>
+          <div className="mt-3 space-y-1.5">
+            {config.business_hours.map((bh) => {
+              const isOpen = bh.horario !== 'Fechado'
+              return (
+                <div
+                  key={bh.dia}
+                  className="flex items-center gap-4 rounded-lg bg-surface-2/50 px-3 py-2.5"
+                >
+                  <span className="w-20 shrink-0 text-sm font-medium text-text-primary">
+                    {bh.dia}
+                  </span>
+                  <div
+                    className={cn(
+                      'relative h-5 w-9 shrink-0 rounded-full',
+                      isOpen ? 'bg-accent' : 'bg-surface-2',
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm',
+                        isOpen && 'translate-x-4',
+                      )}
+                    />
+                  </div>
+                  {isOpen ? (
+                    <div className="flex items-center gap-1.5 text-sm text-text-muted">
+                      <Clock className="h-3.5 w-3.5 text-text-subtle" />
+                      {bh.horario.replace(' as ', ' às ')}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-text-subtle">Fechado</span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Rules */}
+          <h3 className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
+            Regras de agendamento
+          </h3>
+          <div className="mt-3 space-y-1.5">
+            <ConfigRow
+              label="Duração do slot"
+              value={`${config.slot_duration_minutes} min`}
+            />
+            <ConfigRow
+              label="Antecedência para agendar"
+              value={`${config.min_advance_hours}h`}
+            />
+            <ConfigRow
+              label="Antecedência para cancelar"
+              value={`${config.min_cancel_advance_hours}h`}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -415,8 +387,10 @@ function ConfigTab({ config }: { config: CalendarConfig | null }) {
 
 function ConfigRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between rounded-xl bg-surface-1 px-4 py-3 ring-1 ring-border-default/50">
-      <span className="text-sm text-text-muted">{label}</span>
+    <div className="flex items-center justify-between rounded-lg bg-surface-2/50 px-3 py-2.5">
+      <div>
+        <p className="text-sm font-medium text-text-primary">{label}</p>
+      </div>
       <span className="text-sm font-semibold text-text-primary">{value}</span>
     </div>
   )
