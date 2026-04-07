@@ -16,12 +16,14 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
+  Eye,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION } from '@/lib/motion'
 import { formatDate, formatCNPJ } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { createUser } from '../actions'
+import Link from 'next/link'
 import type { AdminUser, AdminUserPagination } from '@/lib/services/interfaces/admin-user-service'
 import type { Plan } from '@/lib/services/interfaces/plan-service'
 
@@ -309,6 +311,9 @@ export function UsersTable({
                 <SortHeader label="CNPJ" sortKey="cnpj" current={sortKey} dir={sortDir} onSort={toggleSort} className="hidden lg:table-cell" />
                 <SortHeader label="Plano" sortKey="plan" current={sortKey} dir={sortDir} onSort={toggleSort} className="hidden md:table-cell" />
                 <SortHeader label="Criado em" sortKey="createdAt" current={sortKey} dir={sortDir} onSort={toggleSort} className="hidden sm:table-cell" />
+                <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
+                  Ações
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -350,6 +355,15 @@ export function UsersTable({
                     </td>
                     <td className="hidden px-4 py-3.5 text-sm text-text-subtle sm:table-cell">
                       {formatDate(user.createdAt)}
+                    </td>
+                    <td className="px-4 py-3.5 text-right">
+                      <Link
+                        href={`/admin/usuarios/${user.id}`}
+                        className="inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium text-accent transition-colors hover:bg-accent/10"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        Ver
+                      </Link>
                     </td>
                   </tr>
                 )

@@ -1,0 +1,53 @@
+feature: admin-user-context-view
+version: 1.0
+status: approved
+
+concept: |
+  Admin clicks a user in the listing and enters a "telescope" view
+  showing that user's dashboard, conversations, appointments, and
+  calendar config — all filtered by user_id.
+
+route: /admin/usuarios/[id]
+auth: JWT Bearer (admin)
+
+data_sources:
+  - GET /admin/users/:id (user info header)
+  - GET /chats?user_id=:id (user conversations — reuse ChatService)
+  - GET /appointments?user_id=:id (user appointments — reuse AppointmentService)
+  - GET /calendar-config?user_id=:id (user calendar config — reuse CalendarConfigService)
+
+screens:
+  - route: /admin/usuarios/[id]
+    layout: |
+      Hero header card with user info (name, email, plan, status, avatar)
+      + Tab navigation (Dashboard, Conversas, Agenda, Configurações)
+      + Tab content area
+    tabs:
+      - id: dashboard
+        label: Dashboard
+        content: Summary stats (conversations count, appointments count)
+      - id: conversas
+        label: Conversas
+        content: List of user's chat sessions (reuse session card pattern)
+      - id: agenda
+        label: Agenda
+        content: List of user's appointments (reuse appointment card pattern)
+      - id: configuracoes
+        label: Configurações
+        content: User's calendar config (read-only view)
+
+components:
+  - UserHero: card-hero with avatar, name/email, plan badge, status badge, back button
+  - UserTabs: tab navigation with animated underline (same pattern as settings)
+  - UserDashboardTab: stat cards for the user
+  - UserConversasTab: session list for the user
+  - UserAgendaTab: appointment cards for the user
+  - UserConfigTab: read-only calendar config display
+
+acceptance_criteria:
+  - AC-01: "Ver" button in users table navigates to /admin/usuarios/[id]
+  - AC-02: Hero header shows user name, email, plan, status (Ativo/Pendente)
+  - AC-03: Tab Dashboard shows user conversation and appointment counts
+  - AC-04: Tab Conversas shows user's chat sessions with links to /conversas/[sessionId]
+  - AC-05: Tab Agenda shows user's appointments with status badges
+  - AC-06: Tab Configurações shows user's calendar config (read-only)
