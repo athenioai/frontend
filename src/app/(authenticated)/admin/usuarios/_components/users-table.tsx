@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION } from '@/lib/motion'
-import { formatDate } from '@/lib/format'
+import { formatDate, formatCNPJ } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { createUser } from '../actions'
 import type { AdminUser, AdminUserPagination } from '@/lib/services/interfaces/admin-user-service'
@@ -245,6 +245,9 @@ export function UsersTable({
                 <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
                   Email
                 </th>
+                <th className="hidden px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle lg:table-cell">
+                  CNPJ
+                </th>
                 <th className="hidden px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-subtle md:table-cell">
                   Plano
                 </th>
@@ -281,6 +284,11 @@ export function UsersTable({
                     </td>
                     <td className="px-4 py-3.5 text-sm text-text-muted">
                       {user.email}
+                    </td>
+                    <td className="hidden px-4 py-3.5 text-sm tabular-nums text-text-muted lg:table-cell">
+                      {user.cnpj ? formatCNPJ(user.cnpj) : (
+                        <span className="text-text-subtle">—</span>
+                      )}
                     </td>
                     <td className="hidden px-4 py-3.5 text-sm text-text-muted md:table-cell">
                       {planMap.get(user.planId) ?? '—'}

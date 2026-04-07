@@ -2,6 +2,7 @@ export interface AdminUser {
   id: string
   name: string | null
   email: string
+  cnpj: string | null
   role: 'admin' | 'user'
   planId: string
   contractUrl: string
