@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button'
 import { MOTION } from '@/lib/motion'
 import { formatDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { createUser } from '../actions'
+import { createUser, uploadContract } from '../actions'
 import type { AdminUser, AdminUserPagination } from '@/lib/services/interfaces/admin-user-service'
 import type { Plan } from '@/lib/services/interfaces/plan-service'
 
@@ -55,6 +55,11 @@ export function UsersTable({
   const [formError, setFormError] = useState<string | null>(null)
   const [isCreating, startCreate] = useTransition()
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Contract upload state
+  const [uploadTarget, setUploadTarget] = useState<string | null>(null)
+  const [isUploading, startUpload] = useTransition()
+  const contractInputRef = useRef<HTMLInputElement>(null)
 
   const totalPages = Math.ceil(pagination.total / pagination.limit)
   const planMap = new Map(plans.map((p) => [p.id, p.name]))
@@ -94,6 +99,34 @@ export function UsersTable({
     setFormFile(null)
     setFormError(null)
     setModalOpen(true)
+  }
+
+  function handleContractUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !uploadTarget) return
+
+    if (file.type !== 'application/pdf') {
+      setFormError('O arquivo deve ser um PDF.')
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setFormError('O arquivo deve ter no máximo 10MB.')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('contract', file)
+
+    startUpload(async () => {
+      const result = await uploadContract(uploadTarget, formData)
+      if (result.success) {
+        setUploadTarget(null)
+        router.refresh()
+      }
+    })
+
+    // Reset input
+    e.target.value = ''
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -293,7 +326,7 @@ export function UsersTable({
                       {formatDate(user.createdAt)}
                     </td>
                     <td className="px-4 py-3.5 text-right">
-                      {user.contractUrl && (
+                      {user.contractUrl ? (
                         <a
                           href={user.contractUrl}
                           target="_blank"
@@ -303,6 +336,23 @@ export function UsersTable({
                         >
                           <FileDown className="h-4 w-4" />
                         </a>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setUploadTarget(user.id)
+                            contractInputRef.current?.click()
+                          }}
+                          disabled={isUploading && uploadTarget === user.id}
+                          className="inline-flex h-7 items-center gap-1 rounded-lg px-2 text-[11px] font-medium text-gold transition-colors hover:bg-gold/10"
+                          title="Vincular contrato"
+                        >
+                          {isUploading && uploadTarget === user.id ? (
+                            <span className="h-3 w-3 animate-spin rounded-full border-2 border-gold/30 border-t-gold" />
+                          ) : (
+                            <Upload className="h-3.5 w-3.5" />
+                          )}
+                          Vincular
+                        </button>
                       )}
                     </td>
                   </tr>
@@ -485,6 +535,15 @@ export function UsersTable({
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
+
+      {/* Hidden file input for contract upload */}
+      <input
+        ref={contractInputRef}
+        type="file"
+        accept=".pdf,application/pdf"
+        onChange={handleContractUpload}
+        className="hidden"
+      />
     </>
   )
 }

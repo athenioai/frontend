@@ -58,3 +58,44 @@ export async function createUser(
     return { success: false, error: 'Erro ao criar usuário.' }
   }
 }
+
+export async function uploadContract(
+  userId: string,
+  formData: FormData,
+): Promise<{ success: boolean; error?: string }> {
+  const contract = formData.get('contract')
+
+  if (!contract || !(contract instanceof File) || contract.size === 0) {
+    return { success: false, error: 'Selecione o contrato (PDF).' }
+  }
+  if (contract.type !== 'application/pdf') {
+    return { success: false, error: 'O arquivo deve ser um PDF.' }
+  }
+  if (contract.size > 10 * 1024 * 1024) {
+    return { success: false, error: 'O arquivo deve ter no máximo 10MB.' }
+  }
+
+  const cookieStore = await cookies()
+  const token = cookieStore.get('access_token')?.value
+  if (!token) return { success: false, error: 'Sessão expirada.' }
+
+  try {
+    const body = new FormData()
+    body.append('contract', contract)
+
+    const res = await fetch(`${API_URL}/admin/users/${userId}/contract`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+      body,
+    })
+
+    if (!res.ok) {
+      return { success: false, error: 'Erro ao enviar contrato.' }
+    }
+
+    revalidatePath('/admin/usuarios')
+    return { success: true }
+  } catch {
+    return { success: false, error: 'Erro ao enviar contrato.' }
+  }
+}
