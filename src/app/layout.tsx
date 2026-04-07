@@ -16,7 +16,7 @@ const sora = Sora({
 })
 
 export const metadata: Metadata = {
-  title: 'Olympus — Athenio.ai',
+  title: 'Olympus - Sua Empresa Autônoma',
   description: 'Painel de controle da sua operação com IA',
 }
 
