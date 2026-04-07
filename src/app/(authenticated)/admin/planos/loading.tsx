@@ -1,6 +1,6 @@
 export default function PlanosLoading() {
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8 lg:py-10">
+    <div className="px-6 py-8 lg:py-10">
       <div className="flex items-center justify-between">
         <div className="skeleton h-7 w-24 rounded-lg" />
         <div className="skeleton h-8 w-28 rounded-lg" />

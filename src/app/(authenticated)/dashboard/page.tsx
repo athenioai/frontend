@@ -49,7 +49,7 @@ export default function DashboardPage() {
   const greeting = getGreeting()
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8 lg:py-10">
+    <div className="px-6 py-8 lg:py-10">
       {/* Hero */}
       <motion.div
         initial="hidden"

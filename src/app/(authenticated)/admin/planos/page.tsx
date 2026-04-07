@@ -29,7 +29,7 @@ export default async function PlanosPage({
   const { plans, pagination } = await fetchPlans(page, search)
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8 lg:py-10">
+    <div className="px-6 py-8 lg:py-10">
       <PlansTable
         plans={plans}
         pagination={pagination}
