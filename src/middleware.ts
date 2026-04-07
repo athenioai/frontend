@@ -10,9 +10,10 @@ export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get('refresh_token')?.value
   const hasAnyToken = accessToken || refreshToken
 
-  // Public paths: redirect authenticated users to dashboard
+  // Public paths: only redirect if access_token exists (verified session)
+  // Don't redirect on refresh_token alone — avoids redirect loop when refresh fails
   if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
-    if (hasAnyToken) {
+    if (accessToken) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     return NextResponse.next()
