@@ -1,40 +1,42 @@
-import { adminUserService, chatService, appointmentService, calendarConfigService } from '@/lib/services'
+import { adminUserService, adminUserDataService } from '@/lib/services'
 import { notFound } from 'next/navigation'
 import { UserContextView } from './_components/user-context-view'
 import type { AdminUser } from '@/lib/services/interfaces/admin-user-service'
+import type { UserDashboardData } from '@/lib/services/interfaces/admin-user-data-service'
 import type { ChatSession } from '@/lib/services/interfaces/chat-service'
 import type { Appointment } from '@/lib/services/interfaces/appointment-service'
 import type { CalendarConfig } from '@/lib/services/interfaces/calendar-config-service'
 
 async function fetchUserData(userId: string) {
   let user: AdminUser | null = null
+  let dashboard: UserDashboardData | null = null
   let sessions: ChatSession[] = []
   let appointments: Appointment[] = []
   let calendarConfig: CalendarConfig | null = null
-  let notFoundError = false
 
   try {
     user = await adminUserService.getById(userId)
-  } catch (error) {
-    if (error instanceof Error && error.message === 'NOT_FOUND') {
-      notFoundError = true
-    }
+  } catch {
+    return { user: null, dashboard, sessions, appointments, calendarConfig }
   }
 
-  if (notFoundError || !user) return { user: null, sessions, appointments, calendarConfig, notFoundError: true }
+  if (!user) return { user: null, dashboard, sessions, appointments, calendarConfig }
 
-  // Fetch user-specific data in parallel
-  const [sessionsResult, appointmentsResult, configResult] = await Promise.allSettled([
-    chatService.listSessions({ limit: 100 }),
-    appointmentService.list({ limit: 100, user_id: userId }),
-    calendarConfigService.get(),
-  ])
+  // Fetch user-specific data via admin endpoints in parallel
+  const [dashResult, chatsResult, aptsResult, configResult] =
+    await Promise.allSettled([
+      adminUserDataService.getDashboard(userId),
+      adminUserDataService.getChats(userId, { limit: 100 }),
+      adminUserDataService.getAppointments(userId, { limit: 100 }),
+      adminUserDataService.getCalendarConfig(userId),
+    ])
 
-  if (sessionsResult.status === 'fulfilled') sessions = sessionsResult.value.data
-  if (appointmentsResult.status === 'fulfilled') appointments = appointmentsResult.value.data
+  if (dashResult.status === 'fulfilled') dashboard = dashResult.value
+  if (chatsResult.status === 'fulfilled') sessions = chatsResult.value.data
+  if (aptsResult.status === 'fulfilled') appointments = aptsResult.value.data
   if (configResult.status === 'fulfilled') calendarConfig = configResult.value
 
-  return { user, sessions, appointments, calendarConfig, notFoundError: false }
+  return { user, dashboard, sessions, appointments, calendarConfig }
 }
 
 export default async function UserDetailPage({
@@ -48,15 +50,16 @@ export default async function UserDetailPage({
   const { tab } = await searchParams
   const activeTab = tab || 'dashboard'
 
-  const { user, sessions, appointments, calendarConfig, notFoundError } =
+  const { user, dashboard, sessions, appointments, calendarConfig } =
     await fetchUserData(id)
 
-  if (notFoundError || !user) notFound()
+  if (!user) notFound()
 
   return (
     <div className="px-6 py-8 lg:py-10">
       <UserContextView
         user={user}
+        dashboard={dashboard}
         sessions={sessions}
         appointments={appointments}
         calendarConfig={calendarConfig}

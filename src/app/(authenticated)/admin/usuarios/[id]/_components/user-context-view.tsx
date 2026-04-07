@@ -12,13 +12,16 @@ import {
   MessageSquare,
   CalendarCheck,
   CalendarX2,
+  Target,
   Clock,
+  FileDown,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION, fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/format'
 import type { AdminUser } from '@/lib/services/interfaces/admin-user-service'
+import type { UserDashboardData } from '@/lib/services/interfaces/admin-user-data-service'
 import type { ChatSession } from '@/lib/services/interfaces/chat-service'
 import type { Appointment } from '@/lib/services/interfaces/appointment-service'
 import type { CalendarConfig } from '@/lib/services/interfaces/calendar-config-service'
@@ -33,6 +36,7 @@ const TABS = [
 
 interface UserContextViewProps {
   user: AdminUser
+  dashboard: UserDashboardData | null
   sessions: ChatSession[]
   appointments: Appointment[]
   calendarConfig: CalendarConfig | null
@@ -41,6 +45,7 @@ interface UserContextViewProps {
 
 export function UserContextView({
   user,
+  dashboard,
   sessions,
   appointments,
   calendarConfig,
@@ -63,13 +68,6 @@ export function UserContextView({
     const qs = params.toString()
     router.push(`/admin/usuarios/${user.id}${qs ? `?${qs}` : ''}`)
   }
-
-  const confirmedAppointments = appointments.filter(
-    (a) => a.status === 'confirmed',
-  ).length
-  const cancelledAppointments = appointments.filter(
-    (a) => a.status === 'cancelled',
-  ).length
 
   return (
     <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
@@ -118,6 +116,19 @@ export function UserContextView({
                 <span className="capitalize">{user.role}</span>
               </div>
             </div>
+
+            {/* Contract download */}
+            {user.contractUrl && (
+              <a
+                href={user.contractUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-medium text-accent ring-1 ring-accent/25 transition-all hover:bg-accent/[0.08] hover:ring-accent/40"
+              >
+                <FileDown className="h-4 w-4" />
+                Contrato
+              </a>
+            )}
           </div>
         </div>
       </motion.div>
@@ -164,14 +175,11 @@ export function UserContextView({
         className="mt-8"
       >
         {activeTab === 'dashboard' && (
-          <DashboardTab
-            sessions={sessions}
-            appointments={appointments}
-            confirmedAppointments={confirmedAppointments}
-            cancelledAppointments={cancelledAppointments}
-          />
+          <DashboardTab dashboard={dashboard} />
         )}
-        {activeTab === 'conversas' && <UserConversasPanel sessions={sessions} />}
+        {activeTab === 'conversas' && (
+          <UserConversasPanel sessions={sessions} userId={user.id} />
+        )}
         {activeTab === 'agenda' && <AgendaTab appointments={appointments} />}
         {activeTab === 'configuracoes' && (
           <ConfigTab config={calendarConfig} />
@@ -181,55 +189,55 @@ export function UserContextView({
   )
 }
 
-// ── Dashboard tab ──
+// ── Dashboard tab (uses real API metrics) ──
 
-function DashboardTab({
-  sessions,
-  appointments,
-  confirmedAppointments,
-  cancelledAppointments,
-}: {
-  sessions: ChatSession[]
-  appointments: Appointment[]
-  confirmedAppointments: number
-  cancelledAppointments: number
-}) {
-  const totalMessages = sessions.reduce((s, c) => s + c.messageCount, 0)
+function DashboardTab({ dashboard }: { dashboard: UserDashboardData | null }) {
+  if (!dashboard) {
+    return (
+      <EmptyState
+        icon={BarChart3}
+        title="Sem dados"
+        sub="Não foi possível carregar as métricas deste usuário"
+      />
+    )
+  }
+
+  const cards = [
+    {
+      label: 'Agendamentos',
+      value: String(dashboard.appointments.total),
+      sub: `${dashboard.appointments.thisMonth} este mês`,
+      icon: CalendarCheck,
+      color: 'violet',
+    },
+    {
+      label: 'Cancelamentos',
+      value: String(dashboard.appointments.cancelledThisMonth),
+      sub: 'este mês',
+      icon: CalendarX2,
+      color: 'danger',
+    },
+    {
+      label: 'Leads',
+      value: String(dashboard.leads.total),
+      sub: `${dashboard.leads.thisMonth} este mês · ${Math.round(dashboard.leads.conversionRate * 100)}% conversão`,
+      icon: Target,
+      color: 'emerald',
+    },
+    {
+      label: 'Mensagens',
+      value: String(dashboard.chats.totalMessages),
+      sub: `${dashboard.chats.messagesThisMonth} este mês · ${dashboard.chats.activeSessionsThisMonth} sessões`,
+      icon: MessageSquare,
+      color: 'gold',
+    },
+  ]
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <StatCard
-        label="Conversas"
-        value={String(sessions.length)}
-        sub={`${totalMessages} mensagens`}
-        icon={MessagesSquare}
-        color="accent"
-      />
-      <StatCard
-        label="Agendamentos"
-        value={String(appointments.length)}
-        sub={`${confirmedAppointments} confirmados`}
-        icon={CalendarCheck}
-        color="violet"
-      />
-      <StatCard
-        label="Cancelamentos"
-        value={String(cancelledAppointments)}
-        sub={
-          appointments.length > 0
-            ? `${Math.round((cancelledAppointments / appointments.length) * 100)}% do total`
-            : 'Nenhum agendamento'
-        }
-        icon={CalendarX2}
-        color="danger"
-      />
-      <StatCard
-        label="Mensagens"
-        value={totalMessages.toLocaleString('pt-BR')}
-        sub={`${sessions.length} sessões`}
-        icon={MessageSquare}
-        color="gold"
-      />
+      {cards.map((card) => (
+        <StatCard key={card.label} {...card} />
+      ))}
     </div>
   )
 }
@@ -278,9 +286,6 @@ function StatCard({
     </div>
   )
 }
-
-// ── Conversas tab ──
-
 
 // ── Agenda tab ──
 
@@ -359,7 +364,6 @@ function ConfigTab({ config }: { config: CalendarConfig | null }) {
 
   return (
     <div className="max-w-2xl space-y-6">
-      {/* Business hours */}
       <div>
         <h3 className="text-xs font-semibold uppercase tracking-wider text-text-subtle">
           Horários de funcionamento
@@ -386,7 +390,6 @@ function ConfigTab({ config }: { config: CalendarConfig | null }) {
         </div>
       </div>
 
-      {/* Settings */}
       <div>
         <h3 className="text-xs font-semibold uppercase tracking-wider text-text-subtle">
           Regras de agendamento

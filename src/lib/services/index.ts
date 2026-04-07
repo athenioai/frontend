@@ -5,6 +5,7 @@ import { CalendarConfigService } from './calendar-config-service'
 import { PlanService } from './plan-service'
 import { AdminUserService } from './admin-user-service'
 import { AdminDashboardService } from './admin-dashboard-service'
+import { AdminUserDataService } from './admin-user-data-service'
 
 export const authService = new AuthService()
 export const chatService = new ChatService()
@@ -13,3 +14,4 @@ export const calendarConfigService = new CalendarConfigService()
 export const planService = new PlanService()
 export const adminUserService = new AdminUserService()
 export const adminDashboardService = new AdminDashboardService()
+export const adminUserDataService = new AdminUserDataService()

@@ -18,16 +18,17 @@ import { MOTION } from '@/lib/motion'
 import { formatRelativeTime, formatDate, formatTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
-  loadInitialMessages,
-  loadMoreMessages,
-} from '@/app/(authenticated)/conversas/actions'
+  loadUserMessages,
+  loadMoreUserMessages,
+} from '../actions'
 import type { ChatSession, ChatMessage, Pagination } from '@/lib/services/interfaces/chat-service'
 
 interface UserConversasPanelProps {
   sessions: ChatSession[]
+  userId: string
 }
 
-export function UserConversasPanel({ sessions }: UserConversasPanelProps) {
+export function UserConversasPanel({ sessions, userId }: UserConversasPanelProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [pagination, setPagination] = useState<Pagination>({
@@ -51,7 +52,7 @@ export function UserConversasPanel({ sessions }: UserConversasPanelProps) {
     setInputValue('')
 
     startLoad(async () => {
-      const result = await loadInitialMessages(sessionId)
+      const result = await loadUserMessages(userId, sessionId)
       if (result.success && result.data && result.pagination) {
         setMessages(result.data)
         setPagination(result.pagination)
@@ -73,7 +74,7 @@ export function UserConversasPanel({ sessions }: UserConversasPanelProps) {
     const prevScrollHeight = container?.scrollHeight ?? 0
 
     startLoadMore(async () => {
-      const result = await loadMoreMessages(selectedId, prevPage)
+      const result = await loadMoreUserMessages(userId, selectedId, prevPage)
       if (result.success && result.data && result.pagination) {
         setMessages((prev) => [...result.data!, ...prev])
         setPagination(result.pagination)
