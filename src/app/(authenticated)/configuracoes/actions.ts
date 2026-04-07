@@ -11,10 +11,7 @@ export async function updateCalendarConfig(
     await calendarConfigService.update(params)
     revalidatePath('/configuracoes')
     return { success: true }
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Erro ao salvar configuração',
-    }
+  } catch {
+    return { success: false, error: 'Erro ao salvar configuração.' }
   }
 }

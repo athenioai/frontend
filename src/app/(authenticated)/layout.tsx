@@ -12,7 +12,7 @@ export default async function AuthenticatedLayout({
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar userName={user.name} />
+      <Sidebar userName={user.name} isAdmin={user.role === 'admin'} />
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="h-14 shrink-0 lg:hidden" aria-hidden="true" />
         <main className="flex-1 overflow-y-auto">

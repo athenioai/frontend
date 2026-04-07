@@ -11,11 +11,8 @@ export async function deleteChatSession(
     await chatService.deleteSession(sessionId)
     revalidatePath('/conversas')
     return { success: true }
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Erro ao deletar conversa',
-    }
+  } catch {
+    return { success: false, error: 'Erro ao deletar conversa.' }
   }
 }
 
@@ -57,10 +54,7 @@ export async function loadMoreMessages(
   try {
     const result = await chatService.getMessages(sessionId, { page })
     return { success: true, data: result.data, pagination: result.pagination }
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Erro ao carregar mensagens',
-    }
+  } catch {
+    return { success: false, error: 'Erro ao carregar mensagens.' }
   }
 }

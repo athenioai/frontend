@@ -13,9 +13,8 @@ export async function loginAction(_prevState: unknown, formData: FormData) {
 
   try {
     await authService.login(email, password)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Erro ao fazer login.'
-    return { error: message }
+  } catch {
+    return { error: 'Email ou senha inválidos.' }
   }
 
   redirect('/dashboard')

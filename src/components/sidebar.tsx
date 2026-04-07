@@ -40,9 +40,10 @@ const ADMIN_ITEMS = [
 
 interface SidebarProps {
   userName: string
+  isAdmin?: boolean
 }
 
-export function Sidebar({ userName }: SidebarProps) {
+export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
@@ -70,24 +71,27 @@ export function Sidebar({ userName }: SidebarProps) {
 
   const desktopNav = (
     <nav className="flex-1 space-y-1 px-2 pt-5">
-      {/* Admin section */}
-      {!collapsed && (
-        <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
-          Admin
-        </p>
+      {/* Admin section (only for admins) */}
+      {isAdmin && (
+        <>
+          {!collapsed && (
+            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
+              Admin
+            </p>
+          )}
+          {ADMIN_ITEMS.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              isActive={isActive(item.href)}
+              collapsed={collapsed}
+            />
+          ))}
+          <div className="pt-4 pb-1">
+            <div className="mx-1 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
+          </div>
+        </>
       )}
-      {ADMIN_ITEMS.map((item) => (
-        <NavLink
-          key={item.href}
-          item={item}
-          isActive={isActive(item.href)}
-          collapsed={collapsed}
-        />
-      ))}
-
-      <div className="pt-4 pb-1">
-        <div className="mx-1 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
-      </div>
 
       {NAV_ITEMS.map((item) => (
         <NavLink
@@ -104,21 +108,25 @@ export function Sidebar({ userName }: SidebarProps) {
 
   const mobileNav = (
     <nav className="flex-1 space-y-1 px-3 pt-5">
-      <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
-        Admin
-      </p>
-      {ADMIN_ITEMS.map((item) => (
-        <NavLink
-          key={item.href}
-          item={item}
-          isActive={isActive(item.href)}
-          collapsed={false}
-          onClick={() => setMobileOpen(false)}
-        />
-      ))}
-      <div className="pt-4 pb-1">
-        <div className="mx-2 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
-      </div>
+      {isAdmin && (
+        <>
+          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-text-subtle">
+            Admin
+          </p>
+          {ADMIN_ITEMS.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              isActive={isActive(item.href)}
+              collapsed={false}
+              onClick={() => setMobileOpen(false)}
+            />
+          ))}
+          <div className="pt-4 pb-1">
+            <div className="mx-2 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
+          </div>
+        </>
+      )}
       {NAV_ITEMS.map((item) => (
         <NavLink
           key={item.href}

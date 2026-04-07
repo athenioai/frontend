@@ -60,14 +60,6 @@ export function MessageThread({
     }
   }, [])
 
-  // Focus textarea and scroll to bottom when takeover activates
-  useEffect(() => {
-    if (isTakeover) {
-      scrollToBottom()
-      requestAnimationFrame(() => textareaRef.current?.focus())
-    }
-  }, [isTakeover])
-
   function scrollToBottom() {
     requestAnimationFrame(() => {
       if (scrollRef.current) {
@@ -75,6 +67,14 @@ export function MessageThread({
       }
     })
   }
+
+  // Focus textarea and scroll to bottom when takeover activates
+  useEffect(() => {
+    if (isTakeover) {
+      scrollToBottom()
+      requestAnimationFrame(() => textareaRef.current?.focus())
+    }
+  }, [isTakeover])
 
   function handleLoadMore() {
     const prevPage = currentPage - 1

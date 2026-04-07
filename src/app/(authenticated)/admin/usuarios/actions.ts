@@ -33,6 +33,10 @@ export async function createUser(
   if (contract.size > 10 * 1024 * 1024) {
     return { success: false, error: 'O arquivo deve ter no máximo 10MB.' }
   }
+  const pdfHeader = new TextDecoder().decode(await contract.slice(0, 5).arrayBuffer())
+  if (!pdfHeader.startsWith('%PDF-')) {
+    return { success: false, error: 'Arquivo PDF inválido.' }
+  }
 
   // Forward FormData directly to the API
   const cookieStore = await cookies()
@@ -73,6 +77,10 @@ export async function uploadContract(
   }
   if (contract.size > 10 * 1024 * 1024) {
     return { success: false, error: 'O arquivo deve ter no máximo 10MB.' }
+  }
+  const pdfCheck = new TextDecoder().decode(await contract.slice(0, 5).arrayBuffer())
+  if (!pdfCheck.startsWith('%PDF-')) {
+    return { success: false, error: 'Arquivo PDF inválido.' }
   }
 
   const cookieStore = await cookies()
