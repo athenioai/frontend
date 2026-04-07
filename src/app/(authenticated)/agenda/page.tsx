@@ -82,7 +82,7 @@ export default async function AgendaPage({
   const appointments = await fetchAppointments(from, to, status)
 
   return (
-    <div className="flex h-full flex-col px-4 py-6 lg:px-6 lg:py-8">
+    <div className="flex h-full flex-col px-6 py-8 lg:py-10">
       <CalendarView
         appointments={appointments}
         anchorDate={anchor}

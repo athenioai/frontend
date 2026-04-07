@@ -49,6 +49,7 @@ export function PlansTable({
 
   // Delete state
   const [deleteTarget, setDeleteTarget] = useState<Plan | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const [isDeleting, startDelete] = useTransition()
 
   const totalPages = Math.ceil(pagination.total / pagination.limit)
@@ -125,11 +126,14 @@ export function PlansTable({
 
   function handleDelete() {
     if (!deleteTarget) return
+    setDeleteError(null)
     startDelete(async () => {
       const result = await deletePlan(deleteTarget.id)
       if (result.success) {
         setDeleteTarget(null)
         router.refresh()
+      } else {
+        setDeleteError(result.error ?? 'Erro ao deletar.')
       }
     })
   }
@@ -409,6 +413,12 @@ export function PlansTable({
                   </Dialog.Description>
                 </div>
               </div>
+
+              {deleteError && (
+                <div className="mt-4 rounded-lg bg-danger/8 px-3 py-2.5">
+                  <p className="text-sm text-danger">{deleteError}</p>
+                </div>
+              )}
 
               <div className="mt-6 flex justify-end gap-2">
                 <Dialog.Close

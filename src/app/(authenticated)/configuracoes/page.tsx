@@ -12,12 +12,21 @@ async function fetchCalendarConfig() {
   return config
 }
 
-export default async function ConfiguracoesPage() {
+export default async function ConfiguracoesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
+  const params = await searchParams
+  const tab = params.tab || 'agenda'
   const calendarConfig = await fetchCalendarConfig()
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8 lg:py-10">
-      <SettingsHub calendarConfig={calendarConfig} />
+    <div className="px-6 py-8 lg:py-10">
+      <SettingsHub
+        activeTab={tab}
+        calendarConfig={calendarConfig}
+      />
     </div>
   )
 }

@@ -1,8 +1,15 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
-import { CalendarDays, Save, Check, ChevronDown } from 'lucide-react'
+import {
+  CalendarDays,
+  User,
+  Bell,
+  Save,
+  Check,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION, fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -11,6 +18,14 @@ import type {
   CalendarConfig,
   BusinessHour,
 } from '@/lib/services/interfaces/calendar-config-service'
+
+// ── Tabs ──
+
+const TABS = [
+  { id: 'agenda', label: 'Agenda', icon: CalendarDays },
+  { id: 'perfil', label: 'Perfil', icon: User },
+  { id: 'notificacoes', label: 'Notificações', icon: Bell },
+]
 
 // ── Calendar config constants ──
 
@@ -54,10 +69,20 @@ function serializeHorario(state: DayState): string {
 // ── Component ──
 
 interface SettingsHubProps {
+  activeTab: string
   calendarConfig: CalendarConfig | null
 }
 
-export function SettingsHub({ calendarConfig }: SettingsHubProps) {
+export function SettingsHub({ activeTab, calendarConfig }: SettingsHubProps) {
+  const router = useRouter()
+
+  function changeTab(id: string) {
+    const params = new URLSearchParams()
+    if (id !== 'agenda') params.set('tab', id)
+    const qs = params.toString()
+    router.push(`/configuracoes${qs ? `?${qs}` : ''}`)
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
       {/* Header */}
@@ -73,29 +98,77 @@ export function SettingsHub({ calendarConfig }: SettingsHubProps) {
         </p>
       </motion.div>
 
-      {/* Sections */}
-      <div className="mt-8 space-y-4">
-        <motion.div
-          variants={fadeInUp}
-          transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-        >
-          <CalendarConfigSection config={calendarConfig} />
-        </motion.div>
-      </div>
+      {/* Tabs */}
+      <motion.div
+        variants={fadeInUp}
+        transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+        className="mt-6 border-b border-border-default"
+      >
+        <nav className="-mb-px flex gap-1">
+          {TABS.map((tab) => {
+            const active = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => changeTab(tab.id)}
+                className={cn(
+                  'relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors duration-150',
+                  active
+                    ? 'text-accent'
+                    : 'text-text-muted hover:text-text-primary',
+                )}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+                {active && (
+                  <motion.div
+                    layoutId="settings-tab-indicator"
+                    className="absolute inset-x-0 -bottom-px h-0.5 bg-accent"
+                    transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+                  />
+                )}
+              </button>
+            )
+          })}
+        </nav>
+      </motion.div>
+
+      {/* Tab content */}
+      <motion.div
+        variants={fadeInUp}
+        transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
+        className="mt-8"
+      >
+        {activeTab === 'agenda' && (
+          <AgendaTab config={calendarConfig} />
+        )}
+        {activeTab === 'perfil' && <PlaceholderTab label="Perfil" />}
+        {activeTab === 'notificacoes' && <PlaceholderTab label="Notificações" />}
+      </motion.div>
     </motion.div>
   )
 }
 
-// ── Calendar config section (collapsible) ──
+// ── Placeholder tab ──
 
-function CalendarConfigSection({
-  config,
-}: {
-  config: CalendarConfig | null
-}) {
+function PlaceholderTab({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <p className="font-title text-lg font-semibold text-text-muted">
+        {label}
+      </p>
+      <p className="mt-1 text-sm text-text-subtle">
+        Em breve
+      </p>
+    </div>
+  )
+}
+
+// ── Agenda tab ──
+
+function AgendaTab({ config }: { config: CalendarConfig | null }) {
   const hours = config?.business_hours ?? DEFAULT_HOURS
 
-  const [expanded, setExpanded] = useState(true)
   const [days, setDays] = useState<DayState[]>(
     DAYS.map((dia) => {
       const found = hours.find((h) => h.dia === dia)
@@ -152,164 +225,132 @@ function CalendarConfigSection({
     'h-9 rounded-lg border border-border-default bg-surface-2 px-3 text-sm text-text-primary outline-none transition-colors hover:border-border-hover focus:border-accent/40 focus:ring-1 focus:ring-accent/15'
 
   return (
-    <div className="card-surface overflow-hidden">
-      {/* Section header */}
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[rgba(255,255,255,0.02)]"
-      >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-          <CalendarDays className="h-4.5 w-4.5 text-accent" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-semibold text-text-primary">Agenda</p>
-          <p className="text-xs text-text-muted">
-            Horários de funcionamento e regras de agendamento
-          </p>
-        </div>
-        <ChevronDown
-          className={cn(
-            'h-4 w-4 text-text-subtle transition-transform duration-200',
-            expanded && 'rotate-180',
-          )}
-        />
-      </button>
+    <form onSubmit={handleSubmit} className="max-w-3xl">
+      {/* Business hours */}
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-text-subtle">
+        Horários de funcionamento
+      </h3>
 
-      {/* Collapsible content */}
-      {expanded && (
-        <form onSubmit={handleSubmit}>
-          <div className="border-t border-border-default px-5 pb-5 pt-4">
-            {/* Business hours */}
-            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
-              Horários de funcionamento
-            </h3>
+      <div className="mt-4 space-y-1.5">
+        {DAYS.map((dia, i) => (
+          <div
+            key={dia}
+            className="flex items-center gap-4 rounded-xl bg-surface-1 px-4 py-3 ring-1 ring-border-default/50"
+          >
+            <span className="w-20 shrink-0 text-sm font-medium text-text-primary">
+              {dia}
+            </span>
 
-            <div className="mt-3 space-y-1.5">
-              {DAYS.map((dia, i) => (
-                <div
-                  key={dia}
-                  className="flex items-center gap-4 rounded-lg bg-surface-2/50 px-3 py-2.5"
-                >
-                  <span className="w-20 shrink-0 text-sm font-medium text-text-primary">
-                    {dia}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => updateDay(i, { open: !days[i].open })}
-                    className={cn(
-                      'relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200',
-                      days[i].open ? 'bg-accent' : 'bg-surface-2',
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200',
-                        days[i].open && 'translate-x-4',
-                      )}
-                    />
-                  </button>
-
-                  {days[i].open ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="time"
-                        value={days[i].start}
-                        onChange={(e) =>
-                          updateDay(i, { start: e.target.value })
-                        }
-                        className={`${inputClass} h-8 text-xs`}
-                      />
-                      <span className="text-[11px] text-text-subtle">às</span>
-                      <input
-                        type="time"
-                        value={days[i].end}
-                        onChange={(e) => updateDay(i, { end: e.target.value })}
-                        className={`${inputClass} h-8 text-xs`}
-                      />
-                    </div>
-                  ) : (
-                    <span className="text-xs text-text-subtle">Fechado</span>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Settings */}
-            <h3 className="mt-6 text-[11px] font-semibold uppercase tracking-wider text-text-subtle">
-              Regras de agendamento
-            </h3>
-
-            <div className="mt-3 space-y-1.5">
-              <SettingRow
-                label="Duração do slot"
-                hint="10 a 120 minutos"
-                value={slotDuration}
-                onChange={setSlotDuration}
-                min={10}
-                max={120}
-                unit="min"
-                inputClass={inputClass}
-              />
-              <SettingRow
-                label="Antecedência para agendar"
-                hint="0 a 72 horas"
-                value={minAdvance}
-                onChange={setMinAdvance}
-                min={0}
-                max={72}
-                unit="h"
-                inputClass={inputClass}
-              />
-              <SettingRow
-                label="Antecedência para cancelar"
-                hint="0 a 72 horas"
-                value={minCancelAdvance}
-                onChange={setMinCancelAdvance}
-                min={0}
-                max={72}
-                unit="h"
-                inputClass={inputClass}
-              />
-            </div>
-
-            {/* Error */}
-            {error && (
-              <div className="mt-4 rounded-lg bg-danger/8 px-3 py-2.5">
-                <p className="text-sm text-danger">{error}</p>
-              </div>
-            )}
-
-            {/* Submit */}
-            <div className="mt-5 flex justify-end">
-              <Button
-                type="submit"
-                disabled={isSaving}
-                className="h-9 gap-2 rounded-xl bg-accent px-4 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_rgba(79,209,197,0.12)] transition-all hover:brightness-110 disabled:opacity-50"
-              >
-                {isSaving ? (
-                  <>
-                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-                    Salvando...
-                  </>
-                ) : saved ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" />
-                    Salvo
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-3.5 w-3.5" />
-                    Salvar
-                  </>
+            <button
+              type="button"
+              onClick={() => updateDay(i, { open: !days[i].open })}
+              className={cn(
+                'relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200',
+                days[i].open ? 'bg-accent' : 'bg-surface-2',
+              )}
+            >
+              <span
+                className={cn(
+                  'absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200',
+                  days[i].open && 'translate-x-4',
                 )}
-              </Button>
-            </div>
+              />
+            </button>
+
+            {days[i].open ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="time"
+                  value={days[i].start}
+                  onChange={(e) => updateDay(i, { start: e.target.value })}
+                  className={`${inputClass} h-8 text-xs`}
+                />
+                <span className="text-[11px] text-text-subtle">às</span>
+                <input
+                  type="time"
+                  value={days[i].end}
+                  onChange={(e) => updateDay(i, { end: e.target.value })}
+                  className={`${inputClass} h-8 text-xs`}
+                />
+              </div>
+            ) : (
+              <span className="text-xs text-text-subtle">Fechado</span>
+            )}
           </div>
-        </form>
+        ))}
+      </div>
+
+      {/* Settings */}
+      <h3 className="mt-8 text-xs font-semibold uppercase tracking-wider text-text-subtle">
+        Regras de agendamento
+      </h3>
+
+      <div className="mt-4 space-y-1.5">
+        <SettingRow
+          label="Duração do slot"
+          hint="10 a 120 minutos"
+          value={slotDuration}
+          onChange={setSlotDuration}
+          min={10}
+          max={120}
+          unit="min"
+          inputClass={inputClass}
+        />
+        <SettingRow
+          label="Antecedência para agendar"
+          hint="0 a 72 horas"
+          value={minAdvance}
+          onChange={setMinAdvance}
+          min={0}
+          max={72}
+          unit="h"
+          inputClass={inputClass}
+        />
+        <SettingRow
+          label="Antecedência para cancelar"
+          hint="0 a 72 horas"
+          value={minCancelAdvance}
+          onChange={setMinCancelAdvance}
+          min={0}
+          max={72}
+          unit="h"
+          inputClass={inputClass}
+        />
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="mt-4 rounded-lg bg-danger/8 px-3 py-2.5">
+          <p className="text-sm text-danger">{error}</p>
+        </div>
       )}
-    </div>
+
+      {/* Submit */}
+      <div className="mt-8 flex justify-end">
+        <Button
+          type="submit"
+          disabled={isSaving}
+          className="h-9 gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_rgba(79,209,197,0.12)] transition-all hover:brightness-110 disabled:opacity-50"
+        >
+          {isSaving ? (
+            <>
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+              Salvando...
+            </>
+          ) : saved ? (
+            <>
+              <Check className="h-3.5 w-3.5" />
+              Salvo
+            </>
+          ) : (
+            <>
+              <Save className="h-3.5 w-3.5" />
+              Salvar configuração
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
   )
 }
 
@@ -335,7 +376,7 @@ function SettingRow({
   inputClass: string
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg bg-surface-2/50 px-3 py-2.5">
+    <div className="flex items-center justify-between rounded-xl bg-surface-1 px-4 py-3 ring-1 ring-border-default/50">
       <div>
         <p className="text-sm font-medium text-text-primary">{label}</p>
         <p className="text-[11px] text-text-subtle">{hint}</p>
