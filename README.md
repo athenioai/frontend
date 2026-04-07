@@ -1,189 +1,178 @@
-# Olympus Frontend
+# Olympus — Sua Empresa Autônoma
 
-Dashboard for [Athenio.ai](https://athenio.ai) autonomous AI sales agents. This is the command center where business owners monitor their AI-driven sales pipeline, manage products and knowledge bases, track conversations with leads, and review real-time analytics. It also includes an internal admin panel for the Athenio team to manage tenants and system health.
+Dashboard do [Athenio.ai](https://athenio.ai) para acompanhar agentes de IA autônomos. Painel onde o dono do negócio monitora conversas, agendamentos, leads e configurações. Inclui painel administrativo para gestão de planos, usuários e métricas.
 
 ---
 
-## Tech Stack
+## Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
+| Camada | Tecnologia | Versão |
+|--------|-----------|--------|
 | Framework | Next.js (App Router) | 16.2.1 |
-| Language | TypeScript (strict) | 5.x |
-| UI Components | React + shadcn/ui | 19.2.4 |
-| Styling | Tailwind CSS v4 (CSS-first config) | 4.x |
-| Animations | Motion (Framer Motion) | 12.x |
-| Charts | Recharts | 3.8.1 |
-| Auth | Supabase Auth (cookie-based sessions) | |
-| Icons | Lucide React | |
-| Tests | Vitest | |
+| Linguagem | TypeScript (strict) | 5.x |
+| UI | React + shadcn/ui + Base UI | 19.2.4 |
+| Estilo | Tailwind CSS v4 | 4.x |
+| Animações | Motion (Framer Motion) | 12.x |
+| Gráficos | Recharts | 3.8.1 |
+| Auth | Custom JWT (httpOnly cookies) | — |
+| Ícones | Lucide React | — |
+| Testes | Vitest | 4.x |
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- npm 10+
-
-### Setup
+## Setup
 
 ```bash
 git clone <repo-url>
 cd olympus-frontend
 cp .env.local.example .env.local
-# Fill in the environment variables (see below)
 npm install
 npm run dev
 ```
 
-The dev server starts at `http://localhost:3000`.
+Dev server em `http://localhost:3000`.
 
 ### Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Development server |
-| `npm run build` | Production build |
-| `npm run start` | Run production build |
+| Comando | Descrição |
+|---------|-----------|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm run start` | Rodar build de produção |
 | `npm run lint` | ESLint |
-| `npm run test` | Vitest (watch mode) |
+| `npm run test` | Vitest (watch) |
 | `npm run test:run` | Vitest (single run) |
 
----
+### Variáveis de Ambiente
 
-## Environment Variables
-
-Create a `.env.local` file from `.env.local.example` with the following variables:
-
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable (anon) key |
-| `NEXT_PUBLIC_API_URL` | Backend API URL (default: `http://localhost:3003`) |
+| Variável | Descrição |
+|----------|-----------|
+| `NEXT_PUBLIC_API_URL` | URL da API backend (default: `http://localhost:3003`) |
 
 ---
 
-## Project Structure
+## Estrutura
 
 ```
 src/
 ├── app/
-│   ├── login/                     # Login page
-│   ├── onboarding/                # Fullscreen onboarding wizard (4 steps)
-│   ├── (authenticated)/           # Protected client routes (sidebar layout)
-│   │   ├── dashboard/             # Bento grid dashboard with KPIs and alerts
-│   │   ├── conversas/             # Real-time conversations with leads
-│   │   ├── alertas/               # Alert timeline
-│   │   ├── leads/                 # Lead table + detail view
-│   │   ├── campanhas/             # Campaign management
-│   │   ├── produtos/              # Product and variant CRUD
-│   │   ├── knowledge-base/        # Q&A knowledge base CRUD
-│   │   ├── funil/                 # Sales funnel visualization
-│   │   ├── relatorios/            # PDF report generation
-│   │   ├── suporte/               # AI support chat
-│   │   └── configuracoes/         # Settings (profile, operations, system status)
-│   ├── admin/                     # Admin panel (role-gated)
-│   │   ├── dashboard/             # Admin KPIs and system health
-│   │   ├── tenants/               # Tenant CRUD (list, create, detail)
-│   │   └── dlq/                   # Dead-letter queue management
-│   └── api/                       # API routes (auth, leads, campaigns, PDF)
+│   ├── login/                          # Login (email/password)
+│   ├── forgot-password/                # Recuperação de senha
+│   ├── (authenticated)/                # Rotas protegidas
+│   │   ├── dashboard/                  # Página de boas-vindas + quick links
+│   │   ├── conversas/                  # Chat WhatsApp-style (split panel)
+│   │   ├── agenda/                     # Calendário dia/semana/mês (Google Calendar)
+│   │   ├── configuracoes/              # Configurações com tabs (Agenda, Perfil, Notificações)
+│   │   └── admin/                      # Admin-only (guard por role)
+│   │       ├── dashboard/              # Dashboard admin (stat cards + gráficos)
+│   │       ├── planos/                 # CRUD de planos
+│   │       └── usuarios/              # Gestão de usuários + contexto por user
+│   │           └── [id]/              # Visualização do user (4 tabs)
 │
 ├── components/
-│   ├── ui/                        # shadcn/ui base components
-│   ├── common/                    # Shared components (StatusBadge, ConfirmDialog, etc.)
-│   ├── layout/                    # App shell (sidebar, topbar, command palette)
-│   ├── charts/                    # Recharts wrappers (gauge, funnel, bar, line)
-│   ├── widgets/                   # Dashboard widgets (ROI, health, KPIs, agents)
-│   ├── onboarding/                # Onboarding wizard components
-│   ├── conversations/             # Conversation panel and chat view
-│   ├── alerts/                    # Alert timeline component
-│   ├── leads/                     # Lead table and detail components
-│   ├── admin/                     # Admin-specific components
-│   └── skeletons/                 # Loading skeleton components
+│   ├── ui/                             # Componentes base (button, input, label, logo)
+│   ├── sidebar.tsx                     # Sidebar colapsável + seção admin condicional
+│   └── providers.tsx                   # Provider wrapper
 │
-├── hooks/
-│   ├── useAuth.ts                 # Auth state (user, role, logout)
-│   ├── useWebSocket.ts            # Real-time messaging via WebSocket
-│   ├── useReadiness.ts            # Client-side readiness check
-│   └── useApi.ts                  # Generic data fetching with error handling
+├── lib/
+│   ├── services/                       # 8 services (class-based, authFetch + cookies)
+│   │   ├── interfaces/                 # Contratos TypeScript
+│   │   └── __tests__/                  # Testes unitários
+│   ├── format.ts                       # Formatação (data, hora, CNPJ, moeda)
+│   ├── motion.ts                       # Constantes de animação
+│   └── utils.ts                        # cn() (clsx + tailwind-merge)
 │
-└── lib/
-    ├── types/                     # Domain TypeScript interfaces
-    ├── services/
-    │   ├── interfaces/            # Service contracts (13 interfaces)
-    │   └── ...                    # Service implementations
-    ├── api/                       # Client-side API helpers
-    ├── constants/                 # Theme palette and color helpers
-    ├── motion.ts                  # Animation constants (durations, easings)
-    └── utils/                     # Formatting utilities (currency, dates, phone)
+├── middleware.ts                        # Token refresh + auth redirect
 ```
 
 ---
 
-## Features
+## Módulos
 
-### Client Panel
+### Painel do Usuário
 
-| Page | Description |
-|------|-------------|
-| **Dashboard** | Bento grid with ROI, health score gauge, KPIs, sales funnel, agent status, recent activity, and alerts. Shows readiness banner when onboarding is incomplete. |
-| **Conversations** | Two-column real-time chat interface with lead conversations. WebSocket-powered with human takeover support. |
-| **Alerts** | Vertical timeline of system alerts (sales, whale detection, campaign pauses, sensor failures). |
-| **Leads** | Filterable lead table with search, temperature/funnel filters, and detail view with conversation history and payment logs. |
-| **Campaigns** | Campaign grid with status, ROAS, CPL metrics, and performance charts. |
-| **Products** | CRUD for products and pricing variants with billing cycle management. |
-| **Knowledge Base** | CRUD for Q&A entries (AI-generated and manual) used by sales agents. |
-| **Sales Funnel** | Full-width funnel visualization with period toggles and conversion rates. |
-| **Reports** | Monthly PDF report generation and download. |
-| **Settings** | Three tabs: company profile, operational config (budget, ROAS targets), and system status. |
-| **Support** | AI-powered support chat with ticket history. |
-| **Onboarding** | Fullscreen 4-step wizard: company profile, products, knowledge base, readiness checklist. |
+| Página | Descrição |
+|--------|-----------|
+| **Dashboard** | Boas-vindas com saudação por horário, stat cards placeholder e links rápidos para Conversas, Agendamentos e Performance. |
+| **Conversas** | Split panel estilo WhatsApp. Lista de sessões à esquerda, thread de mensagens à direita com bubbles (lead/assistant), timestamps, badge de agendamento, input bar com modo takeover. |
+| **Agenda** | Calendário com 3 views (Dia/Semana/Mês). Blocos de agendamento posicionados por horário, indicador de hora atual, navegação por setas, modal de detalhe. |
+| **Configurações** | Tabs (Agenda, Perfil, Notificações). Tab Agenda: editor de horários por dia (toggle + time inputs), duração do slot, antecedência. |
 
-### Admin Panel
+### Painel Admin
 
-| Page | Description |
-|------|-------------|
-| **Dashboard** | KPI cards (total clients, leads, whales), system health indicators, and client list with readiness status. |
-| **Tenants** | Full CRUD for tenant management with configuration for payments, Meta Ads, WhatsApp, orchestrator settings, and quotas. |
-| **Tenant Detail** | Four tabs: overview with readiness checklist, full configuration form, paginated leads table, and orchestrator decision timeline. |
-| **DLQ** | Dead-letter queue viewer with expandable JSON details and replay functionality. |
+| Página | Descrição |
+|--------|-----------|
+| **Dashboard** | Hero card MRR, 4 stat cards interativos (Usuários, Agendamentos, Leads, Chats) com progress bars, donut chart de planos, bar chart de receita por plano. |
+| **Planos** | Tabela CRUD com busca, modal criar/editar (nome + custo R$), modal deletar com confirmação, paginação. Erro 409 inline. |
+| **Usuários** | Tabela com status (Ativo/Pendente), CNPJ formatado, busca, filtros por status e plano, headers ordenáveis, modal criar com upload PDF (dropzone + validação magic byte). |
+| **Contexto do Usuário** | Hero header com avatar + info. 4 tabs: Dashboard (métricas do user via API), Conversas (WhatsApp split panel), Agenda (calendário dia/semana/mês), Configurações (editável pelo admin). |
 
 ---
 
-## Architecture
+## Autenticação
 
-### Server Components by Default
-
-Pages use React Server Components for data fetching. Client components (`'use client'`) are used only where browser APIs are required: charts (Recharts needs DOM), forms, animations (Motion), and real-time features (WebSocket).
-
-### Service Layer
-
-All data access is abstracted behind service interfaces, allowing the data source to be swapped without changing UI code:
-
-```
-Page (Server Component) --> Service Interface --> Implementation (mock or Supabase)
-Client Component        --> clientApi          --> Backend API
-```
-
-### Authentication
-
-- Login via Supabase Auth (email/password)
-- Session stored in HTTP-only cookies
-- Middleware validates sessions on all protected routes
-- Routes under `/admin/*` require `role === 'admin'`
-
-### Routing
-
-The `(authenticated)` route group applies the shared app shell (sidebar, topbar, command palette) to all client-facing pages. Admin routes use a separate layout with admin-specific navigation.
+1. Login via email/password → backend retorna JWT tokens
+2. Tokens armazenados em cookies httpOnly (access_token + refresh_token)
+3. Middleware intercepta requests: se access_token expirou, tenta refresh via `/auth/refresh` e seta novos cookies
+4. Falha no refresh → limpa cookies e redireciona para `/login`
+5. AuthUser possui campo `role` (`admin` | `user`)
+6. Rotas `/admin/*` protegidas por layout guard (`user.role !== 'admin'` → 404)
 
 ---
 
-## Development Notes
+## Service Layer
 
-- All UI labels are in Brazilian Portuguese (pt-BR)
-- Currency formatting follows BRL conventions (`R$ 1.234,50`)
-- Dates use `dd/mm/yyyy` with `America/Sao_Paulo` timezone
-- Dark mode is the default theme; light mode is also supported
-- The command palette (`Cmd+K` / `Ctrl+K`) provides quick navigation across all pages
+Todas as chamadas à API são feitas via classes de serviço com autenticação automática:
+
+```
+Server Component → Service Class → authFetch (cookie) → Backend API
+Server Action    → Service Class → authFetch (cookie) → Backend API
+```
+
+| Serviço | Endpoint Base | Métodos |
+|---------|--------------|---------|
+| AuthService | `/auth/*` | login, logout, getSession, tryRefresh |
+| ChatService | `/chats/*` | listSessions, getMessages, deleteSession |
+| AppointmentService | `/appointments/*` | list, getById |
+| CalendarConfigService | `/calendar-config` | get, update |
+| PlanService | `/admin/plans/*` | list, getById, create, update, delete |
+| AdminUserService | `/admin/users/*` | list, getById, create (multipart) |
+| AdminDashboardService | `/admin/dashboard` | get |
+| AdminUserDataService | `/admin/users/:id/*` | getDashboard, getChats, getChatMessages, getAppointments, getCalendarConfig, updateCalendarConfig |
+
+---
+
+## Segurança
+
+- **RBAC**: Admin layout guard verifica `user.role === 'admin'`
+- **Security Headers**: X-Frame-Options (DENY), HSTS, X-Content-Type-Options (nosniff), Referrer-Policy, Permissions-Policy
+- **Cookies**: httpOnly, sameSite: lax, secure em produção
+- **Error Handling**: Mensagens genéricas para o cliente (sem leakage de erros do backend)
+- **File Upload**: Validação de MIME type + magic bytes (`%PDF-`) para uploads de contrato
+- **CSRF**: Proteção nativa do Next.js via server actions
+
+Relatório completo: `docs/security/audit-2026-04-06.md`
+
+---
+
+## Specs
+
+Especificações formais (SVVA) em `docs/specs/`:
+
+| Spec | Feature |
+|------|---------|
+| `SPEC-plans.yaml` | Admin Plans CRUD |
+| `SPEC-admin-users.yaml` | Admin Users Management |
+| `SPEC-admin-dashboard.yaml` | Admin Dashboard |
+| `SPEC-admin-user-context.yaml` | Admin User Context View |
+
+---
+
+## Desenvolvimento
+
+- Labels em Português (pt-BR)
+- Moeda: BRL (`R$ 1.234,50`)
+- CNPJ: `XX.XXX.XXX/XXXX-XX`
+- Tema: Dark-only (classe `dark` no `<html>`)
+- Padding padrão: `px-6 py-8 lg:py-10`
+- Fontes: Space Grotesk (títulos) + Sora (corpo)
