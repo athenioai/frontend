@@ -9,7 +9,7 @@ export async function updateCalendarConfig(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await calendarConfigService.update(params)
-    revalidatePath('/agenda/configuracao')
+    revalidatePath('/configuracoes')
     return { success: true }
   } catch (error) {
     return {

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'motion/react'
-import { LayoutDashboard, MessagesSquare, CalendarDays, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, MessagesSquare, CalendarDays, Settings, LogOut, Menu, X } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { cn } from '@/lib/utils'
 import { MOTION } from '@/lib/motion'
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/conversas', label: 'Conversas', icon: MessagesSquare },
   { href: '/agenda', label: 'Agenda', icon: CalendarDays },
+  { href: '/configuracoes', label: 'Configurações', icon: Settings },
 ]
 
 interface SidebarProps {

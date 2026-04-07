@@ -23,8 +23,8 @@ import Link from 'next/link'
 // ── Constants ──
 
 const HOUR_HEIGHT = 72
-const START_HOUR = 7
-const END_HOUR = 20
+const START_HOUR = 0
+const END_HOUR = 24
 const TOTAL_HOURS = END_HOUR - START_HOUR
 
 const DAY_NAMES_SHORT = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
@@ -45,12 +45,6 @@ const VIEW_TABS: { value: View; label: string }[] = [
   { value: 'week', label: 'Semana' },
   { value: 'month', label: 'Mês' },
 ]
-
-const STATUS_TABS = [
-  { value: '', label: 'Todos' },
-  { value: 'confirmed', label: 'Confirmados' },
-  { value: 'cancelled', label: 'Cancelados' },
-] as const
 
 // ── Helpers ──
 
@@ -138,10 +132,6 @@ export function CalendarView({
     router.push(buildUrl({ date: formatISODate(newDate) }))
   }
 
-  function goToToday() {
-    router.push(buildUrl({ date: undefined }))
-  }
-
   function changeView(v: View) {
     const params: Record<string, string | undefined> = { view: v }
     // Reset date to sensible default for new view
@@ -152,10 +142,6 @@ export function CalendarView({
       )
     else params.date = anchorDate
     router.push(buildUrl(params))
-  }
-
-  function handleStatusChange(status: string) {
-    router.push(buildUrl({ status: status || undefined }))
   }
 
   // ── Navigation label ──
@@ -214,10 +200,6 @@ export function CalendarView({
             </Button>
           </div>
 
-          <Button variant="outline" size="xs" onClick={goToToday}>
-            Hoje
-          </Button>
-
           {/* View toggle */}
           <div className="flex gap-0.5 rounded-lg bg-surface-2 p-0.5">
             {VIEW_TABS.map((tab) => (
@@ -236,28 +218,10 @@ export function CalendarView({
             ))}
           </div>
 
-          {/* Status filter */}
-          <div className="flex gap-0.5 rounded-lg bg-surface-2 p-0.5">
-            {STATUS_TABS.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => handleStatusChange(tab.value)}
-                className={cn(
-                  'rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-150',
-                  (currentStatus ?? '') === tab.value
-                    ? 'bg-surface-1 text-text-primary shadow-sm'
-                    : 'text-text-muted hover:text-text-primary',
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <Link href="/agenda/configuracao" className="ml-auto">
+          <Link href="/configuracoes" className="ml-auto">
             <Button variant="outline" size="xs">
               <Settings className="h-3.5 w-3.5" />
-              Configuração
+              Configurações
             </Button>
           </Link>
         </div>
@@ -325,7 +289,6 @@ function TimeGrid({
   currentTop: number
   onSelect: (a: Appointment) => void
 }) {
-  const colTemplate = cols === 1 ? '52px 1fr' : `52px repeat(${cols}, 1fr)`
   const showLine =
     timeLineVisible && days.some((d) => formatISODate(d) === todayStr)
 
@@ -333,20 +296,16 @@ function TimeGrid({
     <div className="flex-1 overflow-y-auto">
       <div
         className="relative"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: colTemplate,
-          height: TOTAL_HOURS * HOUR_HEIGHT,
-        }}
+        style={{ height: TOTAL_HOURS * HOUR_HEIGHT }}
       >
-        {/* Hour labels + lines */}
+        {/* Hour labels + grid lines */}
         {Array.from({ length: TOTAL_HOURS }, (_, i) => {
           const hour = START_HOUR + i
           return (
             <div key={hour}>
               <div
                 className="absolute left-0 w-[52px] pr-2 text-right text-[10px] tabular-nums text-text-subtle"
-                style={{ top: i * HOUR_HEIGHT - 6 }}
+                style={{ top: i * HOUR_HEIGHT + (i === 0 ? 4 : -6) }}
               >
                 {String(hour).padStart(2, '0')}:00
               </div>
@@ -363,30 +322,34 @@ function TimeGrid({
         })}
 
         {/* Day columns */}
-        {days.map((day, i) => {
-          const dateStr = formatISODate(day)
-          const apts = byDate.get(dateStr) ?? []
-          const isToday = dateStr === todayStr
+        <div
+          className="absolute inset-y-0 left-[52px] right-0 grid"
+          style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+        >
+          {days.map((day, i) => {
+            const dateStr = formatISODate(day)
+            const apts = byDate.get(dateStr) ?? []
+            const isToday = dateStr === todayStr
 
-          return (
-            <div
-              key={i}
-              className={cn(
-                'relative border-l border-border-default/30',
-                isToday && 'bg-accent/[0.02]',
-              )}
-              style={{ gridColumn: i + 2, gridRow: '1 / -1' }}
-            >
-              {apts.map((apt) => (
-                <AppointmentBlock
-                  key={apt.id}
-                  apt={apt}
-                  onSelect={onSelect}
-                />
-              ))}
-            </div>
-          )
-        })}
+            return (
+              <div
+                key={i}
+                className={cn(
+                  'relative border-l border-border-default/30',
+                  isToday && 'bg-accent/[0.02]',
+                )}
+              >
+                {apts.map((apt) => (
+                  <AppointmentBlock
+                    key={apt.id}
+                    apt={apt}
+                    onSelect={onSelect}
+                  />
+                ))}
+              </div>
+            )
+          })}
+        </div>
 
         {/* Current time line */}
         {showLine && (
