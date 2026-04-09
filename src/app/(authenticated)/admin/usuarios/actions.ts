@@ -56,6 +56,16 @@ export async function createUser(
       return { success: false, error: 'Erro ao criar usuário.' }
     }
 
+    // Create WhatsApp instance for the new user
+    await fetch(`${API_URL}/whatsapp/instances`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({}),
+    }).catch(() => {})
+
     revalidatePath('/admin/usuarios')
     return { success: true }
   } catch {

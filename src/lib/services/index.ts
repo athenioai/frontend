@@ -6,6 +6,7 @@ import { PlanService } from './plan-service'
 import { AdminUserService } from './admin-user-service'
 import { AdminDashboardService } from './admin-dashboard-service'
 import { AdminUserDataService } from './admin-user-data-service'
+import { WhatsAppService } from './whatsapp-service'
 
 export const authService = new AuthService()
 export const chatService = new ChatService()
@@ -15,3 +16,4 @@ export const planService = new PlanService()
 export const adminUserService = new AdminUserService()
 export const adminDashboardService = new AdminDashboardService()
 export const adminUserDataService = new AdminUserDataService()
+export const whatsAppService = new WhatsAppService()

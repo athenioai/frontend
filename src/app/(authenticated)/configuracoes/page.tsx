@@ -1,6 +1,7 @@
-import { calendarConfigService } from '@/lib/services'
+import { calendarConfigService, whatsAppService } from '@/lib/services'
 import { SettingsHub } from './_components/settings-hub'
 import type { CalendarConfig } from '@/lib/services/interfaces/calendar-config-service'
+import type { WhatsAppInstance, WhatsAppInstanceDetail } from '@/lib/services/interfaces/whatsapp-service'
 
 async function fetchCalendarConfig() {
   let config: CalendarConfig | null = null
@@ -12,6 +13,31 @@ async function fetchCalendarConfig() {
   return config
 }
 
+async function fetchWhatsApp() {
+  let instance: WhatsAppInstance | null = null
+  let detail: WhatsAppInstanceDetail | null = null
+
+  try {
+    const instances = await whatsAppService.listInstances()
+    console.log('[WhatsApp] listInstances response:', JSON.stringify(instances))
+    if (instances.length > 0) {
+      instance = instances[0]
+    }
+  } catch (err) {
+    console.error('[WhatsApp] listInstances error:', err)
+  }
+
+  if (instance) {
+    try {
+      detail = await whatsAppService.getStatus(instance.id)
+    } catch {
+      // Stats unavailable, instance still shows
+    }
+  }
+
+  return { instance, detail }
+}
+
 export default async function ConfiguracoesPage({
   searchParams,
 }: {
@@ -19,13 +45,19 @@ export default async function ConfiguracoesPage({
 }) {
   const params = await searchParams
   const tab = params.tab || 'agenda'
-  const calendarConfig = await fetchCalendarConfig()
+
+  const [calendarConfig, whatsApp] = await Promise.all([
+    fetchCalendarConfig(),
+    tab === 'canais' ? fetchWhatsApp() : Promise.resolve({ instance: null, detail: null }),
+  ])
 
   return (
     <div className="px-6 py-8 lg:py-10">
       <SettingsHub
         activeTab={tab}
         calendarConfig={calendarConfig}
+        whatsAppInstance={whatsApp.instance}
+        whatsAppDetail={whatsApp.detail}
       />
     </div>
   )
