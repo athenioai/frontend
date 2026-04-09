@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils'
 import type { AdminDashboardData } from '@/lib/services/interfaces/admin-dashboard-service'
 import Link from 'next/link'
 
-const CHART_COLORS = ['#4FD1C5', '#A78BFA', '#E8C872', '#34D399', '#F07070']
+const CHART_COLORS = ['#D4820A', '#4FD1C5', '#A78BFA', '#34D399', '#F07070']
 
 function formatCurrency(value: number): string {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -320,12 +320,12 @@ export function DashboardView({ data }: DashboardViewProps) {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#1E2228',
-                        border: '1px solid rgba(240,237,232,0.08)',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #E8E6E1',
                         borderRadius: '0.75rem',
                         fontSize: '0.8rem',
                       }}
-                      itemStyle={{ color: '#F0EDE8' }}
+                      itemStyle={{ color: '#1C1B18' }}
                       formatter={(value) => [`${value} usuários`]}
                     />
                   </PieChart>
@@ -381,7 +381,7 @@ export function DashboardView({ data }: DashboardViewProps) {
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(240,237,232,0.06)"
+                    stroke="rgba(28,27,24,0.06)"
                     horizontal={false}
                   />
                   <XAxis
@@ -389,7 +389,7 @@ export function DashboardView({ data }: DashboardViewProps) {
                     tickFormatter={(v) =>
                       `R$${(v / 1000).toFixed(1)}k`
                     }
-                    tick={{ fill: 'rgba(240,237,232,0.45)', fontSize: 10 }}
+                    tick={{ fill: 'rgba(74,72,64,0.55)', fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -397,23 +397,23 @@ export function DashboardView({ data }: DashboardViewProps) {
                     type="category"
                     dataKey="name"
                     width={80}
-                    tick={{ fill: 'rgba(240,237,232,0.65)', fontSize: 12 }}
+                    tick={{ fill: '#4A4840', fontSize: 12 }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1E2228',
-                      border: '1px solid rgba(240,237,232,0.08)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E8E6E1',
                       borderRadius: '0.75rem',
                       fontSize: '0.8rem',
                     }}
-                    itemStyle={{ color: '#F0EDE8' }}
+                    itemStyle={{ color: '#1C1B18' }}
                     formatter={(value) => [
                       formatCurrency(Number(value)),
                       'Receita',
                     ]}
-                    cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                    cursor={{ fill: 'rgba(28,27,24,0.03)' }}
                   />
                   <Bar dataKey="revenue" radius={[0, 6, 6, 0]}>
                     {chartData.map((_, i) => (

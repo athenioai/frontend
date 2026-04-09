@@ -69,7 +69,7 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
       </div>
 
       {/* Divider */}
-      <div className="mx-5 h-px bg-gradient-to-r from-accent/10 via-[rgba(240,237,232,0.06)] to-transparent" />
+      <div className="mx-5 h-px bg-gradient-to-r from-accent/10 via-[rgba(28,27,24,0.06)] to-transparent" />
 
       {/* Session list */}
       <div className="flex-1 overflow-y-auto px-2 py-2">

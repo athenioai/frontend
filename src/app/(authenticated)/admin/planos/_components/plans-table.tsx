@@ -157,7 +157,7 @@ export function PlansTable({
         </div>
         <Button
           onClick={openCreate}
-          className="h-9 gap-1.5 rounded-xl bg-accent px-4 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_rgba(79,209,197,0.12)] transition-all hover:brightness-110"
+          className="h-9 gap-1.5 rounded-xl bg-accent px-4 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_rgba(212,130,10,0.12)] transition-all hover:brightness-110"
         >
           <Plus className="h-4 w-4" />
           Novo Plano

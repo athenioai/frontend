@@ -154,7 +154,7 @@ export function UserConversasPanel({ sessions, userId }: UserConversasPanelProps
         <div className="shrink-0 px-4 pt-4 pb-3">
           <p className="text-sm font-semibold text-text-primary">Conversas</p>
         </div>
-        <div className="mx-4 h-px bg-gradient-to-r from-accent/10 via-[rgba(240,237,232,0.06)] to-transparent" />
+        <div className="mx-4 h-px bg-gradient-to-r from-accent/10 via-[rgba(28,27,24,0.06)] to-transparent" />
 
         {/* Session list */}
         <div className="flex-1 overflow-y-auto px-2 py-2">
@@ -414,7 +414,7 @@ export function UserConversasPanel({ sessions, userId }: UserConversasPanelProps
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-primary-foreground transition-all duration-150 hover:brightness-110 disabled:opacity-25"
                         style={{
                           boxShadow: inputValue.trim()
-                            ? '0 0 16px rgba(79, 209, 197, 0.15)'
+                            ? '0 0 16px rgba(212, 130, 10, 0.15)'
                             : 'none',
                         }}
                       >

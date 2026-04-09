@@ -317,7 +317,7 @@ export function MessageThread({
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-primary-foreground transition-all duration-150 hover:brightness-110 disabled:opacity-25 disabled:hover:brightness-100"
                   style={{
                     boxShadow: inputValue.trim()
-                      ? '0 0 16px rgba(79, 209, 197, 0.15)'
+                      ? '0 0 16px rgba(212, 130, 10, 0.15)'
                       : 'none',
                   }}
                 >

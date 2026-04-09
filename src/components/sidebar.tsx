@@ -88,7 +88,7 @@ export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
             />
           ))}
           <div className="pt-4 pb-1">
-            <div className="mx-1 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
+            <div className="mx-1 h-px bg-gradient-to-r from-transparent via-[rgba(28,27,24,0.06)] to-transparent" />
           </div>
         </>
       )}
@@ -123,7 +123,7 @@ export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
             />
           ))}
           <div className="pt-4 pb-1">
-            <div className="mx-2 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.06)] to-transparent" />
+            <div className="mx-2 h-px bg-gradient-to-r from-transparent via-[rgba(28,27,24,0.06)] to-transparent" />
           </div>
         </>
       )}
@@ -283,7 +283,7 @@ export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
 
         <div
           className={cn(
-            'h-px bg-gradient-to-r from-accent/10 via-[rgba(240,237,232,0.06)] to-transparent',
+            'h-px bg-gradient-to-r from-accent/10 via-[rgba(28,27,24,0.06)] to-transparent',
             collapsed ? 'mx-2' : 'mx-5',
           )}
         />
@@ -294,7 +294,7 @@ export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
         <div className="relative mt-auto">
           <div
             className={cn(
-              'h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.08)] to-transparent',
+              'h-px bg-gradient-to-r from-transparent via-[rgba(28,27,24,0.08)] to-transparent',
               collapsed ? 'mx-2' : 'mx-5',
             )}
           />
@@ -346,11 +346,11 @@ export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
               <div className="relative px-6 pt-7 pb-5">
                 <Logo width={130} height={32} />
               </div>
-              <div className="mx-5 h-px bg-gradient-to-r from-accent/10 via-[rgba(240,237,232,0.06)] to-transparent" />
+              <div className="mx-5 h-px bg-gradient-to-r from-accent/10 via-[rgba(28,27,24,0.06)] to-transparent" />
               {mobileNav}
               {/* Mobile user section (always expanded) */}
               <div className="relative mt-auto">
-                <div className="mx-5 h-px bg-gradient-to-r from-transparent via-[rgba(240,237,232,0.08)] to-transparent" />
+                <div className="mx-5 h-px bg-gradient-to-r from-transparent via-[rgba(28,27,24,0.08)] to-transparent" />
                 {userDropdown}
                 <div className="px-3 pt-3 pb-4">{userButton}</div>
               </div>
@@ -396,19 +396,19 @@ function NavLink({
           className="absolute inset-0 rounded-xl bg-accent/[0.12]"
           style={{
             boxShadow:
-              '0 0 20px rgba(79, 209, 197, 0.06), inset 0 1px 0 rgba(79, 209, 197, 0.08)',
+              '0 0 20px rgba(212, 130, 10, 0.06), inset 0 1px 0 rgba(212, 130, 10, 0.08)',
           }}
           transition={{ type: 'spring', stiffness: 300, damping: 28 }}
         />
       )}
       {!active && (
-        <div className="absolute inset-0 rounded-xl bg-[rgba(255,255,255,0.04)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+        <div className="absolute inset-0 rounded-xl bg-[rgba(28,27,24,0.04)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       )}
       {active && !collapsed && (
         <motion.div
           layoutId="sidebar-active-bar"
           className="absolute -left-2 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-accent"
-          style={{ boxShadow: '2px 0 8px rgba(79, 209, 197, 0.3)' }}
+          style={{ boxShadow: '2px 0 8px rgba(212, 130, 10, 0.3)' }}
           transition={{ type: 'spring', stiffness: 300, damping: 28 }}
         />
       )}

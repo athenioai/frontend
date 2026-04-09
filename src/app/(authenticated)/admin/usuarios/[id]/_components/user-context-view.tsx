@@ -431,7 +431,7 @@ function ConfigTab({ config, userId }: { config: CalendarConfig | null; userId: 
             <Button
               type="submit"
               disabled={isSaving}
-              className="h-9 gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_rgba(79,209,197,0.12)] transition-all hover:brightness-110 disabled:opacity-50"
+              className="h-9 gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_rgba(212,130,10,0.12)] transition-all hover:brightness-110 disabled:opacity-50"
             >
               {isSaving ? (
                 <><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />Salvando...</>

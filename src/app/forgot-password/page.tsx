@@ -53,15 +53,15 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen">
       {/* ─── Left panel: brand showcase ─── */}
       <div className="relative hidden w-[55%] flex-col items-center justify-center overflow-hidden lg:flex">
-        <div className="absolute inset-0 bg-[#080A0E]" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#4FD1C5]/[0.14] via-[#4FD1C5]/[0.04] to-[#A78BFA]/[0.08]" />
+        <div className="absolute inset-0 bg-brand-green" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#D4820A]/[0.12] via-[#D4820A]/[0.03] to-[#4FD1C5]/[0.06]" />
 
         <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2">
-          <div className="absolute inset-0 animate-[spin_25s_linear_infinite] rounded-full bg-gradient-conic from-[#4FD1C5]/20 via-transparent via-40% to-[#A78BFA]/15 blur-[80px]" />
+          <div className="absolute inset-0 animate-[spin_25s_linear_infinite] rounded-full bg-gradient-conic from-[#D4820A]/15 via-transparent via-40% to-[#4FD1C5]/10 blur-[80px]" />
         </div>
 
-        <div className="absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#4FD1C5]/[0.15] animate-[spin_40s_linear_infinite]" />
-        <div className="absolute left-1/2 top-1/2 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#A78BFA]/[0.10] animate-[spin_60s_linear_infinite_reverse]" />
+        <div className="absolute left-1/2 top-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#D4820A]/[0.12] animate-[spin_40s_linear_infinite]" />
+        <div className="absolute left-1/2 top-1/2 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#4FD1C5]/[0.08] animate-[spin_60s_linear_infinite_reverse]" />
 
         <div
           className="absolute inset-0 opacity-[0.06]"
@@ -119,28 +119,28 @@ export default function ForgotPasswordPage() {
           </motion.div>
         </motion.div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#080A0E] to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[#4FD1C5]/30 to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-[60px] bg-gradient-to-l from-[#4FD1C5]/[0.04] to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-brand-green to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[#D4820A]/25 to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-[60px] bg-gradient-to-l from-[#D4820A]/[0.03] to-transparent" />
       </div>
 
       {/* ─── Right panel ─── */}
       <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 py-12 lg:px-16">
-        <div className="absolute inset-0 bg-[#141820]" />
+        <div className="absolute inset-0 bg-bg-base" />
 
-        <div className="pointer-events-none absolute -right-[10%] top-[5%] h-[450px] w-[450px] rounded-full bg-[#4FD1C5]/[0.12] blur-[100px] animate-[float-slow_20s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute -left-[5%] bottom-[0%] h-[400px] w-[400px] rounded-full bg-[#A78BFA]/[0.10] blur-[90px] animate-[float-slow_25s_ease-in-out_infinite_reverse]" />
-        <div className="pointer-events-none absolute right-[15%] bottom-[15%] h-[250px] w-[250px] rounded-full bg-[#E8C872]/[0.07] blur-[70px] animate-[float-slow_18s_ease-in-out_infinite_2s]" />
+        <div className="pointer-events-none absolute -right-[10%] top-[5%] h-[450px] w-[450px] rounded-full bg-[#D4820A]/[0.05] blur-[100px] animate-[float-slow_20s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute -left-[5%] bottom-[0%] h-[400px] w-[400px] rounded-full bg-[#4FD1C5]/[0.04] blur-[90px] animate-[float-slow_25s_ease-in-out_infinite_reverse]" />
+        <div className="pointer-events-none absolute right-[15%] bottom-[15%] h-[250px] w-[250px] rounded-full bg-[#F0B84A]/[0.04] blur-[70px] animate-[float-slow_18s_ease-in-out_infinite_2s]" />
 
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(240,237,232,0.6) 0.5px, transparent 0.5px)',
+            backgroundImage: 'radial-gradient(circle, rgba(28,27,24,0.15) 0.5px, transparent 0.5px)',
             backgroundSize: '40px 40px',
           }}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-b from-[#4FD1C5]/[0.04] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#D4820A]/[0.03] via-transparent to-transparent" />
 
         <div className="relative z-10 mb-12 lg:hidden">
           <Logo width={160} height={40} />
@@ -184,7 +184,7 @@ export default function ForgotPasswordPage() {
                     placeholder="seu@empresa.com"
                     required
                     autoComplete="email"
-                    className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
+                    className="h-12 rounded-xl border-border-default bg-white text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-accent/5 focus:ring-2 focus:ring-accent/15"
                   />
                 </motion.div>
 
@@ -202,7 +202,7 @@ export default function ForgotPasswordPage() {
                   <Button
                     type="submit"
                     disabled={sendPending}
-                    className="h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(79,209,197,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(79,209,197,0.18)] active:scale-[0.99] disabled:opacity-50"
+                    className="h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(212,130,10,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(212,130,10,0.18)] active:scale-[0.99] disabled:opacity-50"
                   >
                     {sendPending ? (
                       <span className="flex items-center gap-2">
@@ -265,7 +265,7 @@ export default function ForgotPasswordPage() {
                     required
                     autoComplete="one-time-code"
                     maxLength={6}
-                    className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] text-center font-title text-[20px] tracking-[0.3em] text-text-primary placeholder:text-text-subtle placeholder:tracking-[0.3em] transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
+                    className="h-12 rounded-xl border-border-default bg-white text-center font-title text-[20px] tracking-[0.3em] text-text-primary placeholder:text-text-subtle placeholder:tracking-[0.3em] transition-all duration-200 focus:border-accent/40 focus:bg-accent/5 focus:ring-2 focus:ring-accent/15"
                   />
                 </div>
 
@@ -282,7 +282,7 @@ export default function ForgotPasswordPage() {
                       required
                       minLength={8}
                       autoComplete="new-password"
-                      className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] pr-11 text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
+                      className="h-12 rounded-xl border-border-default bg-white pr-11 text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-accent/5 focus:ring-2 focus:ring-accent/15"
                     />
                     <button
                       type="button"
@@ -307,7 +307,7 @@ export default function ForgotPasswordPage() {
                       required
                       minLength={8}
                       autoComplete="new-password"
-                      className="h-12 rounded-xl border-[rgba(240,237,232,0.10)] bg-[rgba(240,237,232,0.06)] pr-11 text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-[rgba(79,209,197,0.06)] focus:ring-2 focus:ring-accent/15"
+                      className="h-12 rounded-xl border-border-default bg-white pr-11 text-text-primary placeholder:text-text-subtle transition-all duration-200 focus:border-accent/40 focus:bg-accent/5 focus:ring-2 focus:ring-accent/15"
                     />
                     <button
                       type="button"
@@ -332,7 +332,7 @@ export default function ForgotPasswordPage() {
                 <Button
                   type="submit"
                   disabled={resetPending}
-                  className="h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(79,209,197,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(79,209,197,0.18)] active:scale-[0.99] disabled:opacity-50"
+                  className="h-12 w-full rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(212,130,10,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(212,130,10,0.18)] active:scale-[0.99] disabled:opacity-50"
                 >
                   {resetPending ? (
                     <span className="flex items-center gap-2">
@@ -382,7 +382,7 @@ export default function ForgotPasswordPage() {
 
               <Link
                 href="/login"
-                className="flex h-12 w-full items-center justify-center rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(79,209,197,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(79,209,197,0.18)] active:scale-[0.99]"
+                className="flex h-12 w-full items-center justify-center rounded-xl bg-accent text-[15px] font-semibold text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_32px_rgba(212,130,10,0.12)] transition-all duration-200 hover:brightness-110 hover:shadow-[0_1px_2px_rgba(0,0,0,0.1),0_0_48px_rgba(212,130,10,0.18)] active:scale-[0.99]"
               >
                 Ir para o login
               </Link>
