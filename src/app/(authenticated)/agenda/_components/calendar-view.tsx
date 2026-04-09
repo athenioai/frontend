@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
 import { Dialog } from '@base-ui/react/dialog'
@@ -84,7 +84,7 @@ export function CalendarView({
 
   const anchor = new Date(anchorDate + 'T00:00:00')
   const todayStr = formatISODate(new Date())
-  const byDate = groupByDate(appointments)
+  const byDate = useMemo(() => groupByDate(appointments), [appointments])
 
   // ── Navigation ──
 

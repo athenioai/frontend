@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import {
   ArrowLeft,
@@ -76,7 +76,7 @@ export function MessageThread({
     }
   }, [isTakeover])
 
-  function handleLoadMore() {
+  const handleLoadMore = useCallback(() => {
     const prevPage = currentPage - 1
     if (prevPage < 1) return
 
@@ -96,14 +96,14 @@ export function MessageThread({
         })
       }
     })
-  }
+  }, [currentPage, sessionId])
 
-  function handleTextareaInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
+  const handleTextareaInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value)
     const el = e.target
     el.style.height = 'auto'
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`
-  }
+  }, [])
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {

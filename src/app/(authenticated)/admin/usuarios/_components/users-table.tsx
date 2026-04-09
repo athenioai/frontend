@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
+import { useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
 import { Dialog } from '@base-ui/react/dialog'
@@ -70,7 +70,7 @@ export function UsersTable({
   const [sortDir, setSortDir] = useState<SortDir>('desc')
 
   const totalPages = Math.ceil(pagination.total / pagination.limit)
-  const planMap = new Map(plans.map((p) => [p.id, p.name]))
+  const planMap = useMemo(() => new Map(plans.map((p) => [p.id, p.name])), [plans])
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
@@ -82,39 +82,45 @@ export function UsersTable({
   }
 
   // Client-side filtering
-  const filteredUsers = users.filter((u) => {
-    if (statusFilter === 'active' && u.name === null) return false
-    if (statusFilter === 'pending' && u.name !== null) return false
-    if (planFilter && u.planId !== planFilter) return false
-    return true
-  })
+  const filteredUsers = useMemo(
+    () =>
+      users.filter((u) => {
+        if (statusFilter === 'active' && u.name === null) return false
+        if (statusFilter === 'pending' && u.name !== null) return false
+        if (planFilter && u.planId !== planFilter) return false
+        return true
+      }),
+    [users, statusFilter, planFilter],
+  )
 
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    let cmp = 0
-    switch (sortKey) {
-      case 'status':
-        cmp = (a.name ? 1 : 0) - (b.name ? 1 : 0)
-        break
-      case 'name':
-        cmp = (a.name ?? '').localeCompare(b.name ?? '')
-        break
-      case 'email':
-        cmp = a.email.localeCompare(b.email)
-        break
-      case 'cnpj':
-        cmp = (a.cnpj ?? '').localeCompare(b.cnpj ?? '')
-        break
-      case 'plan':
-        cmp = (planMap.get(a.planId) ?? '').localeCompare(
-          planMap.get(b.planId) ?? '',
-        )
-        break
-      case 'createdAt':
-        cmp = a.createdAt.localeCompare(b.createdAt)
-        break
-    }
-    return sortDir === 'asc' ? cmp : -cmp
-  })
+  const sortedUsers = useMemo(() => {
+    return [...filteredUsers].sort((a, b) => {
+      let cmp = 0
+      switch (sortKey) {
+        case 'status':
+          cmp = (a.name ? 1 : 0) - (b.name ? 1 : 0)
+          break
+        case 'name':
+          cmp = (a.name ?? '').localeCompare(b.name ?? '')
+          break
+        case 'email':
+          cmp = a.email.localeCompare(b.email)
+          break
+        case 'cnpj':
+          cmp = (a.cnpj ?? '').localeCompare(b.cnpj ?? '')
+          break
+        case 'plan':
+          cmp = (planMap.get(a.planId) ?? '').localeCompare(
+            planMap.get(b.planId) ?? '',
+          )
+          break
+        case 'createdAt':
+          cmp = a.createdAt.localeCompare(b.createdAt)
+          break
+      }
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+  }, [filteredUsers, sortKey, sortDir, planMap])
 
   // ── Navigation ──
 

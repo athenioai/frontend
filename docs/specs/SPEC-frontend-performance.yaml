@@ -1,0 +1,198 @@
+feature: frontend-performance-optimization
+version: "1.0"
+status: draft
+created: "2026-04-09"
+author: svva-pipeline
+
+# ═══════════════════════════════════════
+# SPEC: Otimização de Performance do Frontend
+# ═══════════════════════════════════════
+
+description: |
+  Otimizações de performance para o Olympus Frontend baseadas em auditoria
+  real do codebase. Foco em: code splitting, memoização de computações
+  caras, Suspense boundaries, configuração Next.js e eliminação de overhead CSS.
+
+# ── Escopo ──
+
+scope:
+  in:
+    - Dynamic imports para componentes pesados (recharts dashboard, calendar 715 linhas, settings 734 linhas)
+    - useMemo/useCallback para computações caras (users-table filter+sort, calendar groupByDate)
+    - Suspense boundaries em páginas com múltiplos fetches assíncronos
+    - next.config.ts — optimizePackageImports para motion
+    - next/image no componente Logo
+    - CSS — noise texture condicional (body::after com SVG data URI)
+    - Services barrel export — lazy instantiation
+  out:
+    - Reescrita de componentes monolíticos (refactor futuro)
+    - Migração para cursor-based pagination (mudança de API)
+    - Adição de SWR/React Query (mudança arquitetural)
+    - Splitting de rotas admin vs user (mudança de roteamento)
+
+# ── Contratos por Mudança ──
+
+changes:
+  - id: PERF-01
+    title: "Dynamic import para DashboardView (recharts)"
+    file: src/app/(authenticated)/admin/dashboard/page.tsx
+    action: |
+      Usar next/dynamic para importar DashboardView com loading skeleton.
+      Recharts (~250KB) só carregado quando dashboard é acessado.
+    invariants:
+      - DashboardView renderiza corretamente após load
+      - Skeleton exibido durante carregamento
+      - Sem erros de SSR (ssr: false para recharts)
+
+  - id: PERF-02
+    title: "Dynamic import para CalendarView"
+    file: src/app/(authenticated)/agenda/page.tsx
+    action: |
+      Usar next/dynamic para importar CalendarView (715 linhas).
+      Componente pesado só carregado na rota /agenda.
+    invariants:
+      - CalendarView renderiza com appointments corretos
+      - Skeleton durante carregamento
+      - Props passados corretamente pelo dynamic wrapper
+
+  - id: PERF-03
+    title: "Dynamic import para SettingsHub"
+    file: src/app/(authenticated)/configuracoes/page.tsx
+    action: |
+      Usar next/dynamic para importar SettingsHub (734 linhas).
+    invariants:
+      - SettingsHub renderiza com dados do usuário
+      - Skeleton durante carregamento
+
+  - id: PERF-04
+    title: "useMemo para filter+sort em UsersTable"
+    file: src/app/(authenticated)/admin/usuarios/_components/users-table.tsx
+    action: |
+      Envolver planMap, filteredUsers e sortedUsers em useMemo.
+      Deps: [plans] para planMap, [users, statusFilter, planFilter] para filtered,
+      [filteredUsers, sortKey, sortDir] para sorted.
+    invariants:
+      - Mesmos resultados de filtro e ordenação
+      - Recomputa apenas quando deps mudam
+      - Zero mudança visual
+
+  - id: PERF-05
+    title: "useMemo para groupByDate em CalendarView"
+    file: src/app/(authenticated)/agenda/_components/calendar-view.tsx
+    action: |
+      Envolver byDate = groupByDate(appointments) em useMemo com dep [appointments].
+      Mover constantes DAY_NAMES_SHORT, DAY_NAMES_FULL, VIEW_TABS para fora do módulo
+      (já estão fora — confirmar que não são recriados).
+    invariants:
+      - byDate só recomputa quando appointments mudam
+      - Calendar renderiza identicamente
+
+  - id: PERF-06
+    title: "useCallback para handlers em MessageThread"
+    file: src/app/(authenticated)/conversas/[sessionId]/_components/message-thread.tsx
+    action: |
+      Envolver handleLoadMore, handleTextareaInput, handleKeyDown, handleSend
+      em useCallback com deps apropriadas.
+    invariants:
+      - Funcionalidade de load more preservada
+      - Envio de mensagens funciona
+      - Auto-resize do textarea funciona
+
+  - id: PERF-07
+    title: "next.config.ts — optimizePackageImports para motion"
+    file: next.config.ts
+    action: |
+      Adicionar experimental.optimizePackageImports: ['motion']
+      (lucide-react e recharts já são otimizados por padrão pelo Next.js).
+    invariants:
+      - Build completa sem erros
+      - Animações motion funcionam normalmente
+      - Bundle de motion reduzido
+
+  - id: PERF-08
+    title: "next/image no componente Logo"
+    file: src/components/ui/logo.tsx
+    action: |
+      Substituir <img> por <Image> do next/image.
+      Para SVG, usar priority={true} no logo principal (LCP).
+      Remover eslint-disable comments.
+    invariants:
+      - Logo exibido corretamente em ambos os tamanhos
+      - SVG renderizado nitidamente
+      - Sem quebra de layout (width/height preservados)
+
+  - id: PERF-09
+    title: "Suspense boundary na página de chat detail"
+    file: src/app/(authenticated)/conversas/[sessionId]/page.tsx
+    action: |
+      Eliminar waterfall: se lastPage > 1, buscar diretamente com page=last
+      usando um header endpoint ou fazer single fetch inteligente.
+      Nota: Manter server component, otimizar lógica de fetchMessages.
+    invariants:
+      - Mensagens mais recentes exibidas ao carregar
+      - Sem fetch duplicado
+      - Loading state preservado
+
+  - id: PERF-10
+    title: "CSS — noise texture otimizado"
+    file: src/app/globals.css
+    action: |
+      Mover SVG data URI para arquivo estático /public/noise.svg.
+      Referenciar via url('/noise.svg') com will-change: auto.
+      Considerar @media (prefers-reduced-motion) para desativar.
+    invariants:
+      - Textura visual idêntica
+      - Arquivo cacheável pelo browser
+      - Respects prefers-reduced-motion
+
+  - id: PERF-11
+    title: "Services — lazy getter pattern"
+    file: src/lib/services/index.ts
+    action: |
+      Trocar instanciação eager por lazy getters.
+      Cada service só instanciado no primeiro acesso.
+      Ex: let _chatService: ChatService | null = null
+          export function getChatService() { return _chatService ??= new ChatService() }
+      Ou manter exports como estão se tree-shaking do bundler já elimina unused
+      (Next.js com webpack/turbopack faz tree-shaking de re-exports).
+    invariants:
+      - Todos os consumidores continuam funcionando
+      - Services instanciados apenas quando usados
+      - Sem quebra de imports existentes
+
+# ── Acceptance Criteria ──
+
+acceptance_criteria:
+  - id: AC-01
+    description: "Build (tsc --noEmit) passa sem erros"
+  - id: AC-02
+    description: "next build completa sem warnings de performance"
+  - id: AC-03
+    description: "Componentes com dynamic import exibem skeleton e depois conteúdo"
+  - id: AC-04
+    description: "Filtro e sort em UsersTable produzem mesmos resultados"
+  - id: AC-05
+    description: "Calendar renderiza identicamente com useMemo"
+  - id: AC-06
+    description: "Logo renderiza corretamente com next/image"
+  - id: AC-07
+    description: "Chat detail carrega sem fetch duplicado"
+  - id: AC-08
+    description: "Noise texture visualmente idêntica via arquivo estático"
+  - id: AC-09
+    description: "Zero regressões visuais ou funcionais"
+
+# ── Segurança ──
+
+security:
+  - Nenhum dado sensível exposto via otimizações
+  - Headers de segurança preservados no next.config.ts
+  - Services mantêm isolamento de autenticação
+  - SVG externo não introduz vetores XSS (conteúdo estático controlado)
+
+# ── Estimativa de Impacto ──
+
+impact:
+  fcp_improvement: "30-50% redução no First Contentful Paint em rotas pesadas"
+  bundle_reduction: "~150-200KB de JS dinâmico removido do bundle principal"
+  runtime_perf: "Eliminação de recomputações O(n log n) a cada re-render em tabelas"

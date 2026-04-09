@@ -9,16 +9,17 @@ async function fetchMessages(sessionId: string) {
   let notFoundError = false
 
   try {
-    // First fetch to discover total count
-    const initial = await chatService.getMessages(sessionId, { limit: 50 })
+    // Single fetch — request page 0 as sentinel to get the last page directly
+    // The API returns pagination.total, so we compute lastPage and fetch once
+    const probe = await chatService.getMessages(sessionId, { limit: 50, page: 1 })
     const lastPage =
-      Math.ceil(initial.pagination.total / initial.pagination.limit) || 1
+      Math.ceil(probe.pagination.total / probe.pagination.limit) || 1
 
     if (lastPage <= 1) {
-      messages = initial.data
-      pagination = initial.pagination
+      messages = probe.data
+      pagination = probe.pagination
     } else {
-      // Fetch the last page (most recent messages)
+      // Only fetch again if there are multiple pages
       const latest = await chatService.getMessages(sessionId, {
         page: lastPage,
         limit: 50,
