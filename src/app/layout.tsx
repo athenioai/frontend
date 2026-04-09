@@ -1,18 +1,12 @@
 import type { Metadata } from 'next'
-import { Space_Grotesk, Sora } from 'next/font/google'
+import { Space_Grotesk } from 'next/font/google'
 import { Providers } from '@/components/providers'
 import './globals.css'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  variable: '--font-title',
+  variable: '--font-space-grotesk',
   weight: ['400', '500', '600', '700'],
-})
-
-const sora = Sora({
-  subsets: ['latin'],
-  variable: '--font-body',
-  weight: ['400', '500', '600'],
 })
 
 export const metadata: Metadata = {
@@ -26,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={`dark ${spaceGrotesk.variable} ${sora.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={spaceGrotesk.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-bg-base text-text-primary antialiased" suppressHydrationWarning>
         <Providers>
           {children}

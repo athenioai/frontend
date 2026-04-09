@@ -165,6 +165,7 @@ Especificações formais (SVVA) em `docs/specs/`:
 | `SPEC-admin-users.yaml` | Admin Users Management |
 | `SPEC-admin-dashboard.yaml` | Admin Dashboard |
 | `SPEC-admin-user-context.yaml` | Admin User Context View |
+| `SPEC-design-tokens-v2.yaml` | Design System v2 (paleta + tipografia) |
 
 ---
 
@@ -173,6 +174,6 @@ Especificações formais (SVVA) em `docs/specs/`:
 - Labels em Português (pt-BR)
 - Moeda: BRL (`R$ 1.234,50`)
 - CNPJ: `XX.XXX.XXX/XXXX-XX`
-- Tema: Dark-only (classe `dark` no `<html>`)
+- Tema: Light-only (Pedra Clara `#F7F6F4`, accent Âmbar `#D4820A`, Teal para links)
 - Padding padrão: `px-6 py-8 lg:py-10`
-- Fontes: Space Grotesk (títulos) + Sora (corpo)
+- Fontes: Georgia (títulos/display) + Calibri (UI/corpo, fallback Space Grotesk)

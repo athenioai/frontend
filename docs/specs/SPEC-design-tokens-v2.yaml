@@ -1,0 +1,294 @@
+---
+feature: design-tokens-v2
+title: "Olympus Design Tokens v2 — Nova paleta e tipografia"
+version: "1.0"
+date: "2026-04-09"
+status: approved
+author: spec-writer
+source: "olympus-design-tokens.md (Brand Manual v1.0, Abril 2026)"
+
+description: |
+  Migração completa do sistema de design tokens do Olympus.
+  DE: Tema escuro (Space Grotesk + Sora, backgrounds escuros, teal como primary)
+  PARA: Tema claro (Georgia + Calibri, background #F7F6F4, âmbar como accent, teal para links)
+
+scope:
+  - src/app/globals.css (tokens CSS, tema, cards, efeitos atmosféricos, glows)
+  - src/app/layout.tsx (carregamento de fontes, classe do html)
+  - Nenhum componente React precisa mudar (tudo via CSS custom properties)
+
+out_of_scope:
+  - Dark mode toggle (não existe hoje, não será adicionado)
+  - Mudanças em componentes individuais (tokens propagam via variáveis)
+  - Novos componentes ou páginas
+
+invariants:
+  - INV-01: "Texto primário SEMPRE #1C1B18 — nunca #000000"
+  - INV-02: "Âmbar (#D4820A) é uso restrito — apenas CTAs e métricas de destaque"
+  - INV-03: "Georgia NUNCA abaixo de 12px"
+  - INV-04: "Calibri NUNCA em títulos acima de 14px"
+  - INV-05: "Background geral é #F7F6F4, nunca branco puro #FFFFFF"
+  - INV-06: "Teal (#4FD1C5) é link/ação padrão da UI"
+
+changes:
+
+  fonts:
+    title:
+      before: "'Space Grotesk', sans-serif"
+      after: "'Georgia', serif"
+      notes: "Georgia é system font — não precisa de Google Fonts import"
+    body:
+      before: "'Sora', sans-serif"
+      after: "'Calibri', 'Space Grotesk', sans-serif"
+      notes: |
+        Calibri é system font (Windows/macOS com Office).
+        Space Grotesk mantido como fallback aceito (herança Athenio).
+        Sora removido.
+    layout_changes:
+      - "Remover import de Sora do next/font/google"
+      - "Manter Space Grotesk como fallback (via next/font/google)"
+      - "Atualizar --font-title para Georgia"
+      - "Atualizar --font-body para Calibri com Space Grotesk fallback"
+
+  theme:
+    before: "dark por padrão (classe 'dark' no html)"
+    after: "light por padrão (remover classe 'dark', light como :root)"
+    notes: |
+      O tema dark existente será removido. O projeto opera apenas com tema claro.
+      Remover blocos .dark e .light — tudo fica em :root.
+
+  color_tokens:
+    palette_triade:
+      - token: "--bg-base"
+        before: "#0E1012"
+        after: "#F7F6F4"
+        name: "Pedra Clara"
+        usage: "Background geral da aplicação"
+
+      - token: "--surface-1"
+        before: "#161A1E"
+        after: "#FFFFFF"
+        name: "Surface"
+        usage: "Cards, painéis, modais"
+
+      - token: "--surface-2"
+        before: "#1E2228"
+        after: "#F0EDE8"
+        name: "Surface Alt"
+        usage: "Backgrounds secundários, popovers"
+
+      - token: "--foreground"
+        before: "#F0EDE8"
+        after: "#1C1B18"
+        name: "Obsidiana"
+        usage: "Texto principal"
+
+      - token: "--muted-foreground"
+        before: "rgba(240, 237, 232, 0.65)"
+        after: "#4A4840"
+        name: "Mineral"
+        usage: "Texto secundário, descrições"
+
+      - token: "--text-subtle"
+        before: "rgba(240, 237, 232, 0.45)"
+        after: "rgba(74, 72, 64, 0.55)"
+        usage: "Placeholders, texto terciário"
+
+      - token: "--border"
+        before: "rgba(240, 237, 232, 0.08)"
+        after: "#E8E6E1"
+        usage: "Divisores e bordas"
+
+      - token: "--border-hover"
+        before: "rgba(240, 237, 232, 0.16)"
+        after: "#D4D2CC"
+        usage: "Borda em hover"
+
+      - token: "--input"
+        before: "rgba(240, 237, 232, 0.06)"
+        after: "rgba(28, 27, 24, 0.04)"
+        usage: "Background de inputs"
+
+    accent_system:
+      - token: "--primary"
+        before: "#4FD1C5 (teal)"
+        after: "#D4820A (âmbar)"
+        name: "Âmbar"
+        usage: "Accent principal — CTAs, métricas de destaque"
+        breaking_change: true
+        notes: "Teal era primary, agora âmbar é primary. Teal vira link color."
+
+      - token: "--primary-hover"
+        before: "#6EE7D8"
+        after: "#F0B84A"
+        name: "Fogo"
+        usage: "Hover states, highlights"
+
+      - token: "--primary-foreground"
+        before: "#0E1012"
+        after: "#FFFFFF"
+        usage: "Texto sobre primary"
+
+      - token: "--accent-on-text"
+        value: "#FFF4E0"
+        name: "Âmbar XL"
+        usage: "Texto sobre fundos escuros com acento"
+        new: true
+
+    teal_system:
+      notes: "Teal passa de primary para link/ação. Novas variantes adicionadas."
+      tokens:
+        - token: "--teal"
+          value: "#4FD1C5"
+          usage: "Links, ações, badges positivos"
+        - token: "--teal-light"
+          value: "#9FE1CB"
+          usage: "Hover em links, tags leves"
+        - token: "--teal-xlight"
+          value: "#E1F5EE"
+          usage: "Backgrounds sutis de status positivo"
+        - token: "--teal-dark"
+          value: "#0F6E56"
+          usage: "Texto sobre fundo claro quando teal é contexto"
+        - token: "--teal-xdark"
+          value: "#04342C"
+          usage: "Headers escuros, footers"
+
+    brand:
+      - token: "--brand-green"
+        value: "#0F3D3E"
+        usage: "DNA Athenio — navbar, footer institucional"
+        new: true
+
+    status_colors:
+      notes: "Sem mudança — danger, warning, success mantêm valores atuais"
+
+  atmospheric_effects:
+    body_before:
+      before: "radial-gradient com teal 0.03 + violet 0.02"
+      after: "radial-gradient com âmbar sutil + teal sutil"
+    cards:
+      before: "Glassmorphism escuro com rgba(255,255,255,0.035)"
+      after: "Surface sólida com card-shadow sutil"
+    glows:
+      before: "glow-accent com teal, glow-gold com gold"
+      after: "glow-accent com âmbar, glow-teal com teal"
+    hero_card:
+      before: "Gradiente teal 0.06"
+      after: "Gradiente âmbar sutil"
+
+  typography_scale:
+    georgia_display:
+      - level: "Display XL"
+        size: "48-64px"
+        weight: "Bold"
+      - level: "Display"
+        size: "32-40px"
+        weight: "Bold"
+      - level: "H1"
+        size: "24-28px"
+        weight: "Bold"
+      - level: "H2"
+        size: "18-22px"
+        weight: "Regular"
+      - level: "H3"
+        size: "14-16px"
+        weight: "Regular"
+    calibri_ui:
+      - level: "Label"
+        size: "10-11px"
+        weight: "Medium"
+      - level: "Card title"
+        size: "13-14px"
+        weight: "Medium"
+      - level: "Body"
+        size: "11-12px"
+        weight: "Regular"
+      - level: "Métrica"
+        size: "20-32px"
+        weight: "Bold"
+      - level: "Caption"
+        size: "9-10px"
+        weight: "Regular"
+
+files_to_modify:
+  - path: "src/app/globals.css"
+    changes:
+      - "Atualizar @theme inline com novos font tokens"
+      - "Substituir :root (dark) por novos tokens light como padrão"
+      - "Remover blocos .light e .dark separados"
+      - "Adicionar novos tokens: teal variants, brand-green, accent-on-text"
+      - "Atualizar card styles para tema claro"
+      - "Atualizar efeitos atmosféricos"
+      - "Atualizar glow effects"
+      - "Atualizar card-hero border/gradients"
+      - "Remover @custom-variant dark"
+      - "Remover .light body::before overrides"
+      - "Atualizar shadcn mappings"
+
+  - path: "src/app/layout.tsx"
+    changes:
+      - "Remover import de Sora"
+      - "Manter Space_Grotesk para fallback"
+      - "Remover classe 'dark' do html"
+      - "Atualizar variáveis CSS das fontes"
+
+files_created: []
+
+files_deleted: []
+
+security:
+  risk: "LOW"
+  notes: |
+    Mudanças são puramente visuais (CSS + font loading).
+    Nenhum dado, API, auth ou lógica de negócio é afetado.
+    Único vetor: font loading de Google Fonts (já existente, sem mudança de domínio).
+
+acceptance_criteria:
+  - id: AC-01
+    description: "Background geral da aplicação é #F7F6F4"
+    verification: "CSS variable --bg-base resolve para #F7F6F4 em :root"
+
+  - id: AC-02
+    description: "Texto primário usa cor Obsidiana #1C1B18"
+    verification: "CSS variable --foreground resolve para #1C1B18"
+
+  - id: AC-03
+    description: "Accent/primary é âmbar #D4820A"
+    verification: "CSS variable --primary resolve para #D4820A"
+
+  - id: AC-04
+    description: "Headlines usam Georgia serif"
+    verification: "--font-title contém 'Georgia'"
+
+  - id: AC-05
+    description: "Body text usa Calibri com Space Grotesk fallback"
+    verification: "--font-body contém 'Calibri' e 'Space Grotesk'"
+
+  - id: AC-06
+    description: "Teal tokens existem como sistema separado"
+    verification: "Variáveis --teal, --teal-light, --teal-xlight, --teal-dark, --teal-xdark definidas"
+
+  - id: AC-07
+    description: "Não existe classe 'dark' no html element"
+    verification: "layout.tsx não tem classe 'dark' no className do html"
+
+  - id: AC-08
+    description: "Não existe bloco .dark ou .light no CSS"
+    verification: "globals.css não contém seletores .dark ou .light"
+
+  - id: AC-09
+    description: "Brand green #0F3D3E disponível como token"
+    verification: "--brand-green definido com valor #0F3D3E"
+
+  - id: AC-10
+    description: "Compilação TypeScript passa sem erros"
+    verification: "tsc --noEmit retorna 0"
+
+  - id: AC-11
+    description: "Cards usam surface sólida, sem glassmorphism"
+    verification: "card-surface não usa backdrop-filter nem rgba gradients"
+
+  - id: AC-12
+    description: "Nenhum #000000 no texto primário"
+    verification: "Grep por #000000 em foreground/text-primary retorna vazio"
