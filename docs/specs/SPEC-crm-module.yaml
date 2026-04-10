@@ -1,0 +1,363 @@
+name: CRM Module (Kanban + Lead Detail + Timeline)
+version: "1.0"
+date: "2026-04-10"
+status: approved
+author: spec-writer
+
+# ──────────────────────────────────────────────
+# 1. Overview
+# ──────────────────────────────────────────────
+
+description: |
+  CRM module for Olympus dashboard with:
+  1. Kanban Board — leads organized by status columns with drag & drop
+  2. Lead Detail + Timeline — unified history (messages, appointments, status changes)
+  3. Full CRUD for leads
+
+  Integrates with existing backend API at /leads/* endpoints.
+  Follows project patterns: class-based service, server actions, split-panel layout.
+
+# ──────────────────────────────────────────────
+# 2. Data Models
+# ──────────────────────────────────────────────
+
+interfaces:
+  LeadPublic:
+    id: string (UUID)
+    owner_id: string (UUID)
+    name: string
+    email: string
+    phone: string | null
+    status: "new" | "contacted" | "qualified" | "converted" | "lost"
+    metadata: Record<string, unknown>
+    created_at: string (ISO 8601)
+    updated_at: string (ISO 8601)
+
+  LeadBoard:
+    new: LeadPublic[]
+    contacted: LeadPublic[]
+    qualified: LeadPublic[]
+    converted: LeadPublic[]
+    lost: LeadPublic[]
+
+  LeadStatus:
+    enum: [new, contacted, qualified, converted, lost]
+
+  CreateLeadPayload:
+    name: string (1-255, required)
+    email: string (valid email, required, unique per user)
+    phone: string (1-50, optional)
+    status: LeadStatus (optional, default "new")
+    metadata: Record<string, unknown> (optional)
+
+  UpdateLeadPayload:
+    name: string (optional)
+    email: string (optional)
+    phone: string | null (optional)
+    status: LeadStatus (optional)
+    metadata: Record<string, unknown> | null (optional)
+
+  ListLeadsParams:
+    page: number (default 1)
+    limit: number (1-100, default 20)
+    status: LeadStatus (optional)
+    search: string (max 255, optional)
+
+  PaginatedLeadResponse:
+    data: LeadPublic[]
+    pagination: { page: number, limit: number, total: number }
+
+  TimelineEntry:
+    type: "message" | "appointment" | "status_change"
+    timestamp: string (ISO 8601)
+    data: TimelineMessage | TimelineAppointment | TimelineStatusChange
+
+  TimelineMessage:
+    id: string
+    session_id: string
+    agent: "horos" | "kairos" | "human"
+    role: "lead" | "assistant"
+    content: string
+    appointment_id: string | null
+    created_at: string
+
+  TimelineAppointment:
+    id: string
+    session_id: string
+    lead_name: string
+    service_type: string
+    date: string (YYYY-MM-DD)
+    start_time: string (HH:mm)
+    end_time: string (HH:mm)
+    status: "confirmed" | "cancelled"
+    created_at: string
+
+  TimelineStatusChange:
+    id: string
+    old_status: string
+    new_status: string
+    changed_at: string
+
+  TimelineParams:
+    limit: number (1-200, default 50)
+    type: "message" | "appointment" | "status_change" (optional)
+
+# ──────────────────────────────────────────────
+# 3. Service Layer
+# ──────────────────────────────────────────────
+
+service:
+  name: LeadService
+  file: src/lib/services/lead-service.ts
+  interface_file: src/lib/services/interfaces/lead-service.ts
+  singleton_export: src/lib/services/index.ts
+  pattern: |
+    Same as existing services:
+    - Class implements ILeadService
+    - Private getToken() from cookies
+    - Private authFetch(path, init?) with Bearer token
+    - Error handling: NOT_FOUND (404), VALIDATION_ERROR (400), CONFLICT (409), FORBIDDEN (403)
+    - Throws NOT_AUTHENTICATED if no token
+
+  methods:
+    getBoard:
+      endpoint: GET /leads/board
+      returns: LeadBoard
+      rate_limit: 20/min
+
+    listLeads:
+      endpoint: GET /leads
+      params: ListLeadsParams
+      returns: PaginatedLeadResponse
+
+    getLead:
+      endpoint: GET /leads/:id
+      returns: LeadPublic
+
+    createLead:
+      endpoint: POST /leads
+      body: CreateLeadPayload
+      returns: LeadPublic
+
+    updateLead:
+      endpoint: PATCH /leads/:id
+      body: UpdateLeadPayload
+      returns: LeadPublic
+
+    deleteLead:
+      endpoint: DELETE /leads/:id
+      returns: void
+
+    getTimeline:
+      endpoint: GET /leads/:id/timeline
+      params: TimelineParams
+      returns: { data: TimelineEntry[] }
+      rate_limit: 30/min
+
+# ──────────────────────────────────────────────
+# 4. Server Actions
+# ──────────────────────────────────────────────
+
+actions:
+  file: src/app/(authenticated)/crm/actions.ts
+  pattern: |
+    Same as whatsapp/actions.ts:
+    - 'use server' directive
+    - UUID validation with regex
+    - SAFE_ERRORS map for known error codes
+    - safeError() helper
+    - Returns { success: boolean; error?: string; data?: T }
+    - revalidatePath('/crm') on mutations
+
+  functions:
+    fetchBoard:
+      returns: "{ success: boolean; data?: LeadBoard; error?: string }"
+
+    createLead:
+      params: [name, email, phone?, status?, metadata?]
+      validation: name required 1-255, email valid format
+      returns: "{ success: boolean; data?: LeadPublic; error?: string }"
+
+    updateLead:
+      params: [id, payload]
+      validation: UUID id, at least one field in payload
+      returns: "{ success: boolean; data?: LeadPublic; error?: string }"
+
+    updateLeadStatus:
+      params: [id, status]
+      validation: UUID id, valid status enum
+      returns: "{ success: boolean; data?: LeadPublic; error?: string }"
+      note: Used by drag & drop — optimistic UI
+
+    deleteLead:
+      params: [id]
+      validation: UUID id
+      returns: "{ success: boolean; error?: string }"
+
+    fetchTimeline:
+      params: [id, limit?, type?]
+      returns: "{ success: boolean; data?: TimelineEntry[]; error?: string }"
+
+# ──────────────────────────────────────────────
+# 5. Pages & Components
+# ──────────────────────────────────────────────
+
+pages:
+  kanban:
+    route: /crm
+    file: src/app/(authenticated)/crm/page.tsx
+    type: server component
+    description: |
+      Fetches board data via service, renders CrmBoard client component.
+      Shows page header with "CRM" title and "Novo Lead" button.
+
+  lead_detail:
+    route: /crm/[id]
+    file: src/app/(authenticated)/crm/[id]/page.tsx
+    type: server component
+    description: |
+      Fetches lead detail + timeline, renders LeadDetailView client component.
+
+components:
+  CrmBoard:
+    file: src/app/(authenticated)/crm/_components/crm-board.tsx
+    type: client component
+    description: |
+      Kanban board with 5 columns (new, contacted, qualified, converted, lost).
+      Uses @dnd-kit for drag & drop between columns.
+      Optimistic status update on drop.
+      Each column has a header with status label and lead count.
+
+  LeadCard:
+    file: src/app/(authenticated)/crm/_components/lead-card.tsx
+    type: client component
+    description: |
+      Compact card showing lead name, email, phone (if present), and relative time.
+      Draggable via @dnd-kit. Clickable to navigate to /crm/[id].
+
+  CreateLeadDialog:
+    file: src/app/(authenticated)/crm/_components/create-lead-dialog.tsx
+    type: client component
+    description: |
+      Modal dialog to create a new lead.
+      Fields: name (required), email (required), phone (optional).
+      Uses server action createLead.
+
+  LeadDetailView:
+    file: src/app/(authenticated)/crm/[id]/_components/lead-detail-view.tsx
+    type: client component
+    description: |
+      Full lead detail page with:
+      - Lead info header (name, email, phone, status badge, created date)
+      - Edit inline fields
+      - Timeline below
+      - Delete button with confirmation
+
+  Timeline:
+    file: src/app/(authenticated)/crm/[id]/_components/timeline.tsx
+    type: client component
+    description: |
+      Vertical timeline showing all events.
+      Differentiates by type:
+      - message: chat bubble icon, shows role + content + agent badge
+      - appointment: calendar icon, shows service + date/time + status
+      - status_change: arrow icon, shows old → new status
+      Filter tabs: All, Messages, Appointments, Status Changes
+
+# ──────────────────────────────────────────────
+# 6. Navigation
+# ──────────────────────────────────────────────
+
+navigation:
+  sidebar:
+    file: src/components/sidebar.tsx
+    change: |
+      Add CRM to NAV_ITEMS array after Conversas:
+      { href: '/crm', label: 'CRM', icon: Kanban }
+      Import Kanban icon from lucide-react.
+
+# ──────────────────────────────────────────────
+# 7. Dependencies
+# ──────────────────────────────────────────────
+
+dependencies:
+  new:
+    - "@dnd-kit/core": "^6.3.1"
+    - "@dnd-kit/sortable": "^10.0.0"
+    - "@dnd-kit/utilities": "^3.2.2"
+  note: |
+    @dnd-kit is the standard React DnD library for accessible drag & drop.
+    No other new dependencies required — existing stack covers everything else.
+
+# ──────────────────────────────────────────────
+# 8. Invariants
+# ──────────────────────────────────────────────
+
+invariants:
+  - Lead status can only be one of: new, contacted, qualified, converted, lost
+  - Email must be unique per user (409 CONFLICT on duplicate)
+  - All API calls require Bearer token (401 UNAUTHORIZED without)
+  - User can only see/modify their own leads (403 FORBIDDEN otherwise)
+  - Drag & drop uses optimistic UI — reverts on server error
+  - Board endpoint returns max 500 leads total
+  - Timeline entries are ordered by timestamp DESC
+  - Server actions validate UUID format before API calls
+  - No raw backend errors exposed to UI — use SAFE_ERRORS map
+
+# ──────────────────────────────────────────────
+# 9. Security
+# ──────────────────────────────────────────────
+
+security:
+  authentication: Bearer token from httpOnly cookies (same as all services)
+  authorization: owner_id filter enforced by backend — frontend does not need extra checks
+  input_validation:
+    - UUID regex for all ID parameters in server actions
+    - String length limits on name (255), email (255), phone (50), search (255)
+    - Status enum validation
+  error_handling:
+    - SAFE_ERRORS map — never expose raw backend errors
+    - Generic fallback messages for unknown errors
+  xss_prevention: React handles escaping — no dangerouslySetInnerHTML used
+  csrf: Server actions use Next.js built-in CSRF protection
+
+# ──────────────────────────────────────────────
+# 10. Acceptance Criteria
+# ──────────────────────────────────────────────
+
+acceptance_criteria:
+  - AC1: Kanban board renders 5 columns (new, contacted, qualified, converted, lost) with correct leads
+  - AC2: Drag & drop moves lead between columns with optimistic UI update
+  - AC3: Drag & drop reverts on server error (toast notification)
+  - AC4: "Novo Lead" button opens dialog with name, email, phone fields
+  - AC5: Creating a lead adds it to the "new" column
+  - AC6: Clicking a lead card navigates to /crm/[id] detail page
+  - AC7: Lead detail shows name, email, phone, status badge, created/updated dates
+  - AC8: Timeline displays messages, appointments, and status changes with correct icons
+  - AC9: Timeline messages differentiate between lead, assistant (AI), and human responses
+  - AC10: Lead can be edited inline (name, email, phone, status)
+  - AC11: Lead can be deleted with confirmation dialog
+  - AC12: Sidebar shows CRM navigation item with Kanban icon
+  - AC13: Empty column shows placeholder text
+  - AC14: Error states show user-friendly messages via SAFE_ERRORS
+  - AC15: All server actions validate UUID and input before API calls
+
+# ──────────────────────────────────────────────
+# 11. Files to Create/Modify
+# ──────────────────────────────────────────────
+
+files:
+  create:
+    - src/lib/services/interfaces/lead-service.ts
+    - src/lib/services/lead-service.ts
+    - src/app/(authenticated)/crm/page.tsx
+    - src/app/(authenticated)/crm/actions.ts
+    - src/app/(authenticated)/crm/_components/crm-board.tsx
+    - src/app/(authenticated)/crm/_components/lead-card.tsx
+    - src/app/(authenticated)/crm/_components/create-lead-dialog.tsx
+    - src/app/(authenticated)/crm/[id]/page.tsx
+    - src/app/(authenticated)/crm/[id]/_components/lead-detail-view.tsx
+    - src/app/(authenticated)/crm/[id]/_components/timeline.tsx
+  modify:
+    - src/lib/services/index.ts (add LeadService singleton)
+    - src/components/sidebar.tsx (add CRM nav item)

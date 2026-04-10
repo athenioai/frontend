@@ -18,6 +18,7 @@ import {
   ChevronsRight,
   User,
   Users,
+  Kanban,
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { cn } from '@/lib/utils'
@@ -27,6 +28,7 @@ import Link from 'next/link'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/crm', label: 'CRM', icon: Kanban },
   { href: '/conversas', label: 'Conversas', icon: MessagesSquare },
   { href: '/agenda', label: 'Agenda', icon: CalendarDays },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
