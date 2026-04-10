@@ -159,7 +159,7 @@ export function CrmBoard({ initialBoard }: CrmBoardProps) {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="flex h-full gap-4" style={{ minWidth: COLUMNS.length * 280 }}>
+          <div className="flex h-full gap-4" style={{ minWidth: COLUMNS.length * 272 }}>
             {COLUMNS.map((col, idx) => (
               <KanbanColumn
                 key={col.id}
@@ -208,7 +208,7 @@ function KanbanColumn({
       }}
       ref={setNodeRef}
       className={cn(
-        'flex h-full w-[280px] shrink-0 flex-col rounded-2xl border border-border-default bg-surface-2/50 transition-colors duration-200',
+        'flex h-full min-w-[260px] flex-1 flex-col rounded-2xl border border-border-default bg-surface-2/50 transition-colors duration-200',
         isOver && 'border-accent/40 bg-accent/[0.03]',
       )}
     >

@@ -163,7 +163,7 @@ export function MessageThread({
 
       {/* Messages — scrollable */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-2xl px-4 py-6 lg:px-6">
+        <div className="mx-auto max-w-3xl px-4 py-6 lg:px-6 2xl:max-w-4xl">
           {/* Load more */}
           {hasMore && (
             <div className="mb-6 flex justify-center">

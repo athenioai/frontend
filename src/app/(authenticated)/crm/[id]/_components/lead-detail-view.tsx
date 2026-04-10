@@ -103,7 +103,7 @@ export function LeadDetailView({ lead: initialLead, timeline }: LeadDetailViewPr
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: MOTION.duration.normal, ease: MOTION.ease.out }}
-      className="mx-auto max-w-3xl px-6 py-6 lg:px-8"
+      className="mx-auto max-w-3xl px-6 py-6 lg:px-8 2xl:max-w-5xl"
     >
       {/* Back link */}
       <Link

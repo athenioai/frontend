@@ -52,7 +52,7 @@ export default async function ConfiguracoesPage({
   ])
 
   return (
-    <div className="px-6 py-8 lg:py-10">
+    <div className="mx-auto max-w-screen-2xl px-6 py-8 lg:py-10">
       <SettingsHub
         activeTab={tab}
         calendarConfig={calendarConfig}

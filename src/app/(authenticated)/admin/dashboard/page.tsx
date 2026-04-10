@@ -16,7 +16,7 @@ export default async function AdminDashboardPage() {
   const data = await fetchDashboard()
 
   return (
-    <div className="px-6 py-8 lg:py-10">
+    <div className="mx-auto max-w-screen-2xl px-6 py-8 lg:py-10">
       <DashboardView data={data} />
     </div>
   )
