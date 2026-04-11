@@ -11,29 +11,177 @@ import {
   Plug,
   Unplug,
   Loader2,
-  Phone,
   X,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Send,
+  KeyRound,
+  ExternalLink,
+  ChevronRight,
+  ChevronLeft,
+  Copy,
+  CircleDot,
+  Bot,
+  ClipboardPaste,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION } from '@/lib/motion'
 import { cn } from '@/lib/utils'
-import { updateCalendarConfig } from '../actions'
-import {
-  connectWhatsAppInstance,
-  disconnectWhatsAppInstance,
-} from '../../whatsapp/actions'
+import { updateCalendarConfig, connectChannel, disconnectChannel } from '../actions'
 import { Dialog } from '@base-ui/react/dialog'
 import type {
   CalendarConfig,
   BusinessHour,
 } from '@/lib/services/interfaces/calendar-config-service'
 import type {
-  WhatsAppInstance,
-  WhatsAppInstanceDetail,
-} from '@/lib/services/interfaces/whatsapp-service'
+  ChannelAccount,
+  SupportedChannel,
+} from '@/lib/services/interfaces/channel-account-service'
+
+// ── Channel config ──
+
+interface WizardStep {
+  id: string
+  title: string
+  description: string
+  icon: React.ReactNode
+  content: 'instructions' | 'token' | 'embedded-signup' | 'info'
+  instructions?: { text: string; command?: string }[]
+  deepLink?: { url: string; label: string }
+  infoBullets?: { emoji: string; title: string; text: string }[]
+}
+
+interface ChannelConfig {
+  label: string
+  color: string
+  bgClass: string
+  textClass: string
+  borderClass: string
+  hoverClass: string
+  icon: React.ReactNode
+  tokenPlaceholder: string
+  wizardSteps: WizardStep[]
+}
+
+const CHANNEL_META: Record<SupportedChannel, ChannelConfig> = {
+  telegram: {
+    label: 'Telegram',
+    color: '#2AABEE',
+    bgClass: 'bg-[#2AABEE]/10',
+    textClass: 'text-[#2AABEE]',
+    borderClass: 'border-[#2AABEE]/30',
+    hoverClass: 'hover:border-[#2AABEE]/50 hover:bg-[#2AABEE]/15',
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-6 w-6 fill-[#2AABEE]">
+        <path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+      </svg>
+    ),
+    tokenPlaceholder: '7123456789:AAHx9k...',
+    wizardSteps: [
+      {
+        id: 'open-botfather',
+        title: 'Abrir o BotFather',
+        description: 'O BotFather é o assistente oficial do Telegram para criar bots.',
+        icon: <Bot className="h-5 w-5" />,
+        content: 'instructions',
+        instructions: [
+          { text: 'Clique no botão abaixo para abrir o BotFather no Telegram' },
+          { text: 'Se não tiver o Telegram instalado, baixe primeiro em telegram.org' },
+        ],
+        deepLink: { url: 'https://t.me/BotFather', label: 'Abrir BotFather' },
+      },
+      {
+        id: 'create-bot',
+        title: 'Criar o bot',
+        description: 'Envie os comandos abaixo no chat com o BotFather.',
+        icon: <CircleDot className="h-5 w-5" />,
+        content: 'instructions',
+        instructions: [
+          { text: 'Envie o comando:', command: '/newbot' },
+          { text: 'Escolha um nome para o bot (ex: "Minha Empresa")' },
+          { text: 'Escolha um username (deve terminar com "bot", ex: minhaempresa_bot)' },
+          { text: 'O BotFather vai gerar um token — copie ele' },
+        ],
+      },
+      {
+        id: 'paste-token',
+        title: 'Colar o token',
+        description: 'Cole o token que o BotFather gerou para conectar seu bot.',
+        icon: <ClipboardPaste className="h-5 w-5" />,
+        content: 'token',
+      },
+    ],
+  },
+  whatsapp: {
+    label: 'WhatsApp',
+    color: '#25D366',
+    bgClass: 'bg-[#25D366]/10',
+    textClass: 'text-[#25D366]',
+    borderClass: 'border-[#25D366]/30',
+    hoverClass: 'hover:border-[#25D366]/50 hover:bg-[#25D366]/15',
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-6 w-6 fill-[#25D366]">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+      </svg>
+    ),
+    tokenPlaceholder: 'Token de acesso do WhatsApp Business',
+    wizardSteps: [
+      {
+        id: 'pricing-info',
+        title: 'Como funciona o custo',
+        description: 'Antes de conectar, entenda como o WhatsApp Business funciona:',
+        icon: <MessageCircle className="h-5 w-5" />,
+        content: 'info',
+        infoBullets: [
+          {
+            emoji: '✓',
+            title: 'Atendimento é gratuito',
+            text: 'Quando o cliente envia uma mensagem, abre uma janela de 24h. Dentro dela, você troca quantas mensagens quiser — tudo grátis.',
+          },
+          {
+            emoji: '✓',
+            title: 'A janela reinicia automaticamente',
+            text: 'Cada nova mensagem do cliente renova a janela por mais 24h. Enquanto ele responder, a conversa continua gratuita indefinidamente.',
+          },
+          {
+            emoji: '✓',
+            title: 'IA responde na hora',
+            text: 'O Olympus responde em segundos — sempre dentro da janela gratuita. Na prática, o custo do atendimento é zero.',
+          },
+          {
+            emoji: '~',
+            title: 'Só cobra se você iniciar',
+            text: 'O único custo é se você contactar um lead que ficou em silêncio por mais de 24h (ex: campanha de marketing). Custo: ~R$0,35 por conversa.',
+          },
+          {
+            emoji: '!',
+            title: 'A Meta pede um cartão no cadastro',
+            text: 'É como o cartão na Netflix: pede no cadastro, mas só cobra se você usar algo além do que já está incluso.',
+          },
+        ],
+      },
+      {
+        id: 'embedded-signup',
+        title: 'Conectar via Meta',
+        description: 'Conecte sua conta WhatsApp Business diretamente pela Meta. O processo leva poucos minutos.',
+        icon: <Plug className="h-5 w-5" />,
+        content: 'embedded-signup',
+        instructions: [
+          { text: 'Faça login com sua conta Meta (Facebook/Instagram)' },
+          { text: 'Crie ou selecione uma conta WhatsApp Business' },
+          { text: 'Registre o número de telefone desejado' },
+          { text: 'Pronto — a conexão é automática' },
+        ],
+      },
+      {
+        id: 'paste-token',
+        title: 'Token manual',
+        description: 'Se preferir, cole o token de acesso da sua conta WhatsApp Business API.',
+        icon: <KeyRound className="h-5 w-5" />,
+        content: 'token',
+      },
+    ],
+  },
+}
+
+const ALL_CHANNELS: SupportedChannel[] = ['whatsapp', 'telegram']
 
 // ── Navigation ──
 
@@ -96,15 +244,13 @@ function serializeHorario(state: DayState): string {
 interface SettingsHubProps {
   activeTab: string
   calendarConfig: CalendarConfig | null
-  whatsAppInstance: WhatsAppInstance | null
-  whatsAppDetail: WhatsAppInstanceDetail | null
+  channelAccounts: ChannelAccount[]
 }
 
 export function SettingsHub({
   activeTab,
   calendarConfig,
-  whatsAppInstance,
-  whatsAppDetail,
+  channelAccounts,
 }: SettingsHubProps) {
   const router = useRouter()
 
@@ -117,7 +263,6 @@ export function SettingsHub({
 
   return (
     <div>
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -131,14 +276,12 @@ export function SettingsHub({
         </p>
       </motion.div>
 
-      {/* Layout: sidebar + content */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.08, duration: MOTION.duration.slow }}
         className="mt-8 flex flex-col gap-6 lg:flex-row lg:h-[calc(100vh-180px)]"
       >
-        {/* Vertical nav */}
         <nav className="flex shrink-0 gap-2 lg:w-56 lg:flex-col">
           {SECTIONS.map((section) => {
             const active = activeTab === section.id
@@ -189,7 +332,6 @@ export function SettingsHub({
           })}
         </nav>
 
-        {/* Content */}
         <div className="min-w-0 flex-1 lg:overflow-y-auto lg:pr-1">
           <AnimatePresence mode="wait">
             {activeTab === 'agenda' && (
@@ -211,10 +353,7 @@ export function SettingsHub({
                 exit={{ opacity: 0, x: -12 }}
                 transition={{ duration: 0.2 }}
               >
-                <CanaisTab
-                  whatsAppInstance={whatsAppInstance}
-                  whatsAppDetail={whatsAppDetail}
-                />
+                <CanaisTab channelAccounts={channelAccounts} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -226,109 +365,64 @@ export function SettingsHub({
 
 // ── Canais Tab ──
 
-function CanaisTab({
-  whatsAppInstance,
-  whatsAppDetail,
-}: {
-  whatsAppInstance: WhatsAppInstance | null
-  whatsAppDetail: WhatsAppInstanceDetail | null
-}) {
+function CanaisTab({ channelAccounts }: { channelAccounts: ChannelAccount[] }) {
+  const connectedMap = new Map(channelAccounts.map((a) => [a.channel, a]))
+
   return (
     <div className="space-y-4">
-      <WhatsAppChannel instance={whatsAppInstance} detail={whatsAppDetail} />
-
-      {/* Telegram — coming soon */}
-      <div className="relative overflow-hidden rounded-2xl border border-border-default/50 bg-surface-1/50 p-6 opacity-60">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2AABEE]/10">
-            <svg viewBox="0 0 24 24" className="h-6 w-6 fill-[#2AABEE]">
-              <path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-title text-base font-semibold text-text-primary">
-              Telegram
-            </h3>
-            <p className="mt-0.5 text-xs text-text-subtle">
-              Em breve
-            </p>
-          </div>
-          <span className="ml-auto rounded-full bg-surface-2 px-3 py-1 text-[11px] font-semibold text-text-subtle">
-            Em breve
-          </span>
-        </div>
-      </div>
+      {ALL_CHANNELS.map((channel, i) => (
+        <motion.div
+          key={channel}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.06, duration: 0.25 }}
+        >
+          <ChannelCard channel={channel} account={connectedMap.get(channel) ?? null} />
+        </motion.div>
+      ))}
     </div>
   )
 }
 
-// ── WhatsApp Channel ──
+// ── Channel Card ──
 
-function WhatsAppChannel({
-  instance,
-  detail,
+function ChannelCard({
+  channel,
+  account,
 }: {
-  instance: WhatsAppInstance | null
-  detail: WhatsAppInstanceDetail | null
+  channel: SupportedChannel
+  account: ChannelAccount | null
 }) {
+  const meta = CHANNEL_META[channel]
   const router = useRouter()
-  const [isActing, startAction] = useTransition()
-  const [connectOpen, setConnectOpen] = useState(false)
-  const [phoneInput, setPhoneInput] = useState('')
-  const [connectError, setConnectError] = useState<string | null>(null)
-  const [isConnecting, startConnect] = useTransition()
+  const [isDisconnecting, startDisconnect] = useTransition()
+  const [wizardOpen, setWizardOpen] = useState(false)
 
-  const isConnected = instance?.status === 'connected'
-  const hasInstance = instance !== null
-
-  function handleConnect() {
-    const phone = phoneInput.replace(/\D/g, '')
-    if (phone.length < 10 || phone.length > 15) {
-      setConnectError('Número inválido. Use formato: 5511999999999')
-      return
-    }
-    setConnectError(null)
-
-    startConnect(async () => {
-      const instanceId = instance?.id
-      if (!instanceId) {
-        setConnectError('Nenhuma instância disponível. Contate o administrador.')
-        return
-      }
-      const result = await connectWhatsAppInstance(instanceId, phone)
-      if (result.success) {
-        setConnectOpen(false)
-        setPhoneInput('')
-        router.refresh()
-      } else {
-        setConnectError(result.error ?? 'Erro ao conectar.')
-      }
-    })
-  }
+  const isConnected = account?.status === 'active'
 
   function handleDisconnect() {
-    if (!instance) return
-    startAction(async () => {
-      await disconnectWhatsAppInstance(instance.id)
+    startDisconnect(async () => {
+      await disconnectChannel(channel)
       router.refresh()
     })
   }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border-default bg-surface-1">
-      {/* Header */}
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4 border-b border-border-default/50 p-5">
+      <div className="flex items-center justify-between gap-4 p-5">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#25D366]/10">
-            <svg viewBox="0 0 24 24" className="h-6 w-6 fill-[#25D366]">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-            </svg>
+          <div
+            className={cn(
+              'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl',
+              meta.bgClass,
+            )}
+          >
+            {meta.icon}
           </div>
           <div>
             <div className="flex items-center gap-2.5">
               <h3 className="font-title text-base font-semibold text-text-primary">
-                WhatsApp
+                {meta.label}
               </h3>
               <span
                 className={cn(
@@ -347,14 +441,18 @@ function WhatsAppChannel({
                 {isConnected ? 'Conectado' : 'Desconectado'}
               </span>
             </div>
-            {hasInstance && instance.phone_number ? (
-              <p className="mt-1 flex items-center gap-1.5 text-sm text-text-muted">
-                <Phone className="h-3.5 w-3.5" />
-                {instance.phone_number}
+            {isConnected && account?.connectedAt ? (
+              <p className="mt-1 text-sm text-text-muted">
+                Conectado em{' '}
+                {new Date(account.connectedAt).toLocaleDateString('pt-BR', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                })}
               </p>
             ) : (
               <p className="mt-1 text-sm text-text-subtle">
-                Nenhum número vinculado
+                Conecte seu bot para receber mensagens
               </p>
             )}
           </div>
@@ -364,10 +462,10 @@ function WhatsAppChannel({
           <Button
             variant="ghost"
             onClick={handleDisconnect}
-            disabled={isActing}
+            disabled={isDisconnecting}
             className="h-9 gap-2 rounded-xl px-4 text-sm text-text-muted hover:bg-danger/10 hover:text-danger"
           >
-            {isActing ? (
+            {isDisconnecting ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
               <Unplug className="h-3.5 w-3.5" />
@@ -376,146 +474,491 @@ function WhatsAppChannel({
           </Button>
         ) : (
           <Button
-            onClick={() => {
-              setPhoneInput('')
-              setConnectError(null)
-              setConnectOpen(true)
-            }}
-            className="h-9 gap-2 rounded-xl border border-[#25D366]/30 bg-[#25D366]/8 px-4 text-sm font-semibold text-[#25D366] transition-all duration-200 hover:border-[#25D366]/50 hover:bg-[#25D366]/15"
+            onClick={() => setWizardOpen(true)}
+            className={cn(
+              'h-9 gap-2 rounded-xl border px-4 text-sm font-semibold transition-all duration-200',
+              meta.borderClass,
+              `bg-[${meta.color}]/8`,
+              meta.textClass,
+              meta.hoverClass,
+            )}
           >
             <Plug className="h-3.5 w-3.5" />
-            Conectar número
+            Conectar
           </Button>
         )}
       </div>
 
-      {/* Stats or empty state */}
-      {detail ? (
-        <div className="grid grid-cols-2 gap-px bg-border-default/30 sm:grid-cols-4">
-          <StatCell
-            label="Enviadas hoje"
-            value={detail.messages_sent_today}
-            icon={<ArrowUpRight className="h-3.5 w-3.5 text-accent" />}
-          />
-          <StatCell
-            label="Recebidas hoje"
-            value={detail.messages_received_today}
-            icon={<ArrowDownLeft className="h-3.5 w-3.5 text-emerald" />}
-          />
-          <StatCell
-            label="Enviadas semana"
-            value={detail.messages_sent_week}
-            icon={<ArrowUpRight className="h-3.5 w-3.5 text-accent" />}
-          />
-          <StatCell
-            label="Recebidas semana"
-            value={detail.messages_received_week}
-            icon={<ArrowDownLeft className="h-3.5 w-3.5 text-emerald" />}
-          />
-        </div>
-      ) : (
-        <div className="px-5 py-6 text-center text-sm text-text-subtle">
-          Conecte um número para visualizar as estatísticas de mensagens
-        </div>
-      )}
-
-      {/* Connect modal */}
-      <Dialog.Root
-        open={connectOpen}
-        onOpenChange={(isOpen) => {
-          if (!isOpen && !isConnecting) {
-            setConnectOpen(false)
-            setConnectError(null)
-          }
-        }}
-      >
-        <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
-          <Dialog.Popup className="fixed inset-0 z-50 flex items-center justify-center p-4 outline-none">
-            <div className="card-glass w-full max-w-sm p-6">
-              <div className="flex items-start justify-between">
-                <Dialog.Title className="font-title text-lg font-semibold text-text-primary">
-                  Conectar WhatsApp
-                </Dialog.Title>
-                <Dialog.Close
-                  disabled={isConnecting}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-text-subtle transition-colors hover:bg-surface-2 hover:text-text-primary disabled:pointer-events-none"
-                >
-                  <X className="h-4 w-4" />
-                </Dialog.Close>
-              </div>
-
-              <div className="mt-5 space-y-1.5">
-                <label className="text-xs font-medium text-text-muted">
-                  Número de telefone
-                </label>
-                <input
-                  type="text"
-                  value={phoneInput}
-                  onChange={(e) => setPhoneInput(e.target.value)}
-                  placeholder="5511999999999"
-                  className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm tabular-nums text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
-                />
-                <p className="text-[11px] text-text-subtle">
-                  Inclua código do país (55) + DDD + número
-                </p>
-              </div>
-
-              {connectError && (
-                <div className="mt-4 rounded-lg bg-danger/8 px-3 py-2.5">
-                  <p className="text-sm text-danger">{connectError}</p>
-                </div>
-              )}
-
-              <div className="mt-6 flex justify-end gap-2">
-                <Dialog.Close
-                  disabled={isConnecting}
-                  className="inline-flex h-9 items-center rounded-xl px-4 text-sm font-medium text-text-muted transition-colors hover:bg-surface-2 hover:text-text-primary disabled:pointer-events-none disabled:opacity-50"
-                >
-                  Cancelar
-                </Dialog.Close>
-                <Button
-                  onClick={handleConnect}
-                  disabled={isConnecting}
-                  className="h-9 rounded-xl border border-[#25D366]/30 bg-[#25D366]/8 px-4 text-sm font-semibold text-[#25D366] transition-all duration-200 hover:border-[#25D366]/50 hover:bg-[#25D366]/15 disabled:opacity-50"
-                >
-                  {isConnecting ? (
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                      Conectando...
-                    </span>
-                  ) : (
-                    'Conectar'
-                  )}
-                </Button>
-              </div>
-            </div>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <ConnectWizard
+        channel={channel}
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+      />
     </div>
   )
 }
 
-function StatCell({
-  label,
-  value,
-  icon,
+// ── Facebook SDK loader ──
+
+const META_APP_ID = process.env.NEXT_PUBLIC_META_APP_ID ?? ''
+const META_CONFIG_ID = process.env.NEXT_PUBLIC_META_CONFIG_ID ?? ''
+
+declare global {
+  interface Window {
+    fbAsyncInit?: () => void
+    FB?: {
+      init: (params: Record<string, unknown>) => void
+      login: (
+        callback: (response: { authResponse?: { code?: string; accessToken?: string } }) => void,
+        options: Record<string, unknown>,
+      ) => void
+    }
+  }
+}
+
+function loadFacebookSDK(): Promise<void> {
+  return new Promise((resolve) => {
+    if (window.FB) {
+      resolve()
+      return
+    }
+
+    window.fbAsyncInit = () => {
+      window.FB!.init({
+        appId: META_APP_ID,
+        cookie: true,
+        xfbml: false,
+        version: 'v22.0',
+      })
+      resolve()
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://connect.facebook.net/en_US/sdk.js'
+    script.async = true
+    script.defer = true
+    document.body.appendChild(script)
+  })
+}
+
+function launchEmbeddedSignup(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (!window.FB) {
+      reject(new Error('Facebook SDK not loaded'))
+      return
+    }
+
+    window.FB.login(
+      (response) => {
+        if (response.authResponse?.code) {
+          resolve(response.authResponse.code)
+        } else {
+          reject(new Error('CANCELLED'))
+        }
+      },
+      {
+        config_id: META_CONFIG_ID,
+        response_type: 'code',
+        override_default_response_type: true,
+        extras: {
+          featureType: '',
+          sessionInfoVersion: '3',
+        },
+      },
+    )
+  })
+}
+
+// ── Connect Wizard ──
+
+function ConnectWizard({
+  channel,
+  open,
+  onOpenChange,
 }: {
-  label: string
-  value: number
-  icon: React.ReactNode
+  channel: SupportedChannel
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }) {
+  const meta = CHANNEL_META[channel]
+  const steps = meta.wizardSteps
+  const router = useRouter()
+
+  const [currentStep, setCurrentStep] = useState(0)
+  const [tokenInput, setTokenInput] = useState('')
+  const [connectError, setConnectError] = useState<string | null>(null)
+  const [isConnecting, startConnect] = useTransition()
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null)
+  const [isLoadingSDK, setIsLoadingSDK] = useState(false)
+
+  const step = steps[currentStep]
+  const isFirstStep = currentStep === 0
+  const totalSteps = steps.length
+
+  function reset() {
+    setCurrentStep(0)
+    setTokenInput('')
+    setConnectError(null)
+    setCopiedCommand(null)
+    setIsLoadingSDK(false)
+  }
+
+  function doConnect(token: string) {
+    setConnectError(null)
+    startConnect(async () => {
+      const result = await connectChannel(channel, token)
+      if (result.success) {
+        onOpenChange(false)
+        reset()
+        router.refresh()
+      } else {
+        setConnectError(result.error ?? 'Erro ao conectar.')
+      }
+    })
+  }
+
+  function handleConnect() {
+    const token = tokenInput.trim()
+    if (!token) {
+      setConnectError('Token de acesso é obrigatório.')
+      return
+    }
+    if (token.length > 500) {
+      setConnectError('Token muito longo (máximo 500 caracteres).')
+      return
+    }
+    doConnect(token)
+  }
+
+  async function handleEmbeddedSignup() {
+    setConnectError(null)
+    setIsLoadingSDK(true)
+
+    try {
+      await loadFacebookSDK()
+      const code = await launchEmbeddedSignup()
+      setIsLoadingSDK(false)
+      doConnect(code)
+    } catch (err) {
+      setIsLoadingSDK(false)
+      if (err instanceof Error && err.message === 'CANCELLED') {
+        setConnectError('Cadastro cancelado. Tente novamente ou use o token manual.')
+      } else {
+        setConnectError('Erro ao iniciar cadastro. Tente novamente.')
+      }
+    }
+  }
+
+  function copyCommand(command: string) {
+    navigator.clipboard.writeText(command)
+    setCopiedCommand(command)
+    setTimeout(() => setCopiedCommand(null), 2000)
+  }
+
   return (
-    <div className="flex flex-col gap-1 bg-surface-1 px-5 py-4">
-      <div className="flex items-center gap-1.5">
-        {icon}
-        <span className="text-[11px] text-text-subtle">{label}</span>
-      </div>
-      <span className="font-title text-xl font-bold tabular-nums text-text-primary">
-        {value.toLocaleString('pt-BR')}
-      </span>
-    </div>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen && !isConnecting && !isLoadingSDK) {
+          onOpenChange(false)
+          reset()
+        }
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
+        <Dialog.Popup className="fixed inset-0 z-50 flex items-center justify-center p-4 outline-none">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="card-glass w-full max-w-md p-0"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-border-default/50 px-6 py-4">
+              <div className="flex items-center gap-3">
+                <div className={cn('flex h-8 w-8 items-center justify-center rounded-lg', meta.bgClass)}>
+                  {meta.icon}
+                </div>
+                <Dialog.Title className="font-title text-base font-semibold text-text-primary">
+                  Conectar {meta.label}
+                </Dialog.Title>
+              </div>
+              <Dialog.Close
+                disabled={isConnecting || isLoadingSDK}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-text-subtle transition-colors hover:bg-surface-2 hover:text-text-primary disabled:pointer-events-none"
+              >
+                <X className="h-4 w-4" />
+              </Dialog.Close>
+            </div>
+
+            {/* Step indicator */}
+            {totalSteps > 1 && (
+              <div className="flex items-center gap-2 px-6 pt-4">
+                {steps.map((s, i) => (
+                  <div key={s.id} className="flex flex-1 items-center gap-2">
+                    <div
+                      className={cn(
+                        'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300',
+                        i < currentStep
+                          ? `${meta.bgClass} ${meta.textClass}`
+                          : i === currentStep
+                            ? `${meta.bgClass} ${meta.textClass} ring-2 ring-[${meta.color}]/30`
+                            : 'bg-surface-2 text-text-subtle',
+                      )}
+                    >
+                      {i < currentStep ? (
+                        <Check className="h-3 w-3" />
+                      ) : (
+                        i + 1
+                      )}
+                    </div>
+                    {i < totalSteps - 1 && (
+                      <div
+                        className={cn(
+                          'h-px flex-1 transition-colors duration-300',
+                          i < currentStep ? meta.bgClass : 'bg-border-default/50',
+                        )}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Step content */}
+            <div className="px-6 py-5">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={step.id}
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  <div className="flex items-center gap-2 text-text-muted">
+                    {step.icon}
+                    <h4 className="text-sm font-semibold">{step.title}</h4>
+                  </div>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-text-subtle">
+                    {step.description}
+                  </p>
+
+                  {/* Instructions */}
+                  {step.content === 'instructions' && step.instructions && (
+                    <div className="mt-4 space-y-2.5">
+                      {step.instructions.map((instruction, i) => (
+                        <div key={i} className="flex gap-2.5">
+                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[10px] font-bold text-text-subtle">
+                            {i + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm text-text-primary">
+                              {instruction.text}
+                            </p>
+                            {instruction.command && (
+                              <button
+                                type="button"
+                                onClick={() => copyCommand(instruction.command!)}
+                                className="mt-1.5 inline-flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-1.5 font-mono text-sm text-accent transition-colors hover:bg-surface-2/80"
+                              >
+                                <code>{instruction.command}</code>
+                                {copiedCommand === instruction.command ? (
+                                  <Check className="h-3 w-3 text-emerald" />
+                                ) : (
+                                  <Copy className="h-3 w-3 text-text-subtle" />
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      {step.deepLink && (
+                        <a
+                          href={step.deepLink.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cn(
+                            'mt-3 inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200',
+                            meta.borderClass,
+                            meta.textClass,
+                            meta.hoverClass,
+                          )}
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          {step.deepLink.label}
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Info bullets */}
+                  {step.content === 'info' && step.infoBullets && (
+                    <div className="mt-4 space-y-3">
+                      {step.infoBullets.map((bullet, i) => (
+                        <div
+                          key={i}
+                          className="flex gap-3 rounded-xl bg-surface-2/50 px-4 py-3"
+                        >
+                          <span
+                            className={cn(
+                              'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold',
+                              bullet.emoji === '✓'
+                                ? 'bg-emerald/15 text-emerald'
+                                : bullet.emoji === '!'
+                                  ? 'bg-accent/15 text-accent'
+                                  : 'bg-surface-2 text-text-subtle',
+                            )}
+                          >
+                            {bullet.emoji}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-text-primary">
+                              {bullet.title}
+                            </p>
+                            <p className="mt-0.5 text-[12px] leading-relaxed text-text-subtle">
+                              {bullet.text}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Embedded Signup */}
+                  {step.content === 'embedded-signup' && (
+                    <div className="mt-4 space-y-3">
+                      {step.instructions && (
+                        <div className="space-y-2">
+                          {step.instructions.map((instruction, i) => (
+                            <div key={i} className="flex gap-2.5">
+                              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-surface-2 text-[10px] font-bold text-text-subtle">
+                                {i + 1}
+                              </span>
+                              <p className="text-sm text-text-primary">
+                                {instruction.text}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <Button
+                        onClick={handleEmbeddedSignup}
+                        disabled={isLoadingSDK || isConnecting}
+                        className="h-11 w-full gap-2.5 rounded-xl border border-[#25D366]/30 bg-[#25D366]/8 text-sm font-semibold text-[#25D366] transition-all duration-200 hover:border-[#25D366]/50 hover:bg-[#25D366]/15 disabled:opacity-50"
+                      >
+                        {isLoadingSDK || isConnecting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {isConnecting ? 'Conectando...' : 'Carregando...'}
+                          </>
+                        ) : (
+                          <>
+                            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                            </svg>
+                            Iniciar cadastro Meta
+                          </>
+                        )}
+                      </Button>
+
+                      <button
+                        type="button"
+                        onClick={() => setCurrentStep(totalSteps - 1)}
+                        className="block w-full text-center text-xs text-text-subtle transition-colors hover:text-text-muted"
+                      >
+                        Já tenho um token →
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Token input */}
+                  {step.content === 'token' && (
+                    <div className="mt-4 space-y-1.5">
+                      <label className="flex items-center gap-1.5 text-xs font-medium text-text-muted">
+                        <KeyRound className="h-3 w-3" />
+                        Token de acesso
+                      </label>
+                      <input
+                        type="password"
+                        value={tokenInput}
+                        onChange={(e) => setTokenInput(e.target.value)}
+                        placeholder={meta.tokenPlaceholder}
+                        autoFocus
+                        className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 font-mono text-sm text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
+                      />
+                    </div>
+                  )}
+
+                  {connectError && (
+                    <div className="mt-4 rounded-lg bg-danger/8 px-3 py-2.5">
+                      <p className="text-sm text-danger">{connectError}</p>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between border-t border-border-default/50 px-6 py-4">
+              <div>
+                {!isFirstStep && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConnectError(null)
+                      setCurrentStep((s) => s - 1)
+                    }}
+                    disabled={isConnecting || isLoadingSDK}
+                    className="inline-flex items-center gap-1 text-sm font-medium text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                    Voltar
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {step.content === 'token' ? (
+                  <Button
+                    onClick={handleConnect}
+                    disabled={isConnecting}
+                    className={cn(
+                      'h-9 gap-2 rounded-xl border px-5 text-sm font-semibold transition-all duration-200 disabled:opacity-50',
+                      meta.borderClass,
+                      `bg-[${meta.color}]/8`,
+                      meta.textClass,
+                      meta.hoverClass,
+                    )}
+                  >
+                    {isConnecting ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Conectando...
+                      </>
+                    ) : (
+                      <>
+                        <Plug className="h-3.5 w-3.5" />
+                        Conectar
+                      </>
+                    )}
+                  </Button>
+                ) : step.content === 'instructions' || step.content === 'info' ? (
+                  <Button
+                    onClick={() => setCurrentStep((s) => s + 1)}
+                    className="h-9 gap-1.5 rounded-xl bg-surface-2 px-4 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-2/80"
+                  >
+                    Próximo
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </motion.div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 

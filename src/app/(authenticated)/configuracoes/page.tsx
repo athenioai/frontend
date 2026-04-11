@@ -1,7 +1,7 @@
-import { calendarConfigService, whatsAppService } from '@/lib/services'
+import { calendarConfigService, channelAccountService } from '@/lib/services'
 import { SettingsHub } from './_components/settings-hub'
 import type { CalendarConfig } from '@/lib/services/interfaces/calendar-config-service'
-import type { WhatsAppInstance, WhatsAppInstanceDetail } from '@/lib/services/interfaces/whatsapp-service'
+import type { ChannelAccount } from '@/lib/services/interfaces/channel-account-service'
 
 async function fetchCalendarConfig() {
   let config: CalendarConfig | null = null
@@ -13,29 +13,12 @@ async function fetchCalendarConfig() {
   return config
 }
 
-async function fetchWhatsApp() {
-  let instance: WhatsAppInstance | null = null
-  let detail: WhatsAppInstanceDetail | null = null
-
+async function fetchChannelAccounts(): Promise<ChannelAccount[]> {
   try {
-    const instances = await whatsAppService.listInstances()
-    console.log('[WhatsApp] listInstances response:', JSON.stringify(instances))
-    if (instances.length > 0) {
-      instance = instances[0]
-    }
-  } catch (err) {
-    console.error('[WhatsApp] listInstances error:', err)
+    return await channelAccountService.list()
+  } catch {
+    return []
   }
-
-  if (instance) {
-    try {
-      detail = await whatsAppService.getStatus(instance.id)
-    } catch {
-      // Stats unavailable, instance still shows
-    }
-  }
-
-  return { instance, detail }
 }
 
 export default async function ConfiguracoesPage({
@@ -46,9 +29,9 @@ export default async function ConfiguracoesPage({
   const params = await searchParams
   const tab = params.tab || 'agenda'
 
-  const [calendarConfig, whatsApp] = await Promise.all([
+  const [calendarConfig, channelAccounts] = await Promise.all([
     fetchCalendarConfig(),
-    tab === 'canais' ? fetchWhatsApp() : Promise.resolve({ instance: null, detail: null }),
+    tab === 'canais' ? fetchChannelAccounts() : Promise.resolve([]),
   ])
 
   return (
@@ -56,8 +39,7 @@ export default async function ConfiguracoesPage({
       <SettingsHub
         activeTab={tab}
         calendarConfig={calendarConfig}
-        whatsAppInstance={whatsApp.instance}
-        whatsAppDetail={whatsApp.detail}
+        channelAccounts={channelAccounts}
       />
     </div>
   )

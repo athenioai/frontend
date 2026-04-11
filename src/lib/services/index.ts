@@ -7,6 +7,7 @@ import { AdminUserService } from './admin-user-service'
 import { AdminDashboardService } from './admin-dashboard-service'
 import { AdminUserDataService } from './admin-user-data-service'
 import { WhatsAppService } from './whatsapp-service'
+import { ChannelAccountService } from './channel-account-service'
 import { LeadService } from './lead-service'
 
 export const authService = new AuthService()
@@ -18,4 +19,5 @@ export const adminUserService = new AdminUserService()
 export const adminDashboardService = new AdminDashboardService()
 export const adminUserDataService = new AdminUserDataService()
 export const whatsAppService = new WhatsAppService()
+export const channelAccountService = new ChannelAccountService()
 export const leadService = new LeadService()
