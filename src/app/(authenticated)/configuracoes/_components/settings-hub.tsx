@@ -775,20 +775,22 @@ function ConnectWizard({
                       ))}
 
                       {step.deepLink && (
-                        <a
-                          href={step.deepLink.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={cn(
-                            'mt-3 inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200',
-                            meta.borderClass,
-                            meta.textClass,
-                            meta.hoverClass,
-                          )}
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                          {step.deepLink.label}
-                        </a>
+                        <div className="mt-3 flex justify-center">
+                          <a
+                            href={step.deepLink.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              'inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200',
+                              meta.borderClass,
+                              meta.textClass,
+                              meta.hoverClass,
+                            )}
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            {step.deepLink.label}
+                          </a>
+                        </div>
                       )}
                     </div>
                   )}
