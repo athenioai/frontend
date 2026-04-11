@@ -882,7 +882,7 @@ function ConnectWizard({
                         Token de acesso
                       </label>
                       <input
-                        type="password"
+                        type="text"
                         value={tokenInput}
                         onChange={(e) => setTokenInput(e.target.value)}
                         placeholder={meta.tokenPlaceholder}
