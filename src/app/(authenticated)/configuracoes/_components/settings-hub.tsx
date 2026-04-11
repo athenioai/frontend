@@ -694,9 +694,9 @@ function ConnectWizard({
 
             {/* Step indicator */}
             {totalSteps > 1 && (
-              <div className="flex items-center gap-2 px-6 pt-4">
+              <div className="flex items-center justify-center gap-3 px-6 pt-4">
                 {steps.map((s, i) => (
-                  <div key={s.id} className="flex flex-1 items-center gap-2">
+                  <div key={s.id} className="flex items-center gap-3">
                     <div
                       className={cn(
                         'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300',
@@ -716,7 +716,7 @@ function ConnectWizard({
                     {i < totalSteps - 1 && (
                       <div
                         className={cn(
-                          'h-px flex-1 transition-colors duration-300',
+                          'h-px w-8 transition-colors duration-300',
                           i < currentStep ? meta.bgClass : 'bg-border-default/50',
                         )}
                       />
