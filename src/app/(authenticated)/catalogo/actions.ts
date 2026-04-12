@@ -49,6 +49,12 @@ export async function createService(
     return { success: false, error: 'Desconto Cartão deve estar entre 0 e 100.' }
   }
 
+  const specialDiscountPercent =
+    typeof data.specialDiscountPercent === 'number' ? data.specialDiscountPercent : 0
+  if (specialDiscountPercent < 0 || specialDiscountPercent > 100) {
+    return { success: false, error: 'Desconto especial deve estar entre 0 e 100.' }
+  }
+
   try {
     await financeService.createService({
       name,
@@ -56,6 +62,10 @@ export async function createService(
       price: Math.round(price * 100) / 100,
       pixDiscountPercent,
       cardDiscountPercent,
+      specialDiscountName: data.specialDiscountName ?? null,
+      specialDiscountPercent,
+      specialDiscountStartsAt: data.specialDiscountStartsAt ?? null,
+      specialDiscountEndsAt: data.specialDiscountEndsAt ?? null,
     })
     revalidatePath('/catalogo')
     return { success: true }
@@ -102,6 +112,22 @@ export async function updateService(
       return { success: false, error: 'Desconto Cartão deve estar entre 0 e 100.' }
     }
     patch.cardDiscountPercent = data.cardDiscountPercent
+  }
+
+  if (data.specialDiscountName !== undefined) {
+    patch.specialDiscountName = data.specialDiscountName
+  }
+  if (data.specialDiscountPercent !== undefined) {
+    if (data.specialDiscountPercent !== null && (data.specialDiscountPercent < 0 || data.specialDiscountPercent > 100)) {
+      return { success: false, error: 'Desconto especial deve estar entre 0 e 100.' }
+    }
+    patch.specialDiscountPercent = data.specialDiscountPercent
+  }
+  if (data.specialDiscountStartsAt !== undefined) {
+    patch.specialDiscountStartsAt = data.specialDiscountStartsAt
+  }
+  if (data.specialDiscountEndsAt !== undefined) {
+    patch.specialDiscountEndsAt = data.specialDiscountEndsAt
   }
 
   if (data.active !== undefined) {
@@ -156,6 +182,12 @@ export async function createProduct(
     return { success: false, error: 'Desconto Cartão deve estar entre 0 e 100.' }
   }
 
+  const specialDiscountPercent =
+    typeof data.specialDiscountPercent === 'number' ? data.specialDiscountPercent : 0
+  if (specialDiscountPercent < 0 || specialDiscountPercent > 100) {
+    return { success: false, error: 'Desconto especial deve estar entre 0 e 100.' }
+  }
+
   try {
     await financeService.createProduct({
       name,
@@ -163,6 +195,10 @@ export async function createProduct(
       price: Math.round(price * 100) / 100,
       pixDiscountPercent,
       cardDiscountPercent,
+      specialDiscountName: data.specialDiscountName ?? null,
+      specialDiscountPercent,
+      specialDiscountStartsAt: data.specialDiscountStartsAt ?? null,
+      specialDiscountEndsAt: data.specialDiscountEndsAt ?? null,
     })
     revalidatePath('/catalogo')
     return { success: true }
@@ -209,6 +245,22 @@ export async function updateProduct(
       return { success: false, error: 'Desconto Cartão deve estar entre 0 e 100.' }
     }
     patch.cardDiscountPercent = data.cardDiscountPercent
+  }
+
+  if (data.specialDiscountName !== undefined) {
+    patch.specialDiscountName = data.specialDiscountName
+  }
+  if (data.specialDiscountPercent !== undefined) {
+    if (data.specialDiscountPercent !== null && (data.specialDiscountPercent < 0 || data.specialDiscountPercent > 100)) {
+      return { success: false, error: 'Desconto especial deve estar entre 0 e 100.' }
+    }
+    patch.specialDiscountPercent = data.specialDiscountPercent
+  }
+  if (data.specialDiscountStartsAt !== undefined) {
+    patch.specialDiscountStartsAt = data.specialDiscountStartsAt
+  }
+  if (data.specialDiscountEndsAt !== undefined) {
+    patch.specialDiscountEndsAt = data.specialDiscountEndsAt
   }
 
   if (data.active !== undefined) {
