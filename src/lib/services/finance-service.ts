@@ -35,7 +35,7 @@ export class FinanceService implements IFinanceService {
     if (params?.search) searchParams.set('search', params.search)
 
     const query = searchParams.toString()
-    const res = await authFetch(`/finance/services${query ? `?${query}` : ''}`)
+    const res = await authFetch(`/services${query ? `?${query}` : ''}`)
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -46,7 +46,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async createService(params: CreateServiceParams): Promise<Service> {
-    const res = await authFetch('/finance/services', {
+    const res = await authFetch('/services', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -61,7 +61,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async updateService(id: string, params: UpdateServiceParams): Promise<Service> {
-    const res = await authFetch(`/finance/services/${id}`, {
+    const res = await authFetch(`/services/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -77,7 +77,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async deleteService(id: string): Promise<void> {
-    const res = await authFetch(`/finance/services/${id}`, { method: 'DELETE' })
+    const res = await authFetch(`/services/${id}`, { method: 'DELETE' })
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -95,7 +95,7 @@ export class FinanceService implements IFinanceService {
     if (params?.search) searchParams.set('search', params.search)
 
     const query = searchParams.toString()
-    const res = await authFetch(`/finance/products${query ? `?${query}` : ''}`)
+    const res = await authFetch(`/products${query ? `?${query}` : ''}`)
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -106,7 +106,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async createProduct(params: CreateProductParams): Promise<Product> {
-    const res = await authFetch('/finance/products', {
+    const res = await authFetch('/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -121,7 +121,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async updateProduct(id: string, params: UpdateProductParams): Promise<Product> {
-    const res = await authFetch(`/finance/products/${id}`, {
+    const res = await authFetch(`/products/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -137,7 +137,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async deleteProduct(id: string): Promise<void> {
-    const res = await authFetch(`/finance/products/${id}`, { method: 'DELETE' })
+    const res = await authFetch(`/products/${id}`, { method: 'DELETE' })
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -159,7 +159,7 @@ export class FinanceService implements IFinanceService {
     if (params?.dateTo) searchParams.set('dateTo', params.dateTo)
 
     const query = searchParams.toString()
-    const res = await authFetch(`/finance/invoices${query ? `?${query}` : ''}`)
+    const res = await authFetch(`/invoices${query ? `?${query}` : ''}`)
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -170,7 +170,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async createInvoice(params: CreateInvoiceParams): Promise<Invoice> {
-    const res = await authFetch('/finance/invoices', {
+    const res = await authFetch('/invoices', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -185,7 +185,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async markInvoicePaid(id: string): Promise<Invoice> {
-    const res = await authFetch(`/finance/invoices/${id}/pay`, { method: 'POST' })
+    const res = await authFetch(`/invoices/${id}/mark-paid`, { method: 'PATCH' })
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -197,7 +197,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async cancelInvoice(id: string): Promise<Invoice> {
-    const res = await authFetch(`/finance/invoices/${id}/cancel`, { method: 'POST' })
+    const res = await authFetch(`/invoices/${id}/cancel`, { method: 'PATCH' })
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -209,7 +209,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async getFinanceDashboard(): Promise<FinanceDashboard> {
-    const res = await authFetch('/finance/dashboard')
+    const res = await authFetch('/invoices/dashboard')
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -309,7 +309,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async markAdminInvoicePaid(id: string): Promise<AdminInvoice> {
-    const res = await authFetch(`/admin/invoices/${id}/pay`, { method: 'POST' })
+    const res = await authFetch(`/admin/invoices/${id}/mark-paid`, { method: 'PATCH' })
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -321,7 +321,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async cancelAdminInvoice(id: string): Promise<AdminInvoice> {
-    const res = await authFetch(`/admin/invoices/${id}/cancel`, { method: 'POST' })
+    const res = await authFetch(`/admin/invoices/${id}/cancel`, { method: 'PATCH' })
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -333,7 +333,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async getAdminBillingDashboard(): Promise<AdminBillingDashboard> {
-    const res = await authFetch('/admin/billing/dashboard')
+    const res = await authFetch('/admin/invoices/dashboard')
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -346,7 +346,7 @@ export class FinanceService implements IFinanceService {
   // ── Settings ──
 
   async getPrepaymentSetting(): Promise<PrepaymentSetting> {
-    const res = await authFetch('/finance/settings/prepayment')
+    const res = await authFetch('/settings/prepayment')
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -357,7 +357,7 @@ export class FinanceService implements IFinanceService {
   }
 
   async updatePrepaymentSetting(enabled: boolean): Promise<PrepaymentSetting> {
-    const res = await authFetch('/finance/settings/prepayment', {
+    const res = await authFetch('/settings/prepayment', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ enabled }),

@@ -445,6 +445,43 @@ function CanaisTab({ channelAccounts }: { channelAccounts: ChannelAccount[] }) {
 
 // ── Pagamentos Tab ──
 
+const GATEWAYS = [
+  {
+    id: 'stripe',
+    name: 'Stripe',
+    description: 'Cartão de crédito, PIX e boleto. API robusta com billing recorrente.',
+    color: '#635BFF',
+    bgClass: 'bg-[#635BFF]/10',
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-6 w-6 fill-[#635BFF]">
+        <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'mercadopago',
+    name: 'Mercado Pago',
+    description: 'Popular no Brasil. PIX, cartão e boleto com checkout pronto.',
+    color: '#00B1EA',
+    bgClass: 'bg-[#00B1EA]/10',
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-6 w-6 fill-[#00B1EA]">
+        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 1.97a.75.75 0 01-1.06 0L12 7.327 9.136 10.19a.75.75 0 01-1.06 0l-1.97-1.97a.75.75 0 010-1.06l4.834-4.834a1.5 1.5 0 012.12 0l4.834 4.834a.75.75 0 010 1.06zm0 8.608l-4.834 4.834a1.5 1.5 0 01-2.12 0L6.106 16.83a.75.75 0 010-1.06l1.97-1.97a.75.75 0 011.06 0L12 16.673l2.864-2.864a.75.75 0 011.06 0l1.97 1.97a.75.75 0 010 1.06z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'asaas',
+    name: 'Asaas',
+    description: 'Focado em cobrança recorrente e boleto. Gestão de inadimplência nativa.',
+    color: '#1A1A2E',
+    bgClass: 'bg-[#7C3AED]/10',
+    icon: (
+      <CreditCard className="h-6 w-6 text-[#7C3AED]" />
+    ),
+  },
+]
+
 function PagamentosTab({ prepaymentEnabled }: { prepaymentEnabled: boolean }) {
   const router = useRouter()
   const [enabled, setEnabled] = useState(prepaymentEnabled)
@@ -477,6 +514,7 @@ function PagamentosTab({ prepaymentEnabled }: { prepaymentEnabled: boolean }) {
         </p>
       </div>
 
+      {/* Prepayment toggle */}
       <div className="card-surface p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -511,6 +549,48 @@ function PagamentosTab({ prepaymentEnabled }: { prepaymentEnabled: boolean }) {
             <p className="text-sm text-danger">{saveError}</p>
           </div>
         )}
+      </div>
+
+      {/* Payment gateways */}
+      <div>
+        <h3 className="text-sm font-semibold text-text-primary">
+          Gateways de pagamento
+        </h3>
+        <p className="mt-1 text-sm text-text-muted">
+          Conecte um gateway para processar pagamentos automaticamente.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {GATEWAYS.map((gw, i) => (
+          <motion.div
+            key={gw.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06, duration: 0.25 }}
+          >
+            <div className="overflow-hidden rounded-2xl border border-border-default bg-surface-1">
+              <div className="flex items-center justify-between gap-4 p-5">
+                <div className="flex items-center gap-4">
+                  <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl', gw.bgClass)}>
+                    {gw.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-title text-base font-semibold text-text-primary">
+                      {gw.name}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-text-muted">
+                      {gw.description}
+                    </p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-surface-2 px-3 py-1 text-[11px] font-semibold text-text-subtle">
+                  Em breve
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </div>
   )
