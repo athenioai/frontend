@@ -59,15 +59,20 @@ src/
 │   ├── login/                          # Login (email/password)
 │   ├── forgot-password/                # Recuperação de senha
 │   ├── (authenticated)/                # Rotas protegidas
-│   │   ├── dashboard/                  # Página de boas-vindas + quick links
+│   │   ├── dashboard/                  # Boas-vindas + métricas financeiras e operacionais
 │   │   ├── conversas/                  # Chat WhatsApp-style (split panel)
 │   │   ├── agenda/                     # Calendário dia/semana/mês (Google Calendar)
-│   │   ├── configuracoes/              # Configurações com tabs (Agenda, Perfil, Notificações)
+│   │   ├── crm/                        # Kanban de leads por status
+│   │   ├── catalogo/                   # Catálogo de serviços e produtos (workType-aware)
+│   │   ├── cobrancas/                  # Cobranças a leads (CRUD + nova cobrança)
+│   │   ├── configuracoes/              # Tabs: Agenda, Perfil, Financeiro (pré-pagamento, juros, gateway)
 │   │   └── admin/                      # Admin-only (guard por role)
-│   │       ├── dashboard/              # Dashboard admin (stat cards + gráficos)
+│   │       ├── dashboard/              # Dashboard admin (MRR, assinaturas, inadimplência)
 │   │       ├── planos/                 # CRUD de planos
-│   │       └── usuarios/              # Gestão de usuários + contexto por user
-│   │           └── [id]/              # Visualização do user (4 tabs)
+│   │       ├── usuarios/              # Gestão de usuários + contexto por user
+│   │       │   └── [id]/              # Visualização do user (4 tabs)
+│   │       ├── assinaturas/           # Assinaturas Olympus por usuário
+│   │       └── faturas/               # Faturas de cobrança da plataforma
 │
 ├── components/
 │   ├── ui/                             # Componentes base (button, input, label, logo)
@@ -93,10 +98,13 @@ src/
 
 | Página | Descrição |
 |--------|-----------|
-| **Dashboard** | Boas-vindas com saudação por horário, stat cards placeholder e links rápidos para Conversas, Agendamentos e Performance. |
+| **Dashboard** | Boas-vindas com saudação por horário, métricas financeiras (receita, pendente, vencido, ticket médio), conversas, agendamentos, leads e ROI. |
 | **Conversas** | Split panel estilo WhatsApp. Lista de sessões à esquerda, thread de mensagens à direita com bubbles (lead/assistant), timestamps, badge de agendamento, input bar com modo takeover. |
 | **Agenda** | Calendário com 3 views (Dia/Semana/Mês). Blocos de agendamento posicionados por horário, indicador de hora atual, navegação por setas, modal de detalhe. |
-| **Configurações** | Tabs (Agenda, Perfil, Notificações). Tab Agenda: editor de horários por dia (toggle + time inputs), duração do slot, antecedência. |
+| **CRM** | Kanban de leads por status (Novo, Contatado, Qualificado, Convertido, Perdido). Drag & drop entre colunas, timeline por lead. |
+| **Catálogo** | Serviços e produtos com preço, descontos PIX/cartão e **desconto especial** (nome + % + período). Badge âmbar "X% OFF" quando ativo. Visibilidade por `work_type` (services/sales/hybrid). |
+| **Cobranças** | Lista de cobranças com filtros por status/tipo/lead. Formulário de nova cobrança (item do catálogo ou manual livre). |
+| **Configurações** | Tabs: Agenda (horários, slot, antecedência), Perfil, Financeiro (pré-pagamento, multa, juros, gateway). |
 
 ### Painel Admin
 
@@ -139,6 +147,7 @@ Server Action    → Service Class → authFetch (cookie) → Backend API
 | AdminUserService | `/admin/users/*` | list, getById, create (multipart) |
 | AdminDashboardService | `/admin/dashboard` | get |
 | AdminUserDataService | `/admin/users/:id/*` | getDashboard, getChats, getChatMessages, getAppointments, getCalendarConfig, updateCalendarConfig |
+| FinanceService | `/services`, `/products`, `/invoices`, `/financial-settings`, `/admin/subscriptions`, `/admin/invoices` | CRUD catálogo, cobranças, assinaturas, dashboard financeiro |
 
 ---
 
