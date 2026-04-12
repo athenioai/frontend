@@ -40,6 +40,8 @@ export async function authFetch(path: string, init?: RequestInit): Promise<Respo
   let token = cookieStore.get('access_token')?.value ?? null
   if (!token) throw new Error('NOT_AUTHENTICATED')
 
+  const isGet = !init?.method || init.method === 'GET'
+
   const doFetch = (t: string) =>
     fetch(`${API_URL}${path}`, {
       ...init,
@@ -47,6 +49,7 @@ export async function authFetch(path: string, init?: RequestInit): Promise<Respo
         ...init?.headers,
         Authorization: `Bearer ${t}`,
       },
+      ...(isGet ? { next: { revalidate: 30 } } : {}),
     })
 
   const res = await doFetch(token)
