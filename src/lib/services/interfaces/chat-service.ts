@@ -44,4 +44,5 @@ export interface IChatService {
   listSessions(params?: ListSessionsParams): Promise<PaginatedResponse<ChatSession>>
   getMessages(sessionId: string, params?: ListMessagesParams): Promise<PaginatedResponse<ChatMessage>>
   deleteSession(sessionId: string): Promise<void>
+  sendMessage(sessionId: string, message: string): Promise<void>
 }

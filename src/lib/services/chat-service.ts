@@ -75,4 +75,17 @@ export class ChatService implements IChatService {
       throw new Error(body.message ?? 'Failed to delete session')
     }
   }
+
+  async sendMessage(sessionId: string, message: string): Promise<void> {
+    const res = await this.authFetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId, message }),
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.message ?? 'Failed to send message')
+    }
+  }
 }

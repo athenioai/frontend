@@ -42,6 +42,18 @@ export async function loadInitialMessages(
   }
 }
 
+export async function sendMessageToLead(
+  sessionId: string,
+  message: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await chatService.sendMessage(sessionId, message)
+    return { success: true }
+  } catch {
+    return { success: false, error: 'Erro ao enviar mensagem.' }
+  }
+}
+
 export async function loadMoreMessages(
   sessionId: string,
   page: number,

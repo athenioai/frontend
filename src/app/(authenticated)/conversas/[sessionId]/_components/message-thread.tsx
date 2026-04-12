@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { MOTION, fadeInUp, staggerContainer } from '@/lib/motion'
 import { formatDate, formatTime } from '@/lib/format'
-import { loadMoreMessages } from '../../actions'
+import { loadMoreMessages, sendMessageToLead } from '../../actions'
 import type { ChatMessage, Pagination } from '@/lib/services/interfaces/chat-service'
 import Link from 'next/link'
 
@@ -112,14 +112,14 @@ export function MessageThread({
     }
   }
 
-  function handleSend() {
+  async function handleSend() {
     const content = inputValue.trim()
     if (!content) return
 
     const newMessage: ChatMessage = {
       id: crypto.randomUUID(),
       sessionId,
-      agent,
+      agent: 'human',
       role: 'assistant',
       content,
       appointmentId: null,
@@ -135,6 +135,11 @@ export function MessageThread({
     }
 
     scrollToBottom()
+
+    const result = await sendMessageToLead(sessionId, content)
+    if (!result.success) {
+      setMessages((prev) => prev.filter((m) => m.id !== newMessage.id))
+    }
   }
 
   return (
