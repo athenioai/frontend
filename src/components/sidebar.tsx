@@ -19,6 +19,8 @@ import {
   User,
   Users,
   Kanban,
+  Wallet,
+  Receipt,
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { cn } from '@/lib/utils'
@@ -29,6 +31,7 @@ import Link from 'next/link'
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/crm', label: 'CRM', icon: Kanban },
+  { href: '/financeiro', label: 'Financeiro', icon: Wallet },
   { href: '/conversas', label: 'Conversas', icon: MessagesSquare },
   { href: '/agenda', label: 'Agenda', icon: CalendarDays },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
@@ -38,6 +41,8 @@ const ADMIN_ITEMS = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: BarChart3 },
   { href: '/admin/planos', label: 'Planos', icon: CreditCard },
   { href: '/admin/usuarios', label: 'Usuários', icon: Users },
+  { href: '/admin/assinaturas', label: 'Assinaturas', icon: CreditCard },
+  { href: '/admin/faturas', label: 'Faturas', icon: Receipt },
 ]
 
 interface SidebarProps {

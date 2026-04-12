@@ -9,6 +9,7 @@ import { AdminUserDataService } from './admin-user-data-service'
 import { WhatsAppService } from './whatsapp-service'
 import { ChannelAccountService } from './channel-account-service'
 import { LeadService } from './lead-service'
+import { FinanceService } from './finance-service'
 
 export const authService = new AuthService()
 export const chatService = new ChatService()
@@ -21,3 +22,4 @@ export const adminUserDataService = new AdminUserDataService()
 export const whatsAppService = new WhatsAppService()
 export const channelAccountService = new ChannelAccountService()
 export const leadService = new LeadService()
+export const financeService = new FinanceService()
