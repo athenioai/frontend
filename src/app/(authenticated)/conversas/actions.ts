@@ -2,6 +2,7 @@
 
 import { chatService } from '@/lib/services'
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 import type { ChatMessage, Pagination } from '@/lib/services/interfaces/chat-service'
 
 export async function deleteChatSession(
@@ -74,6 +75,11 @@ export async function deactivateHandoff(
   } catch {
     return { success: false, error: 'Erro ao devolver conversa.' }
   }
+}
+
+export async function getWsToken(): Promise<string | null> {
+  const cookieStore = await cookies()
+  return cookieStore.get('access_token')?.value ?? null
 }
 
 export async function loadMoreMessages(

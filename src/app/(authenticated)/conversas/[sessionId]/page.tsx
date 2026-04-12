@@ -55,6 +55,7 @@ export default async function ChatDetailPage({
     <MessageThread
       sessionId={sessionId}
       userName={user?.name ?? 'Você'}
+      leadName={session?.leadName ?? 'Cliente'}
       initialMessages={messages}
       initialPagination={pagination}
       initialHandoff={session?.handoff ?? false}

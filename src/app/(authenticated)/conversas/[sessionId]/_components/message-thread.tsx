@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { MOTION, fadeInUp, staggerContainer } from '@/lib/motion'
 import { formatDate, formatTime } from '@/lib/format'
-import { loadMoreMessages, sendMessageToLead, activateHandoff, deactivateHandoff } from '../../actions'
+import { loadMoreMessages, sendMessageToLead, activateHandoff, deactivateHandoff, getWsToken } from '../../actions'
 import type { ChatMessage, Pagination } from '@/lib/services/interfaces/chat-service'
 import Link from 'next/link'
 
@@ -39,6 +39,7 @@ function getAgentConfig(agent: string, userName?: string) {
 interface MessageThreadProps {
   sessionId: string
   userName: string
+  leadName: string
   initialMessages: ChatMessage[]
   initialPagination: Pagination
   initialHandoff: boolean
@@ -47,6 +48,7 @@ interface MessageThreadProps {
 export function MessageThread({
   sessionId,
   userName,
+  leadName,
   initialMessages,
   initialPagination,
   initialHandoff,
@@ -80,6 +82,49 @@ export function MessageThread({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
   }, [])
+
+  // WebSocket — real-time message updates
+  useEffect(() => {
+    let ws: WebSocket | null = null
+    let canceled = false
+
+    async function connect() {
+      const token = await getWsToken()
+      if (!token || canceled) return
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+      const wsUrl = apiUrl.replace(/^http/, 'ws') + `/ws?token=${encodeURIComponent(token)}`
+      ws = new WebSocket(wsUrl)
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data)
+          if (data.type === 'new_message' && data.sessionId === sessionId) {
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === data.message.id)) return prev
+              return [...prev, data.message]
+            })
+            scrollToBottom()
+          }
+        } catch {
+          // ignore malformed messages
+        }
+      }
+
+      ws.onclose = () => {
+        if (!canceled) {
+          setTimeout(connect, 3000)
+        }
+      }
+    }
+
+    connect()
+
+    return () => {
+      canceled = true
+      ws?.close()
+    }
+  }, [sessionId])
 
   function scrollToBottom() {
     requestAnimationFrame(() => {
@@ -266,7 +311,7 @@ export function MessageThread({
                     >
                       {isAssistant && <MsgIcon className="h-2.5 w-2.5" />}
                       <span className={!isAssistant ? 'text-text-subtle' : ''}>
-                        {isAssistant ? msgConfig.label : 'Cliente'}
+                        {isAssistant ? msgConfig.label : leadName}
                       </span>
                     </p>
 
