@@ -441,15 +441,26 @@ function ChannelCard({
                 {isConnected ? 'Conectado' : 'Desconectado'}
               </span>
             </div>
-            {isConnected && account?.connectedAt ? (
-              <p className="mt-1 text-sm text-text-muted">
-                Conectado em{' '}
-                {new Date(account.connectedAt).toLocaleDateString('pt-BR', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
-                })}
-              </p>
+            {isConnected ? (
+              <div className="mt-1 flex items-center gap-3 text-sm text-text-muted">
+                {account?.channelAccountId && (
+                  <span className="inline-flex items-center gap-1 font-mono text-xs text-text-subtle">
+                    <KeyRound className="h-3 w-3" />
+                    {account.channelAccountId.length > 8
+                      ? account.channelAccountId.slice(0, 4) + '...' + account.channelAccountId.slice(-4)
+                      : account.channelAccountId}
+                  </span>
+                )}
+                {account?.connectedAt && (
+                  <span className="text-xs text-text-subtle">
+                    {new Date(account.connectedAt).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </span>
+                )}
+              </div>
             ) : (
               <p className="mt-1 text-sm text-text-subtle">
                 Conecte seu bot para receber mensagens
@@ -681,7 +692,7 @@ function ConnectWizard({
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="card-glass w-full max-w-md max-h-[90vh] overflow-y-auto p-0"
+            className="card-glass w-full max-w-[28rem] p-0"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border-default/50 px-6 py-4">
@@ -736,7 +747,7 @@ function ConnectWizard({
             )}
 
             {/* Step content */}
-            <div className="px-6 py-5">
+            <div className="px-6 py-5 min-h-[16rem] flex flex-col justify-center">
               <AnimatePresence mode="wait">
                 {connected ? (
                   <motion.div
