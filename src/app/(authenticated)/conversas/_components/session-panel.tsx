@@ -237,9 +237,21 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
                       >
                         {displayName}
                       </span>
-                      <span className="shrink-0 text-[10px] text-text-subtle">
-                        {formatRelativeTime(session.lastMessageAt)}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        <span className="text-[10px] text-text-subtle">
+                          {formatRelativeTime(session.lastMessageAt)}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setDeleteTarget(session.sessionId)
+                          }}
+                          className="flex h-5 w-5 items-center justify-center rounded-md text-text-subtle opacity-0 transition-all group-hover:opacity-100 hover:bg-danger/10 hover:text-danger"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
                     </div>
                     <p className="mt-0.5 truncate text-xs leading-relaxed text-text-muted">
                       {session.lastMessage}
@@ -261,20 +273,6 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
                       <span>·</span>
                       <span>{roleLabel}</span>
                     </div>
-                  </div>
-
-                  {/* Delete */}
-                  <div className="absolute right-2 top-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setDeleteTarget(session.sessionId)
-                      }}
-                      className="flex h-6 w-6 items-center justify-center rounded-md text-text-subtle transition-colors hover:bg-danger/10 hover:text-danger"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </button>
                   </div>
                 </Link>
               )
