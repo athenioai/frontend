@@ -590,10 +590,17 @@ function ConnectWizard({
   const [isConnecting, startConnect] = useTransition()
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null)
   const [isLoadingSDK, setIsLoadingSDK] = useState(false)
+  const [connected, setConnected] = useState(false)
+  const [maskedToken, setMaskedToken] = useState('')
 
-  const step = steps[currentStep]
+  const step = connected ? null : steps[currentStep]
   const isFirstStep = currentStep === 0
   const totalSteps = steps.length
+
+  function maskToken(token: string): string {
+    if (token.length <= 8) return token.slice(0, 4) + '...'
+    return token.slice(0, 4) + '...' + token.slice(-4)
+  }
 
   function reset() {
     setCurrentStep(0)
@@ -601,6 +608,8 @@ function ConnectWizard({
     setConnectError(null)
     setCopiedCommand(null)
     setIsLoadingSDK(false)
+    setConnected(false)
+    setMaskedToken('')
   }
 
   function doConnect(token: string) {
@@ -608,8 +617,8 @@ function ConnectWizard({
     startConnect(async () => {
       const result = await connectChannel(channel, token)
       if (result.success) {
-        onOpenChange(false)
-        reset()
+        setMaskedToken(maskToken(token))
+        setConnected(true)
         router.refresh()
       } else {
         setConnectError(result.error ?? 'Erro ao conectar.')
@@ -672,7 +681,7 @@ function ConnectWizard({
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="card-glass w-full max-w-md p-0"
+            className="card-glass w-full max-w-md max-h-[90vh] overflow-y-auto p-0"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border-default/50 px-6 py-4">
@@ -693,7 +702,7 @@ function ConnectWizard({
             </div>
 
             {/* Step indicator */}
-            {totalSteps > 1 && (
+            {totalSteps > 1 && !connected && (
               <div className="flex items-center justify-center gap-3 px-6 pt-4">
                 {steps.map((s, i) => (
                   <div key={s.id} className="flex items-center gap-3">
@@ -729,6 +738,29 @@ function ConnectWizard({
             {/* Step content */}
             <div className="px-6 py-5">
               <AnimatePresence mode="wait">
+                {connected ? (
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.25 }}
+                    className="flex flex-col items-center py-4 text-center"
+                  >
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald/15">
+                      <Check className="h-7 w-7 text-emerald" />
+                    </div>
+                    <h4 className="mt-4 font-title text-lg font-semibold text-text-primary">
+                      {meta.label} conectado!
+                    </h4>
+                    <p className="mt-1.5 text-sm text-text-muted">
+                      Seu bot está ativo e pronto para receber mensagens.
+                    </p>
+                    <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-2">
+                      <KeyRound className="h-3.5 w-3.5 text-text-subtle" />
+                      <code className="font-mono text-sm text-text-muted">{maskedToken}</code>
+                    </div>
+                  </motion.div>
+                ) : step ? (
                 <motion.div
                   key={step.id}
                   initial={{ opacity: 0, x: 16 }}
@@ -900,62 +932,80 @@ function ConnectWizard({
                     </div>
                   )}
                 </motion.div>
+                ) : null}
               </AnimatePresence>
             </div>
 
             {/* Footer */}
             <div className="flex items-center justify-between border-t border-border-default/50 px-6 py-4">
-              <div>
-                {!isFirstStep && (
-                  <button
-                    type="button"
+              {connected ? (
+                <div className="flex w-full justify-end">
+                  <Button
                     onClick={() => {
-                      setConnectError(null)
-                      setCurrentStep((s) => s - 1)
+                      onOpenChange(false)
+                      reset()
                     }}
-                    disabled={isConnecting || isLoadingSDK}
-                    className="inline-flex items-center gap-1 text-sm font-medium text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
+                    className="h-9 gap-2 rounded-xl bg-emerald/10 px-5 text-sm font-semibold text-emerald transition-colors hover:bg-emerald/20"
                   >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                    Voltar
-                  </button>
-                )}
-              </div>
-              <div className="flex gap-2">
-                {step.content === 'token' ? (
-                  <Button
-                    onClick={handleConnect}
-                    disabled={isConnecting}
-                    className={cn(
-                      'h-9 gap-2 rounded-xl border px-5 text-sm font-semibold transition-all duration-200 disabled:opacity-50',
-                      meta.borderClass,
-                      `bg-[${meta.color}]/8`,
-                      meta.textClass,
-                      meta.hoverClass,
-                    )}
-                  >
-                    {isConnecting ? (
-                      <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        Conectando...
-                      </>
-                    ) : (
-                      <>
-                        <Plug className="h-3.5 w-3.5" />
-                        Conectar
-                      </>
-                    )}
+                    <Check className="h-3.5 w-3.5" />
+                    Fechar
                   </Button>
-                ) : step.content === 'instructions' || step.content === 'info' ? (
-                  <Button
-                    onClick={() => setCurrentStep((s) => s + 1)}
-                    className="h-9 gap-1.5 rounded-xl bg-surface-2 px-4 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-2/80"
-                  >
-                    Próximo
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
-                ) : null}
-              </div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    {!isFirstStep && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConnectError(null)
+                          setCurrentStep((s) => s - 1)
+                        }}
+                        disabled={isConnecting || isLoadingSDK}
+                        className="inline-flex items-center gap-1 text-sm font-medium text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
+                      >
+                        <ChevronLeft className="h-3.5 w-3.5" />
+                        Voltar
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    {step?.content === 'token' ? (
+                      <Button
+                        onClick={handleConnect}
+                        disabled={isConnecting}
+                        className={cn(
+                          'h-9 gap-2 rounded-xl border px-5 text-sm font-semibold transition-all duration-200 disabled:opacity-50',
+                          meta.borderClass,
+                          `bg-[${meta.color}]/8`,
+                          meta.textClass,
+                          meta.hoverClass,
+                        )}
+                      >
+                        {isConnecting ? (
+                          <>
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            Conectando...
+                          </>
+                        ) : (
+                          <>
+                            <Plug className="h-3.5 w-3.5" />
+                            Conectar
+                          </>
+                        )}
+                      </Button>
+                    ) : step?.content === 'instructions' || step?.content === 'info' ? (
+                      <Button
+                        onClick={() => setCurrentStep((s) => s + 1)}
+                        className="h-9 gap-1.5 rounded-xl bg-surface-2 px-4 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-2/80"
+                      >
+                        Próximo
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    ) : null}
+                  </div>
+                </>
+              )}
             </div>
           </motion.div>
         </Dialog.Popup>
