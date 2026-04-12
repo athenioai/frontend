@@ -60,8 +60,12 @@ export class AuthService implements IAuthService {
       return await res.json() as AuthUser
     }
 
-    // Token expirado — tenta refresh
+    // Token expirado — tenta refresh apenas uma vez
     if (res.status === 401) {
+      // Re-read cookie in case middleware already refreshed it
+      const currentRefresh = cookieStore.get('refresh_token')?.value
+      if (!currentRefresh) return null
+
       token = await this.tryRefresh()
       if (!token) return null
 
@@ -78,9 +82,6 @@ export class AuthService implements IAuthService {
   }
 
   private async tryRefresh(): Promise<string | null> {
-    // Token refresh and cookie persistence is handled by the middleware.
-    // This method only attempts a refresh for the current request's use
-    // (e.g., when middleware already ran but the token expired mid-render).
     const cookieStore = await cookies()
     const refreshToken = cookieStore.get('refresh_token')?.value
 
@@ -95,6 +96,22 @@ export class AuthService implements IAuthService {
     if (!res.ok) return null
 
     const data: { accessToken: string; refreshToken: string } = await res.json()
+
+    cookieStore.set('access_token', data.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60,
+    })
+    cookieStore.set('refresh_token', data.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    })
+
     return data.accessToken
   }
 }

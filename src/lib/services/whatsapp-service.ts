@@ -8,32 +8,11 @@ import type {
   SendTextResponse,
   SendTextSequenceResponse,
 } from './interfaces/whatsapp-service'
-import { cookies } from 'next/headers'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+import { authFetch } from './auth-fetch'
 
 export class WhatsAppService implements IWhatsAppService {
-  private async getToken(): Promise<string | null> {
-    const cookieStore = await cookies()
-    return cookieStore.get('access_token')?.value ?? null
-  }
-
-  private async authFetch(path: string, init?: RequestInit): Promise<Response> {
-    const token = await this.getToken()
-    if (!token) throw new Error('NOT_AUTHENTICATED')
-
-    return fetch(`${API_URL}${path}`, {
-      ...init,
-      headers: {
-        'Content-Type': 'application/json',
-        ...init?.headers,
-        Authorization: `Bearer ${token}`,
-      },
-    })
-  }
-
   async listInstances(): Promise<WhatsAppInstance[]> {
-    const res = await this.authFetch('/whatsapp/instances')
+    const res = await authFetch('/whatsapp/instances')
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -49,7 +28,7 @@ export class WhatsAppService implements IWhatsAppService {
   }
 
   async getInstance(id: string): Promise<WhatsAppInstance> {
-    const res = await this.authFetch(`/whatsapp/instances/${id}`)
+    const res = await authFetch(`/whatsapp/instances/${id}`)
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -61,7 +40,7 @@ export class WhatsAppService implements IWhatsAppService {
   }
 
   async deleteInstance(id: string): Promise<void> {
-    const res = await this.authFetch(`/whatsapp/instances/${id}`, {
+    const res = await authFetch(`/whatsapp/instances/${id}`, {
       method: 'DELETE',
     })
 
@@ -73,8 +52,9 @@ export class WhatsAppService implements IWhatsAppService {
   }
 
   async connect(id: string, params: ConnectParams): Promise<WhatsAppInstance> {
-    const res = await this.authFetch(`/whatsapp/instances/${id}/connect`, {
+    const res = await authFetch(`/whatsapp/instances/${id}/connect`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     })
 
@@ -90,7 +70,7 @@ export class WhatsAppService implements IWhatsAppService {
   }
 
   async disconnect(id: string): Promise<{ status: string }> {
-    const res = await this.authFetch(`/whatsapp/instances/${id}/disconnect`, {
+    const res = await authFetch(`/whatsapp/instances/${id}/disconnect`, {
       method: 'POST',
     })
 
@@ -104,7 +84,7 @@ export class WhatsAppService implements IWhatsAppService {
   }
 
   async getStatus(id: string): Promise<WhatsAppInstanceDetail> {
-    const res = await this.authFetch(`/whatsapp/instances/${id}/status`)
+    const res = await authFetch(`/whatsapp/instances/${id}/status`)
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -116,8 +96,9 @@ export class WhatsAppService implements IWhatsAppService {
   }
 
   async sendText(id: string, params: SendTextParams): Promise<SendTextResponse> {
-    const res = await this.authFetch(`/whatsapp/instances/${id}/send/text`, {
+    const res = await authFetch(`/whatsapp/instances/${id}/send/text`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     })
 
@@ -135,8 +116,9 @@ export class WhatsAppService implements IWhatsAppService {
     id: string,
     params: SendTextSequenceParams,
   ): Promise<SendTextSequenceResponse> {
-    const res = await this.authFetch(`/whatsapp/instances/${id}/send/text-sequence`, {
+    const res = await authFetch(`/whatsapp/instances/${id}/send/text-sequence`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     })
 

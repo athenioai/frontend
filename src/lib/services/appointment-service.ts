@@ -4,29 +4,9 @@ import type {
   Appointment,
   ListAppointmentsParams,
 } from './interfaces/appointment-service'
-import { cookies } from 'next/headers'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+import { authFetch } from './auth-fetch'
 
 export class AppointmentService implements IAppointmentService {
-  private async getToken(): Promise<string | null> {
-    const cookieStore = await cookies()
-    return cookieStore.get('access_token')?.value ?? null
-  }
-
-  private async authFetch(path: string, init?: RequestInit): Promise<Response> {
-    const token = await this.getToken()
-    if (!token) throw new Error('NOT_AUTHENTICATED')
-
-    return fetch(`${API_URL}${path}`, {
-      ...init,
-      headers: {
-        ...init?.headers,
-        Authorization: `Bearer ${token}`,
-      },
-    })
-  }
-
   async list(params?: ListAppointmentsParams): Promise<PaginatedAppointments> {
     const sp = new URLSearchParams()
     if (params?.page) sp.set('page', String(params.page))
@@ -37,7 +17,7 @@ export class AppointmentService implements IAppointmentService {
     if (params?.user_id) sp.set('user_id', params.user_id)
 
     const query = sp.toString()
-    const res = await this.authFetch(`/appointments${query ? `?${query}` : ''}`)
+    const res = await authFetch(`/appointments${query ? `?${query}` : ''}`)
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -48,7 +28,7 @@ export class AppointmentService implements IAppointmentService {
   }
 
   async getById(id: string): Promise<Appointment> {
-    const res = await this.authFetch(`/appointments/${id}`)
+    const res = await authFetch(`/appointments/${id}`)
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')

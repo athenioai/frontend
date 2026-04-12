@@ -9,34 +9,13 @@ import type {
   TimelineEntry,
   TimelineParams,
 } from './interfaces/lead-service'
-import { cookies } from 'next/headers'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+import { authFetch } from './auth-fetch'
 
 /** CRM lead management service. Proxies requests to backend /leads/* endpoints. */
 export class LeadService implements ILeadService {
-  private async getToken(): Promise<string | null> {
-    const cookieStore = await cookies()
-    return cookieStore.get('access_token')?.value ?? null
-  }
-
-  private async authFetch(path: string, init?: RequestInit): Promise<Response> {
-    const token = await this.getToken()
-    if (!token) throw new Error('NOT_AUTHENTICATED')
-
-    return fetch(`${API_URL}${path}`, {
-      ...init,
-      headers: {
-        ...init?.headers,
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-  }
-
   /** Fetches the Kanban board — all leads grouped by status. Rate limit: 20/min. */
   async getBoard(): Promise<LeadBoard> {
-    const res = await this.authFetch('/leads/board')
+    const res = await authFetch('/leads/board')
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -55,7 +34,7 @@ export class LeadService implements ILeadService {
     if (params?.search) searchParams.set('search', params.search)
 
     const query = searchParams.toString()
-    const res = await this.authFetch(`/leads${query ? `?${query}` : ''}`)
+    const res = await authFetch(`/leads${query ? `?${query}` : ''}`)
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
@@ -67,7 +46,7 @@ export class LeadService implements ILeadService {
 
   /** Fetches a single lead by UUID. Throws NOT_FOUND (404) or FORBIDDEN (403). */
   async getLead(id: string): Promise<LeadPublic> {
-    const res = await this.authFetch(`/leads/${id}`)
+    const res = await authFetch(`/leads/${id}`)
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -81,8 +60,9 @@ export class LeadService implements ILeadService {
 
   /** Creates a new lead. Throws CONFLICT (409) if email already exists. */
   async createLead(payload: CreateLeadPayload): Promise<LeadPublic> {
-    const res = await this.authFetch('/leads', {
+    const res = await authFetch('/leads', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
 
@@ -98,8 +78,9 @@ export class LeadService implements ILeadService {
 
   /** Updates lead fields. Used by both inline editing and drag-and-drop status changes. */
   async updateLead(id: string, payload: UpdateLeadPayload): Promise<LeadPublic> {
-    const res = await this.authFetch(`/leads/${id}`, {
+    const res = await authFetch(`/leads/${id}`, {
       method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
 
@@ -117,7 +98,7 @@ export class LeadService implements ILeadService {
 
   /** Soft-deletes a lead by UUID. Authorization enforced by backend. */
   async deleteLead(id: string): Promise<void> {
-    const res = await this.authFetch(`/leads/${id}`, { method: 'DELETE' })
+    const res = await authFetch(`/leads/${id}`, { method: 'DELETE' })
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
@@ -137,7 +118,7 @@ export class LeadService implements ILeadService {
     if (params?.type) searchParams.set('type', params.type)
 
     const query = searchParams.toString()
-    const res = await this.authFetch(`/leads/${id}/timeline${query ? `?${query}` : ''}`)
+    const res = await authFetch(`/leads/${id}/timeline${query ? `?${query}` : ''}`)
 
     if (!res.ok) {
       if (res.status === 404) throw new Error('NOT_FOUND')
