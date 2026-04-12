@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['motion'],
+    staleTimes: {
+      dynamic: 30,
+    },
   },
   headers: async () => [
     {
