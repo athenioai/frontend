@@ -201,10 +201,11 @@ export function SessionPanel({ initialSessions }: SessionPanelProps) {
           <div className="space-y-0.5">
             {filtered.map((session) => {
               const isActive = session.sessionId === activeSessionId
-              const ac = getAgentConfig(session.agent)
+              const activeAgent = session.handoff ? 'human' : session.agent
+              const ac = getAgentConfig(activeAgent)
               const AgentIcon = ac.icon
               const roleLabel =
-                session.lastRole === 'assistant' ? ac.label : 'Cliente'
+                session.lastRole === 'assistant' ? ac.label : (session.leadName ?? 'Cliente')
               const displayName = session.leadName ?? 'Desconhecido'
 
               return (
