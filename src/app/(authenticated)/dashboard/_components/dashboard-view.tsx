@@ -25,9 +25,10 @@ function getGreeting() {
 
 interface DashboardViewProps {
   data: FinanceDashboard | null
+  userName: string | null
 }
 
-export function DashboardView({ data }: DashboardViewProps) {
+export function DashboardView({ data, userName }: DashboardViewProps) {
   const greeting = getGreeting()
 
   const stats = [
@@ -85,7 +86,7 @@ export function DashboardView({ data }: DashboardViewProps) {
           variants={fadeInUp}
           transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
         >
-          <p className="text-sm font-medium text-accent">{greeting}</p>
+          <p className="text-sm font-medium text-accent">{greeting}{userName ? `, ${userName.split(' ')[0]}` : ''}</p>
           <h1 className="mt-1 font-title text-3xl font-bold tracking-tight text-text-primary">
             Painel de controle
           </h1>
