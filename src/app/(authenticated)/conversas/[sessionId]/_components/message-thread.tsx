@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { MOTION, fadeInUp, staggerContainer } from '@/lib/motion'
 import { formatDate, formatTime } from '@/lib/format'
-import { loadMoreMessages, sendMessageToLead } from '../../actions'
+import { loadMoreMessages, sendMessageToLead, activateHandoff, deactivateHandoff } from '../../actions'
 import type { ChatMessage, Pagination } from '@/lib/services/interfaces/chat-service'
 import Link from 'next/link'
 
@@ -28,20 +28,28 @@ const AGENT_CONFIG: Record<string, { color: string; bgLight: string; bgBubble: s
   human:  { color: '#D4820A', bgLight: 'rgba(212,130,10,0.10)', bgBubble: 'rgba(212,130,10,0.08)', ringBubble: 'rgba(212,130,10,0.06)', label: 'Humano', icon: UserRound },
 }
 
-function getAgentConfig(agent: string) {
-  return AGENT_CONFIG[agent] ?? { color: '#888', bgLight: 'rgba(136,136,136,0.10)', bgBubble: 'rgba(136,136,136,0.08)', ringBubble: 'rgba(136,136,136,0.06)', label: agent.charAt(0).toUpperCase() + agent.slice(1), icon: Bot }
+function getAgentConfig(agent: string, userName?: string) {
+  const config = AGENT_CONFIG[agent] ?? { color: '#888', bgLight: 'rgba(136,136,136,0.10)', bgBubble: 'rgba(136,136,136,0.08)', ringBubble: 'rgba(136,136,136,0.06)', label: agent.charAt(0).toUpperCase() + agent.slice(1), icon: Bot }
+  if (agent === 'human' && userName) {
+    return { ...config, label: userName }
+  }
+  return config
 }
 
 interface MessageThreadProps {
   sessionId: string
+  userName: string
   initialMessages: ChatMessage[]
   initialPagination: Pagination
+  initialHandoff: boolean
 }
 
 export function MessageThread({
   sessionId,
+  userName,
   initialMessages,
   initialPagination,
+  initialHandoff,
 }: MessageThreadProps) {
   const [messages, setMessages] = useState(initialMessages)
   const [currentPage, setCurrentPage] = useState(initialPagination.page)
@@ -49,14 +57,20 @@ export function MessageThread({
   const scrollRef = useRef<HTMLDivElement>(null)
 
   // Takeover state
-  const [isTakeover, setIsTakeover] = useState(false)
+  const [isTakeover, setIsTakeover] = useState(initialHandoff)
   const [inputValue, setInputValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const hasMore = currentPage > 1
-  const lastAgentMsg = [...messages].reverse().find((m) => m.role === 'assistant')
-  const headerAgent = lastAgentMsg?.agent ?? messages[0]?.agent ?? 'ai'
-  const headerConfig = getAgentConfig(headerAgent)
+
+  // Find the last AI agent (not human) to know which agent to "return to"
+  const lastAiAgent = [...messages].reverse().find((m) => m.role === 'assistant' && m.agent !== 'human')?.agent ?? 'ai'
+  const aiConfig = getAgentConfig(lastAiAgent)
+  const AiIcon = aiConfig.icon
+
+  // Header shows current state
+  const headerAgent = isTakeover ? 'human' : lastAiAgent
+  const headerConfig = getAgentConfig(headerAgent, userName)
   const HeaderIcon = headerConfig.icon
   const startDate = messages.length > 0 ? formatDate(messages[0].createdAt) : ''
 
@@ -116,6 +130,20 @@ export function MessageThread({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSend()
+    }
+  }
+
+  async function handleTakeover() {
+    const result = await activateHandoff(sessionId)
+    if (result.success) {
+      setIsTakeover(true)
+    }
+  }
+
+  async function handleReturn() {
+    const result = await deactivateHandoff(sessionId)
+    if (result.success) {
+      setIsTakeover(false)
     }
   }
 
@@ -211,7 +239,7 @@ export function MessageThread({
           >
             {messages.map((message) => {
               const isAssistant = message.role === 'assistant'
-              const msgConfig = getAgentConfig(message.agent)
+              const msgConfig = getAgentConfig(message.agent, userName)
               const MsgIcon = msgConfig.icon
 
               return (
@@ -230,7 +258,7 @@ export function MessageThread({
                         ? 'rounded-tl-xl rounded-tr-sm rounded-bl-xl rounded-br-xl ring-1'
                         : 'rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-xl bg-surface-2'
                     }`}
-                    style={isAssistant ? { backgroundColor: msgConfig.bgBubble, ringColor: msgConfig.ringBubble, '--tw-ring-color': msgConfig.ringBubble } as React.CSSProperties : undefined}
+                    style={isAssistant ? { backgroundColor: msgConfig.bgBubble, '--tw-ring-color': msgConfig.ringBubble } as React.CSSProperties : undefined}
                   >
                     <p
                       className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider"
@@ -283,12 +311,12 @@ export function MessageThread({
               transition={{ duration: 0.15 }}
               className="flex items-center justify-between px-4 py-3 lg:px-6"
             >
-              <div className="flex items-center gap-2 text-sm" style={{ color: headerConfig.color }}>
-                <HeaderIcon className="h-4 w-4" />
-                <span>{headerConfig.label} respondendo</span>
+              <div className="flex items-center gap-2 text-sm" style={{ color: aiConfig.color }}>
+                <AiIcon className="h-4 w-4" />
+                <span>{aiConfig.label} respondendo</span>
               </div>
               <button
-                onClick={() => setIsTakeover(true)}
+                onClick={handleTakeover}
                 className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-accent ring-1 ring-accent/25 transition-all duration-200 hover:bg-accent/[0.08] hover:ring-accent/40"
               >
                 <UserRound className="h-4 w-4" />
@@ -310,11 +338,12 @@ export function MessageThread({
                   Você está respondendo.
                 </div>
                 <button
-                  onClick={() => setIsTakeover(false)}
-                  className="flex items-center gap-1.5 text-xs text-text-subtle transition-colors hover:text-text-muted"
+                  onClick={handleReturn}
+                  className="flex items-center gap-1.5 text-xs transition-colors hover:text-text-muted"
+                  style={{ color: aiConfig.color }}
                 >
-                  <HeaderIcon className="h-3.5 w-3.5" />
-                  Devolver para {headerConfig.label}
+                  <AiIcon className="h-3.5 w-3.5" />
+                  Devolver para {aiConfig.label}
                 </button>
               </div>
 

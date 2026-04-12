@@ -1,4 +1,4 @@
-import { chatService } from '@/lib/services'
+import { chatService, authService } from '@/lib/services'
 import { notFound } from 'next/navigation'
 import { MessageThread } from './_components/message-thread'
 import type { ChatMessage, Pagination } from '@/lib/services/interfaces/chat-service'
@@ -9,8 +9,6 @@ async function fetchMessages(sessionId: string) {
   let notFoundError = false
 
   try {
-    // Single fetch — request page 0 as sentinel to get the last page directly
-    // The API returns pagination.total, so we compute lastPage and fetch once
     const probe = await chatService.getMessages(sessionId, { limit: 50, page: 1 })
     const lastPage =
       Math.ceil(probe.pagination.total / probe.pagination.limit) || 1
@@ -19,7 +17,6 @@ async function fetchMessages(sessionId: string) {
       messages = probe.data
       pagination = probe.pagination
     } else {
-      // Only fetch again if there are multiple pages
       const latest = await chatService.getMessages(sessionId, {
         page: lastPage,
         limit: 50,
@@ -44,15 +41,23 @@ export default async function ChatDetailPage({
   params: Promise<{ sessionId: string }>
 }) {
   const { sessionId } = await params
-  const { messages, pagination, notFoundError } = await fetchMessages(sessionId)
+  const [{ messages, pagination, notFoundError }, sessions, user] = await Promise.all([
+    fetchMessages(sessionId),
+    chatService.listSessions({ limit: 100 }).catch(() => ({ data: [] })),
+    authService.getSession(),
+  ])
 
   if (notFoundError) notFound()
+
+  const session = sessions.data.find((s) => s.sessionId === sessionId)
 
   return (
     <MessageThread
       sessionId={sessionId}
+      userName={user?.name ?? 'Você'}
       initialMessages={messages}
       initialPagination={pagination}
+      initialHandoff={session?.handoff ?? false}
     />
   )
 }

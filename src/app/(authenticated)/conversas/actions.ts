@@ -54,6 +54,28 @@ export async function sendMessageToLead(
   }
 }
 
+export async function activateHandoff(
+  sessionId: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await chatService.activateHandoff(sessionId)
+    return { success: true }
+  } catch {
+    return { success: false, error: 'Erro ao assumir conversa.' }
+  }
+}
+
+export async function deactivateHandoff(
+  sessionId: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await chatService.deactivateHandoff(sessionId)
+    return { success: true }
+  } catch {
+    return { success: false, error: 'Erro ao devolver conversa.' }
+  }
+}
+
 export async function loadMoreMessages(
   sessionId: string,
   page: number,

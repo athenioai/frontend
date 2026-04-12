@@ -3,6 +3,7 @@ export interface ChatSession {
   agent: string
   channel: string | null
   leadName: string | null
+  handoff: boolean
   lastMessage: string
   lastRole: 'lead' | 'assistant'
   messageCount: number

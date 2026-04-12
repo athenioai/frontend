@@ -68,4 +68,22 @@ export class ChatService implements IChatService {
       throw new Error(body.message ?? 'Failed to send message')
     }
   }
+
+  async activateHandoff(sessionId: string): Promise<void> {
+    const res = await authFetch(`/chats/${sessionId}/handoff`, { method: 'POST' })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.message ?? 'Failed to activate handoff')
+    }
+  }
+
+  async deactivateHandoff(sessionId: string): Promise<void> {
+    const res = await authFetch(`/chats/${sessionId}/handoff`, { method: 'DELETE' })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(body.message ?? 'Failed to deactivate handoff')
+    }
+  }
 }
