@@ -20,11 +20,12 @@ import {
   CircleDot,
   Bot,
   ClipboardPaste,
+  CreditCard,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION } from '@/lib/motion'
 import { cn } from '@/lib/utils'
-import { updateCalendarConfig, connectChannel, disconnectChannel } from '../actions'
+import { updateCalendarConfig, connectChannel, disconnectChannel, togglePrepayment } from '../actions'
 import { Dialog } from '@base-ui/react/dialog'
 import type {
   CalendarConfig,
@@ -207,6 +208,12 @@ const SECTIONS = [
     description: 'Apps de conversa',
     icon: MessageCircle,
   },
+  {
+    id: 'pagamentos',
+    label: 'Pagamentos',
+    description: 'Configure formas de pagamento',
+    icon: CreditCard,
+  },
 ]
 
 // ── Calendar constants ──
@@ -254,12 +261,14 @@ interface SettingsHubProps {
   activeTab: string
   calendarConfig: CalendarConfig | null
   channelAccounts: ChannelAccount[]
+  prepaymentEnabled: boolean
 }
 
 export function SettingsHub({
   activeTab,
   calendarConfig,
   channelAccounts,
+  prepaymentEnabled,
 }: SettingsHubProps) {
   const router = useRouter()
 
@@ -365,6 +374,17 @@ export function SettingsHub({
                 <CanaisTab channelAccounts={channelAccounts} />
               </motion.div>
             )}
+            {activeTab === 'pagamentos' && (
+              <motion.div
+                key="pagamentos"
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.2 }}
+              >
+                <PagamentosTab prepaymentEnabled={prepaymentEnabled} />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </motion.div>
@@ -419,6 +439,79 @@ function CanaisTab({ channelAccounts }: { channelAccounts: ChannelAccount[] }) {
           </div>
         </motion.div>
       ))}
+    </div>
+  )
+}
+
+// ── Pagamentos Tab ──
+
+function PagamentosTab({ prepaymentEnabled }: { prepaymentEnabled: boolean }) {
+  const router = useRouter()
+  const [enabled, setEnabled] = useState(prepaymentEnabled)
+  const [isSaving, startSave] = useTransition()
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  function handleToggle() {
+    const next = !enabled
+    setEnabled(next)
+    setSaveError(null)
+    startSave(async () => {
+      const result = await togglePrepayment(next)
+      if (!result.success) {
+        setEnabled(!next)
+        setSaveError(result.error ?? 'Erro ao salvar configuração.')
+      } else {
+        router.refresh()
+      }
+    })
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="font-title text-base font-semibold text-text-primary">
+          Pagamentos
+        </h2>
+        <p className="mt-1 text-sm text-text-muted">
+          Configure formas de pagamento e regras financeiras
+        </p>
+      </div>
+
+      <div className="card-surface p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-text-primary">
+              Exigir pagamento antes do agendamento
+            </p>
+            <p className="mt-1 text-sm text-text-muted">
+              Quando ativado, o lead precisa pagar antes de confirmar o agendamento.
+            </p>
+          </div>
+          <button
+            role="switch"
+            aria-checked={enabled}
+            disabled={isSaving}
+            onClick={handleToggle}
+            className={cn(
+              'relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-50',
+              enabled ? 'bg-accent' : 'bg-surface-2',
+            )}
+          >
+            <span
+              className={cn(
+                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-200',
+                enabled ? 'translate-x-5' : 'translate-x-0',
+              )}
+            />
+          </button>
+        </div>
+
+        {saveError && (
+          <div className="mt-4 rounded-lg bg-danger/8 px-3 py-2.5">
+            <p className="text-sm text-danger">{saveError}</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

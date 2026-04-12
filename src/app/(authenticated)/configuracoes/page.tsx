@@ -1,4 +1,4 @@
-import { calendarConfigService, channelAccountService } from '@/lib/services'
+import { calendarConfigService, channelAccountService, financeService } from '@/lib/services'
 import { SettingsHub } from './_components/settings-hub'
 import type { CalendarConfig } from '@/lib/services/interfaces/calendar-config-service'
 import type { ChannelAccount } from '@/lib/services/interfaces/channel-account-service'
@@ -21,6 +21,15 @@ async function fetchChannelAccounts(): Promise<ChannelAccount[]> {
   }
 }
 
+async function fetchPrepaymentEnabled(): Promise<boolean> {
+  try {
+    const setting = await financeService.getPrepaymentSetting()
+    return setting.enabled
+  } catch {
+    return false
+  }
+}
+
 export default async function ConfiguracoesPage({
   searchParams,
 }: {
@@ -29,9 +38,10 @@ export default async function ConfiguracoesPage({
   const params = await searchParams
   const tab = params.tab || 'agenda'
 
-  const [calendarConfig, channelAccounts] = await Promise.all([
+  const [calendarConfig, channelAccounts, prepaymentEnabled] = await Promise.all([
     fetchCalendarConfig(),
     tab === 'canais' ? fetchChannelAccounts() : Promise.resolve([]),
+    tab === 'pagamentos' ? fetchPrepaymentEnabled() : Promise.resolve(false),
   ])
 
   return (
@@ -40,6 +50,7 @@ export default async function ConfiguracoesPage({
         activeTab={tab}
         calendarConfig={calendarConfig}
         channelAccounts={channelAccounts}
+        prepaymentEnabled={prepaymentEnabled}
       />
     </div>
   )

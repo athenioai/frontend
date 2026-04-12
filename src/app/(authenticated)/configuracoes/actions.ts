@@ -1,6 +1,6 @@
 'use server'
 
-import { calendarConfigService, channelAccountService } from '@/lib/services'
+import { calendarConfigService, channelAccountService, financeService } from '@/lib/services'
 import { revalidatePath } from 'next/cache'
 import type { UpdateCalendarConfigParams } from '@/lib/services/interfaces/calendar-config-service'
 import type { SupportedChannel } from '@/lib/services/interfaces/channel-account-service'
@@ -75,5 +75,21 @@ export async function disconnectChannel(
     return { success: true }
   } catch (error) {
     return { success: false, error: safeError(error, 'Erro ao desconectar canal.') }
+  }
+}
+
+export async function togglePrepayment(
+  enabled: boolean,
+): Promise<{ success: boolean; error?: string }> {
+  if (typeof enabled !== 'boolean') {
+    return { success: false, error: 'Valor inválido.' }
+  }
+
+  try {
+    await financeService.updatePrepaymentSetting(enabled)
+    revalidatePath('/configuracoes')
+    return { success: true }
+  } catch {
+    return { success: false, error: 'Erro ao salvar configuração de pagamento.' }
   }
 }
