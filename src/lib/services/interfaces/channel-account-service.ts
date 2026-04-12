@@ -3,6 +3,7 @@ export type SupportedChannel = 'whatsapp' | 'telegram'
 export interface ChannelAccount {
   channel: SupportedChannel
   channelAccountId: string | null
+  maskedToken: string | null
   status: string
   connectedAt: string
 }

@@ -443,12 +443,10 @@ function ChannelCard({
             </div>
             {isConnected ? (
               <div className="mt-1 flex items-center gap-3 text-sm text-text-muted">
-                {account?.channelAccountId && (
+                {account?.maskedToken && (
                   <span className="inline-flex items-center gap-1 font-mono text-xs text-text-subtle">
                     <KeyRound className="h-3 w-3" />
-                    {account.channelAccountId.length > 8
-                      ? account.channelAccountId.slice(0, 4) + '...' + account.channelAccountId.slice(-4)
-                      : account.channelAccountId}
+                    {account.maskedToken}
                   </span>
                 )}
                 {account?.connectedAt && (
