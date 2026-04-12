@@ -265,18 +265,16 @@ interface SettingsHubProps {
 }
 
 export function SettingsHub({
-  activeTab,
+  activeTab: initialTab,
   calendarConfig,
   channelAccounts,
   prepaymentEnabled,
 }: SettingsHubProps) {
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState(initialTab)
 
   function changeTab(id: string) {
-    const params = new URLSearchParams()
-    if (id !== 'agenda') params.set('tab', id)
-    const qs = params.toString()
-    router.push(`/configuracoes${qs ? `?${qs}` : ''}`)
+    setActiveTab(id)
   }
 
   return (
