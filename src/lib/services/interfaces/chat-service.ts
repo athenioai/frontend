@@ -1,6 +1,8 @@
 export interface ChatSession {
   sessionId: string
   agent: string
+  channel: string | null
+  leadName: string | null
   lastMessage: string
   lastRole: 'lead' | 'assistant'
   messageCount: number

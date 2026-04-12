@@ -7,9 +7,12 @@ import {
   Bot,
   Calendar,
   ChevronUp,
+  Clock,
+  Flame,
   SendHorizontal,
   UserRound,
   UserCheck,
+  Zap,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION, fadeInUp, staggerContainer } from '@/lib/motion'
@@ -18,13 +21,15 @@ import { loadMoreMessages, sendMessageToLead } from '../../actions'
 import type { ChatMessage, Pagination } from '@/lib/services/interfaces/chat-service'
 import Link from 'next/link'
 
-function getAgentBadgeStyle(agent: string) {
-  switch (agent) {
-    case 'horos':
-      return 'bg-accent/10 text-accent'
-    default:
-      return 'bg-violet/10 text-violet'
-  }
+const AGENT_CONFIG: Record<string, { color: string; bgLight: string; bgBubble: string; ringBubble: string; label: string; icon: typeof Bot }> = {
+  ares:   { color: '#D4820A', bgLight: 'rgba(212,130,10,0.10)', bgBubble: 'rgba(212,130,10,0.08)', ringBubble: 'rgba(212,130,10,0.06)', label: 'Ares',   icon: Flame },
+  kairos: { color: '#C8784A', bgLight: 'rgba(200,120,74,0.10)', bgBubble: 'rgba(200,120,74,0.08)', ringBubble: 'rgba(200,120,74,0.06)', label: 'Kairos', icon: Zap },
+  horos:  { color: '#4FD1C5', bgLight: 'rgba(79,209,197,0.10)', bgBubble: 'rgba(79,209,197,0.08)', ringBubble: 'rgba(79,209,197,0.06)', label: 'Horos',  icon: Clock },
+  human:  { color: '#D4820A', bgLight: 'rgba(212,130,10,0.10)', bgBubble: 'rgba(212,130,10,0.08)', ringBubble: 'rgba(212,130,10,0.06)', label: 'Humano', icon: UserRound },
+}
+
+function getAgentConfig(agent: string) {
+  return AGENT_CONFIG[agent] ?? { color: '#888', bgLight: 'rgba(136,136,136,0.10)', bgBubble: 'rgba(136,136,136,0.08)', ringBubble: 'rgba(136,136,136,0.06)', label: agent.charAt(0).toUpperCase() + agent.slice(1), icon: Bot }
 }
 
 interface MessageThreadProps {
@@ -49,8 +54,10 @@ export function MessageThread({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const hasMore = currentPage > 1
-  const agent = messages[0]?.agent ?? 'ai'
-  const agentLabel = agent.charAt(0).toUpperCase() + agent.slice(1)
+  const lastAgentMsg = [...messages].reverse().find((m) => m.role === 'assistant')
+  const headerAgent = lastAgentMsg?.agent ?? messages[0]?.agent ?? 'ai'
+  const headerConfig = getAgentConfig(headerAgent)
+  const HeaderIcon = headerConfig.icon
   const startDate = messages.length > 0 ? formatDate(messages[0].createdAt) : ''
 
   // Scroll to bottom on initial load
@@ -153,10 +160,11 @@ export function MessageThread({
         </Link>
 
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${getAgentBadgeStyle(agent)}`}
+          className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide"
+          style={{ backgroundColor: headerConfig.bgLight, color: headerConfig.color }}
         >
-          <Bot className="h-3 w-3" />
-          {agentLabel}
+          <HeaderIcon className="h-3 w-3" />
+          {headerConfig.label}
         </span>
 
         {startDate && (
@@ -203,6 +211,8 @@ export function MessageThread({
           >
             {messages.map((message) => {
               const isAssistant = message.role === 'assistant'
+              const msgConfig = getAgentConfig(message.agent)
+              const MsgIcon = msgConfig.icon
 
               return (
                 <motion.div
@@ -217,16 +227,19 @@ export function MessageThread({
                   <div
                     className={`max-w-[75%] px-4 py-3 ${
                       isAssistant
-                        ? 'rounded-tl-xl rounded-tr-sm rounded-bl-xl rounded-br-xl bg-accent/[0.08] ring-1 ring-accent/[0.06]'
+                        ? 'rounded-tl-xl rounded-tr-sm rounded-bl-xl rounded-br-xl ring-1'
                         : 'rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-xl bg-surface-2'
                     }`}
+                    style={isAssistant ? { backgroundColor: msgConfig.bgBubble, ringColor: msgConfig.ringBubble, '--tw-ring-color': msgConfig.ringBubble } as React.CSSProperties : undefined}
                   >
                     <p
-                      className={`mb-1 text-[10px] font-semibold uppercase tracking-wider ${
-                        isAssistant ? 'text-accent/50' : 'text-text-subtle'
-                      }`}
+                      className="mb-1 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider"
+                      style={isAssistant ? { color: `${msgConfig.color}80` } : undefined}
                     >
-                      {isAssistant ? agentLabel : 'Cliente'}
+                      {isAssistant && <MsgIcon className="h-2.5 w-2.5" />}
+                      <span className={!isAssistant ? 'text-text-subtle' : ''}>
+                        {isAssistant ? msgConfig.label : 'Cliente'}
+                      </span>
                     </p>
 
                     <p className="whitespace-pre-wrap text-sm leading-relaxed text-text-primary">
@@ -243,11 +256,12 @@ export function MessageThread({
                     )}
 
                     <p
-                      className={`mt-1.5 text-[10px] ${
-                        isAssistant ? 'text-accent/35' : 'text-text-subtle/70'
-                      }`}
+                      className="mt-1.5 text-[10px]"
+                      style={isAssistant ? { color: `${msgConfig.color}59` } : undefined}
                     >
-                      {formatTime(message.createdAt)}
+                      <span className={!isAssistant ? 'text-text-subtle/70' : ''}>
+                        {formatTime(message.createdAt)}
+                      </span>
                     </p>
                   </div>
                 </motion.div>
@@ -269,9 +283,9 @@ export function MessageThread({
               transition={{ duration: 0.15 }}
               className="flex items-center justify-between px-4 py-3 lg:px-6"
             >
-              <div className="flex items-center gap-2 text-sm text-text-subtle">
-                <Bot className="h-4 w-4" />
-                <span>IA respondendo</span>
+              <div className="flex items-center gap-2 text-sm" style={{ color: headerConfig.color }}>
+                <HeaderIcon className="h-4 w-4" />
+                <span>{headerConfig.label} respondendo</span>
               </div>
               <button
                 onClick={() => setIsTakeover(true)}
@@ -299,8 +313,8 @@ export function MessageThread({
                   onClick={() => setIsTakeover(false)}
                   className="flex items-center gap-1.5 text-xs text-text-subtle transition-colors hover:text-text-muted"
                 >
-                  <Bot className="h-3.5 w-3.5" />
-                  Devolver para IA
+                  <HeaderIcon className="h-3.5 w-3.5" />
+                  Devolver para {headerConfig.label}
                 </button>
               </div>
 
