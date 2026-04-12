@@ -89,6 +89,14 @@ export interface FinanceDashboard {
   overdueAmount: number
   averageTicket: number
   byType: { service: number; product: number; manual: number }
+  conversationsThisMonth: number
+  appointmentsThisMonth: number
+  appointmentsCancelledThisMonth: number
+  leadsThisMonth: number
+  conversionRate: number
+  dailyRevenue: { date: string; amount: number }[]
+  planCost: number
+  roi: number | null
 }
 
 export interface AdminBillingDashboard {

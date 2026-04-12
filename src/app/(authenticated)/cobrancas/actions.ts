@@ -20,7 +20,7 @@ export async function markInvoicePaid(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await financeService.markInvoicePaid(id)
-    revalidatePath('/financeiro/cobrancas')
+    revalidatePath('/cobrancas')
     return { success: true }
   } catch (error) {
     return { success: false, error: safeError(error, 'Erro ao marcar como pago.') }
@@ -32,7 +32,7 @@ export async function cancelInvoice(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await financeService.cancelInvoice(id)
-    revalidatePath('/financeiro/cobrancas')
+    revalidatePath('/cobrancas')
     return { success: true }
   } catch (error) {
     return { success: false, error: safeError(error, 'Erro ao cancelar cobrança.') }

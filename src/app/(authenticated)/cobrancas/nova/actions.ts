@@ -43,5 +43,5 @@ export async function createInvoice(
     return { success: false, error: safeError(error, 'Erro ao criar cobrança.') }
   }
 
-  redirect('/financeiro/cobrancas')
+  redirect('/cobrancas')
 }

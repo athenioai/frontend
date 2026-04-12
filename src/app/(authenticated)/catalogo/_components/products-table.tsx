@@ -11,14 +11,14 @@ import {
   Trash2,
   X,
   AlertTriangle,
-  Wrench,
+  Package,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { MOTION } from '@/lib/motion'
-import { createService, updateService, deleteService } from '../actions'
-import type { Service, Pagination } from '@/lib/services/interfaces/finance-service'
+import { createProduct, updateProduct, deleteProduct } from '../actions'
+import type { Product, Pagination } from '@/lib/services/interfaces/finance-service'
 
 function formatCurrency(value: number): string {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -28,23 +28,23 @@ function formatPercent(value: number): string {
   return `${value.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}%`
 }
 
-interface ServicesTableProps {
-  services: Service[]
+interface ProductsTableProps {
+  products: Product[]
   pagination: Pagination
   currentSearch?: string
 }
 
-export function ServicesTable({
-  services,
+export function ProductsTable({
+  products,
   pagination,
   currentSearch,
-}: ServicesTableProps) {
+}: ProductsTableProps) {
   const router = useRouter()
   const [searchValue, setSearchValue] = useState(currentSearch ?? '')
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false)
-  const [editingService, setEditingService] = useState<Service | null>(null)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [formName, setFormName] = useState('')
   const [formDescription, setFormDescription] = useState('')
   const [formPrice, setFormPrice] = useState('')
@@ -55,7 +55,7 @@ export function ServicesTable({
   const [isSaving, startSave] = useTransition()
 
   // Delete state
-  const [deleteTarget, setDeleteTarget] = useState<Service | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Product | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [isDeleting, startDelete] = useTransition()
 
@@ -70,7 +70,7 @@ export function ServicesTable({
       if (v) params.set(k, v)
     })
     const qs = params.toString()
-    return `/financeiro/servicos${qs ? `?${qs}` : ''}`
+    return `/catalogo${qs ? `?${qs}` : ''}`
   }
 
   function handleSearch(e: React.FormEvent) {
@@ -85,7 +85,7 @@ export function ServicesTable({
   // ── Modal ──
 
   function openCreate() {
-    setEditingService(null)
+    setEditingProduct(null)
     setFormName('')
     setFormDescription('')
     setFormPrice('')
@@ -96,14 +96,14 @@ export function ServicesTable({
     setModalOpen(true)
   }
 
-  function openEdit(service: Service) {
-    setEditingService(service)
-    setFormName(service.name)
-    setFormDescription(service.description ?? '')
-    setFormPrice(String(service.price))
-    setFormPixDiscount(String(service.pixDiscountPercent))
-    setFormCardDiscount(String(service.cardDiscountPercent))
-    setFormActive(service.active)
+  function openEdit(product: Product) {
+    setEditingProduct(product)
+    setFormName(product.name)
+    setFormDescription(product.description ?? '')
+    setFormPrice(String(product.price))
+    setFormPixDiscount(String(product.pixDiscountPercent))
+    setFormCardDiscount(String(product.cardDiscountPercent))
+    setFormActive(product.active)
     setFormError(null)
     setModalOpen(true)
   }
@@ -134,8 +134,8 @@ export function ServicesTable({
     setFormError(null)
 
     startSave(async () => {
-      const result = editingService
-        ? await updateService(editingService.id, {
+      const result = editingProduct
+        ? await updateProduct(editingProduct.id, {
             name,
             description: formDescription.trim() || undefined,
             price: Math.round(price * 100) / 100,
@@ -143,7 +143,7 @@ export function ServicesTable({
             cardDiscountPercent: Math.round(cardDiscount * 100) / 100,
             active: formActive,
           })
-        : await createService({
+        : await createProduct({
             name,
             description: formDescription.trim() || undefined,
             price: Math.round(price * 100) / 100,
@@ -166,7 +166,7 @@ export function ServicesTable({
     if (!deleteTarget) return
     setDeleteError(null)
     startDelete(async () => {
-      const result = await deleteService(deleteTarget.id)
+      const result = await deleteProduct(deleteTarget.id)
       if (result.success) {
         setDeleteTarget(null)
         router.refresh()
@@ -187,10 +187,10 @@ export function ServicesTable({
       >
         <div>
           <h1 className="font-title text-2xl font-bold text-text-primary">
-            Serviços
+            Produtos
           </h1>
           <p className="mt-1 text-sm text-text-muted">
-            Gerencie o catálogo de serviços
+            Gerencie o catálogo de produtos
           </p>
         </div>
         <Button
@@ -198,7 +198,7 @@ export function ServicesTable({
           className="h-9 gap-1.5 rounded-xl bg-accent px-4 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_rgba(212,130,10,0.12)] transition-all hover:brightness-110"
         >
           <Plus className="h-4 w-4" />
-          Novo Serviço
+          Novo Produto
         </Button>
       </motion.div>
 
@@ -223,7 +223,7 @@ export function ServicesTable({
       </motion.form>
 
       {/* Table */}
-      {services.length === 0 ? (
+      {products.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -231,15 +231,15 @@ export function ServicesTable({
           className="flex flex-col items-center justify-center py-24"
         >
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-2">
-            <Wrench className="h-8 w-8 text-text-subtle/50" />
+            <Package className="h-8 w-8 text-text-subtle/50" />
           </div>
           <p className="mt-4 font-title text-lg font-semibold text-text-muted">
-            Nenhum serviço encontrado
+            Nenhum produto encontrado
           </p>
           <p className="mt-1 text-sm text-text-subtle">
             {currentSearch
               ? 'Tente uma busca diferente'
-              : 'Crie seu primeiro serviço clicando em "Novo Serviço"'}
+              : 'Crie seu primeiro produto clicando em "Novo Produto"'}
           </p>
         </motion.div>
       ) : (
@@ -273,32 +273,32 @@ export function ServicesTable({
               </tr>
             </thead>
             <tbody>
-              {services.map((service) => (
+              {products.map((product) => (
                 <tr
-                  key={service.id}
+                  key={product.id}
                   className="border-b border-border-default/50 transition-colors last:border-b-0 hover:bg-[rgba(255,255,255,0.02)]"
                 >
                   <td className="px-4 py-3.5 text-sm font-medium text-text-primary">
-                    {service.name}
+                    {product.name}
                   </td>
                   <td className="px-4 py-3.5 text-sm tabular-nums text-text-muted">
-                    {formatCurrency(service.price)}
+                    {formatCurrency(product.price)}
                   </td>
                   <td className="hidden px-4 py-3.5 text-sm tabular-nums text-text-muted md:table-cell">
-                    {formatPercent(service.pixDiscountPercent)}
+                    {formatPercent(product.pixDiscountPercent)}
                   </td>
                   <td className="hidden px-4 py-3.5 text-sm tabular-nums text-text-muted lg:table-cell">
-                    {formatPercent(service.cardDiscountPercent)}
+                    {formatPercent(product.cardDiscountPercent)}
                   </td>
                   <td className="hidden px-4 py-3.5 sm:table-cell">
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                        service.active
+                        product.active
                           ? 'bg-emerald/10 text-emerald'
                           : 'bg-surface-2 text-text-subtle'
                       }`}
                     >
-                      {service.active ? 'Ativo' : 'Inativo'}
+                      {product.active ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>
                   <td className="px-4 py-3.5 text-right">
@@ -306,7 +306,7 @@ export function ServicesTable({
                       <Button
                         variant="ghost"
                         size="icon-xs"
-                        onClick={() => openEdit(service)}
+                        onClick={() => openEdit(product)}
                         className="text-text-subtle hover:text-text-primary"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -314,7 +314,7 @@ export function ServicesTable({
                       <Button
                         variant="ghost"
                         size="icon-xs"
-                        onClick={() => setDeleteTarget(service)}
+                        onClick={() => setDeleteTarget(product)}
                         className="text-text-subtle hover:bg-danger/10 hover:text-danger"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -368,7 +368,7 @@ export function ServicesTable({
             <div className="card-glass w-full max-w-sm p-6">
               <div className="flex items-start justify-between">
                 <Dialog.Title className="font-title text-lg font-semibold text-text-primary">
-                  {editingService ? 'Editar Serviço' : 'Novo Serviço'}
+                  {editingProduct ? 'Editar Produto' : 'Novo Produto'}
                 </Dialog.Title>
                 <Dialog.Close
                   disabled={isSaving}
@@ -387,7 +387,7 @@ export function ServicesTable({
                     type="text"
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    placeholder="Ex: Consulta Inicial"
+                    placeholder="Ex: Produto Premium"
                     maxLength={255}
                     className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
                   />
@@ -401,7 +401,7 @@ export function ServicesTable({
                     type="text"
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
-                    placeholder="Descrição do serviço"
+                    placeholder="Descrição do produto"
                     maxLength={500}
                     className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
                   />
@@ -456,7 +456,7 @@ export function ServicesTable({
                   </div>
                 </div>
 
-                {editingService && (
+                {editingProduct && (
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
@@ -530,10 +530,10 @@ export function ServicesTable({
                 </div>
                 <div>
                   <Dialog.Title className="font-title text-base font-semibold text-text-primary">
-                    Deletar serviço
+                    Deletar produto
                   </Dialog.Title>
                   <Dialog.Description className="mt-1 text-sm text-text-muted">
-                    Tem certeza que deseja deletar o serviço{' '}
+                    Tem certeza que deseja deletar o produto{' '}
                     <strong className="text-text-primary">
                       {deleteTarget?.name}
                     </strong>

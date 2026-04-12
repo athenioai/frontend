@@ -125,7 +125,7 @@ export function InvoicesTable({
       if (v) params.set(k, v)
     })
     const qs = params.toString()
-    return `/financeiro/cobrancas${qs ? `?${qs}` : ''}`
+    return `/cobrancas${qs ? `?${qs}` : ''}`
   }
 
   function handleStatusChange(value: string) {
@@ -189,7 +189,7 @@ export function InvoicesTable({
             Gerencie as cobranças dos seus clientes
           </p>
         </div>
-        <Link href="/financeiro/cobrancas/nova">
+        <Link href="/cobrancas/nova">
           <Button className="h-9 gap-1.5 rounded-xl bg-accent px-4 text-sm font-semibold text-primary-foreground shadow-[0_0_16px_rgba(212,130,10,0.12)] transition-all hover:brightness-110">
             <Plus className="h-4 w-4" />
             Nova Cobrança
