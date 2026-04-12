@@ -50,6 +50,10 @@ export function ServicesTable({
   const [formPrice, setFormPrice] = useState('')
   const [formPixDiscount, setFormPixDiscount] = useState('')
   const [formCardDiscount, setFormCardDiscount] = useState('')
+  const [formSpecialName, setFormSpecialName] = useState('')
+  const [formSpecialPercent, setFormSpecialPercent] = useState('0')
+  const [formSpecialStartsAt, setFormSpecialStartsAt] = useState('')
+  const [formSpecialEndsAt, setFormSpecialEndsAt] = useState('')
   const [formActive, setFormActive] = useState(true)
   const [formError, setFormError] = useState<string | null>(null)
   const [isSaving, startSave] = useTransition()
@@ -91,6 +95,10 @@ export function ServicesTable({
     setFormPrice('')
     setFormPixDiscount('0')
     setFormCardDiscount('0')
+    setFormSpecialName('')
+    setFormSpecialPercent('0')
+    setFormSpecialStartsAt('')
+    setFormSpecialEndsAt('')
     setFormActive(true)
     setFormError(null)
     setModalOpen(true)
@@ -103,6 +111,10 @@ export function ServicesTable({
     setFormPrice(String(service.price))
     setFormPixDiscount(String(service.pixDiscountPercent))
     setFormCardDiscount(String(service.cardDiscountPercent))
+    setFormSpecialName(service.specialDiscountName ?? '')
+    setFormSpecialPercent(String(service.specialDiscountPercent ?? 0))
+    setFormSpecialStartsAt(service.specialDiscountStartsAt ? service.specialDiscountStartsAt.slice(0, 10) : '')
+    setFormSpecialEndsAt(service.specialDiscountEndsAt ? service.specialDiscountEndsAt.slice(0, 10) : '')
     setFormActive(service.active)
     setFormError(null)
     setModalOpen(true)
@@ -130,6 +142,15 @@ export function ServicesTable({
       setFormError('Desconto Cartão deve estar entre 0 e 100.')
       return
     }
+    const specialPercent = parseFloat(formSpecialPercent) || 0
+    if (specialPercent < 0 || specialPercent > 100) {
+      setFormError('Desconto especial deve estar entre 0 e 100.')
+      return
+    }
+    if (formSpecialStartsAt && formSpecialEndsAt && formSpecialStartsAt > formSpecialEndsAt) {
+      setFormError('Data de início deve ser anterior à data de fim.')
+      return
+    }
 
     setFormError(null)
 
@@ -141,6 +162,10 @@ export function ServicesTable({
             price: Math.round(price * 100) / 100,
             pixDiscountPercent: Math.round(pixDiscount * 100) / 100,
             cardDiscountPercent: Math.round(cardDiscount * 100) / 100,
+            specialDiscountName: formSpecialName.trim() || null,
+            specialDiscountPercent: Math.round(specialPercent * 100) / 100,
+            specialDiscountStartsAt: formSpecialStartsAt ? `${formSpecialStartsAt}T00:00:00Z` : null,
+            specialDiscountEndsAt: formSpecialEndsAt ? `${formSpecialEndsAt}T23:59:59Z` : null,
             active: formActive,
           })
         : await createService({
@@ -149,6 +174,10 @@ export function ServicesTable({
             price: Math.round(price * 100) / 100,
             pixDiscountPercent: Math.round(pixDiscount * 100) / 100,
             cardDiscountPercent: Math.round(cardDiscount * 100) / 100,
+            specialDiscountName: formSpecialName.trim() || null,
+            specialDiscountPercent: Math.round(specialPercent * 100) / 100,
+            specialDiscountStartsAt: formSpecialStartsAt ? `${formSpecialStartsAt}T00:00:00Z` : null,
+            specialDiscountEndsAt: formSpecialEndsAt ? `${formSpecialEndsAt}T23:59:59Z` : null,
           })
 
       if (result.success) {
@@ -280,6 +309,20 @@ export function ServicesTable({
                 >
                   <td className="px-4 py-3.5 text-sm font-medium text-text-primary">
                     {service.name}
+                    {(() => {
+                      const now = new Date()
+                      const active =
+                        service.specialDiscountPercent > 0 &&
+                        service.specialDiscountStartsAt &&
+                        service.specialDiscountEndsAt &&
+                        now >= new Date(service.specialDiscountStartsAt) &&
+                        now <= new Date(service.specialDiscountEndsAt)
+                      return active ? (
+                        <span className="ml-2 inline-flex items-center rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
+                          {service.specialDiscountPercent}% OFF
+                        </span>
+                      ) : null
+                    })()}
                   </td>
                   <td className="px-4 py-3.5 text-sm tabular-nums text-text-muted">
                     {formatCurrency(service.price)}
@@ -453,6 +496,55 @@ export function ServicesTable({
                       placeholder="0"
                       className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm tabular-nums text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
                     />
+                  </div>
+                </div>
+
+                {/* Desconto Especial */}
+                <div className="space-y-3 rounded-xl border border-border-default/60 bg-surface-2/40 p-3">
+                  <p className="text-xs font-semibold text-text-muted">Desconto Especial</p>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-text-subtle">Nome (ex: Queima de estoque)</label>
+                    <input
+                      type="text"
+                      value={formSpecialName}
+                      onChange={(e) => setFormSpecialName(e.target.value)}
+                      placeholder="Nome da promoção"
+                      maxLength={255}
+                      className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-text-subtle">Desconto (%)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      value={formSpecialPercent}
+                      onChange={(e) => setFormSpecialPercent(e.target.value)}
+                      placeholder="0"
+                      className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm tabular-nums text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-text-subtle">Início</label>
+                      <input
+                        type="date"
+                        value={formSpecialStartsAt}
+                        onChange={(e) => setFormSpecialStartsAt(e.target.value)}
+                        className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm text-text-primary outline-none transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-text-subtle">Fim</label>
+                      <input
+                        type="date"
+                        value={formSpecialEndsAt}
+                        onChange={(e) => setFormSpecialEndsAt(e.target.value)}
+                        className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm text-text-primary outline-none transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
+                      />
+                    </div>
                   </div>
                 </div>
 
