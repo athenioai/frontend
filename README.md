@@ -15,6 +15,7 @@ Dashboard do [Athenio.ai](https://athenio.ai) para acompanhar agentes de IA aut�
 | Animações | Motion (Framer Motion) | 12.x |
 | Gráficos | Recharts | 3.8.1 |
 | Auth | Custom JWT (httpOnly cookies) | — |
+| Validação | Zod | 4.x |
 | Ícones | Lucide React | — |
 | Testes | Vitest | 4.x |
 
@@ -80,7 +81,7 @@ src/
 │   └── providers.tsx                   # Provider wrapper
 │
 ├── lib/
-│   ├── services/                       # 8 services (class-based, authFetch + cookies)
+│   ├── services/                       # 12 services (class-based, authFetch + cookies)
 │   │   ├── interfaces/                 # Contratos TypeScript
 │   │   └── __tests__/                  # Testes unitários
 │   ├── format.ts                       # Formatação (data, hora, CNPJ, moeda)
@@ -121,8 +122,12 @@ src/
 
 1. Login via email/password → backend retorna JWT tokens
 2. Tokens armazenados em cookies httpOnly (access_token + refresh_token)
-3. Middleware intercepta requests: se access_token expirou, tenta refresh via `/auth/refresh` e seta novos cookies
-4. Falha no refresh → limpa cookies e redireciona para `/login`
+3. **Middleware** intercepta requests:
+   - Parseia JWT para detectar expiração (com buffer de 30s)
+   - Token expirado + refresh_token → refresh no middleware e seta novos cookies
+   - Sem access_token + refresh_token → tenta refresh
+   - Falha no refresh → limpa cookies e redireciona para `/login`
+4. **authFetch / getSession**: Em caso de 401 (token revogado), `tryRefresh()` faz refresh in-memory. `cookies().set()` é tentado, mas em contexto de Server Component o set é silenciado (Next.js 16 só permite set em Server Actions, Route Handlers e Middleware). O token in-memory funciona para o request atual; no próximo navigation o middleware resolve.
 5. AuthUser possui campo `role` (`admin` | `user`)
 6. Rotas `/admin/*` protegidas por layout guard (`user.role !== 'admin'` → 404)
 
@@ -147,7 +152,10 @@ Server Action    → Service Class → authFetch (cookie) → Backend API
 | AdminUserService | `/admin/users/*` | list, getById, create (multipart) |
 | AdminDashboardService | `/admin/dashboard` | get |
 | AdminUserDataService | `/admin/users/:id/*` | getDashboard, getChats, getChatMessages, getAppointments, getCalendarConfig, updateCalendarConfig |
+| LeadService | `/leads/*` | listLeads, createLead, updateLead, deleteLead, getBoard, getTimeline |
 | FinanceService | `/services`, `/products`, `/invoices`, `/financial-settings`, `/admin/subscriptions`, `/admin/invoices` | CRUD catálogo, cobranças, assinaturas, dashboard financeiro |
+| WhatsAppService | `/whatsapp/*` | sendMessage, listTemplates, getMessageStatus |
+| ChannelAccountService | `/channel-accounts/*` | list, create, update, delete |
 
 ---
 
@@ -159,8 +167,18 @@ Server Action    → Service Class → authFetch (cookie) → Backend API
 - **Error Handling**: Mensagens genéricas para o cliente (sem leakage de erros do backend)
 - **File Upload**: Validação de MIME type + magic bytes (`%PDF-`) para uploads de contrato
 - **CSRF**: Proteção nativa do Next.js via server actions
+- **Validação de Input**: Zod schemas nos módulos financeiros (cobranças, catálogo) — UUID, ranges, whitelists
+- **Token Refresh Seguro**: JWT expiry detection no middleware + try/catch em `cookies().set()` para Server Components
 
-Relatório completo: `docs/security/audit-2026-04-06.md`
+Relatórios de segurança em `docs/security/`:
+
+| Relatório | Escopo |
+|-----------|--------|
+| `audit-2026-04-06.md` | Auditoria geral do frontend |
+| `audit-whatsapp-module-2026-04-07.md` | Módulo WhatsApp |
+| `audit-frontend-performance-2026-04-09.md` | Performance |
+| `audit-crm-module-2026-04-10.md` | Módulo CRM |
+| `audit-financial-modules-2026-04-12.md` | Módulos financeiros (9 findings, todos remediados) |
 
 ---
 
@@ -175,6 +193,9 @@ Especificações formais (SVVA) em `docs/specs/`:
 | `SPEC-admin-dashboard.yaml` | Admin Dashboard |
 | `SPEC-admin-user-context.yaml` | Admin User Context View |
 | `SPEC-design-tokens-v2.yaml` | Design System v2 (paleta + tipografia) |
+| `SPEC-frontend-performance.yaml` | Performance optimizations |
+| `SPEC-crm-module.yaml` | CRM Kanban + Lead Timeline |
+| `SPEC-whatsapp-module.yaml` | WhatsApp Business API |
 
 ---
 

@@ -2,37 +2,42 @@ import { cookies } from 'next/headers'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
+const COOKIE_OPTS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+}
+
 async function tryRefresh(): Promise<string | null> {
   const cookieStore = await cookies()
   const refreshToken = cookieStore.get('refresh_token')?.value
   if (!refreshToken) return null
 
-  const res = await fetch(`${API_URL}/auth/refresh`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken }),
-  })
+  try {
+    const res = await fetch(`${API_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    })
 
-  if (!res.ok) return null
+    if (!res.ok) return null
 
-  const data: { accessToken: string; refreshToken: string } = await res.json()
+    const data: { accessToken: string; refreshToken: string } = await res.json()
 
-  cookieStore.set('access_token', data.accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60,
-  })
-  cookieStore.set('refresh_token', data.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-  })
+    // cookies().set() only works in Server Actions, Route Handlers, and Middleware.
+    // In Server Component context this throws — the in-memory token still works for the current request.
+    try {
+      cookieStore.set('access_token', data.accessToken, { ...COOKIE_OPTS, maxAge: 60 * 60 })
+      cookieStore.set('refresh_token', data.refreshToken, { ...COOKIE_OPTS, maxAge: 60 * 60 * 24 * 7 })
+    } catch {
+      // Server Component context — cookie will be refreshed by middleware on next navigation
+    }
 
-  return data.accessToken
+    return data.accessToken
+  } catch {
+    return null
+  }
 }
 
 export async function authFetch(path: string, init?: RequestInit): Promise<Response> {

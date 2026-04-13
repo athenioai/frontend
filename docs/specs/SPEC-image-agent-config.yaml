@@ -1,0 +1,863 @@
+# ============================================================
+# SPEC DOCUMENT — SVVA Framework
+# ============================================================
+
+meta:
+  feature: "Image Upload, Agent Instructions & Agent Config"
+  owner: "A ser definido pelo dev"
+  date: "2026-04-12"
+  priority: "high"
+  estimated_complexity: "large"
+  affects_modules:
+    - "src/lib/services/interfaces/finance-service.ts"
+    - "src/lib/services/finance-service.ts"
+    - "src/app/(authenticated)/catalogo/_components/services-table.tsx"
+    - "src/app/(authenticated)/catalogo/_components/products-table.tsx"
+    - "src/app/(authenticated)/catalogo/actions.ts"
+    - "src/app/(authenticated)/configuracoes/_components/settings-hub.tsx"
+    - "src/app/(authenticated)/configuracoes/page.tsx"
+    - "src/app/(authenticated)/configuracoes/actions.ts"
+    - "src/lib/services/auth-fetch.ts"
+    - "src/lib/services/index.ts"
+    - "next.config.ts"
+
+# ============================================================
+# 1. OBJETIVO
+# ============================================================
+objective:
+  summary: >
+    Adicionar upload de imagem e campo de instruções para o agente IA nos
+    formulários de Serviço/Produto, exibir thumbnail na listagem, e criar
+    nova tela de Configuração do Agente dentro da página de Configurações.
+  problem: >
+    Atualmente serviços e produtos não possuem imagem nem instruções para o
+    agente IA. Além disso, não existe tela para configurar parâmetros globais
+    do agente (nome, tom de voz, instruções gerais). Isso limita a experiência
+    visual do catálogo e a personalização do assistente IA.
+  success_criteria: >
+    1) Formulários de criar/editar serviço e produto permitem upload de imagem
+       e preenchimento de instruções para o agente;
+    2) Listagem exibe thumbnail da imagem quando disponível;
+    3) Tela de configuração do agente funcional com GET/PUT via authFetch;
+    4) Envio via FormData (multipart/form-data) funciona corretamente;
+    5) Todos os critérios de aceite passam.
+
+# ============================================================
+# 2. CONTRATO TÉCNICO
+# ============================================================
+contract:
+
+  # ──────────────────────────────────────────────
+  # 2A. MUDANÇAS EM INTERFACES EXISTENTES
+  # ──────────────────────────────────────────────
+
+  types:
+    # --- Extensão da interface Service ---
+    - name: "Service (campos adicionais)"
+      file: "src/lib/services/interfaces/finance-service.ts"
+      action: "ADD_FIELDS"
+      new_fields: |
+        imageUrl: string | null
+        agentInstructions: string | null
+
+    # --- Extensão da interface Product ---
+    - name: "Product (campos adicionais)"
+      file: "src/lib/services/interfaces/finance-service.ts"
+      action: "ADD_FIELDS"
+      new_fields: |
+        imageUrl: string | null
+        agentInstructions: string | null
+
+    # --- CreateServiceParams: adicionar agentInstructions ---
+    # NOTA: image NÃO vai nos Params tipados — vai direto no FormData
+    - name: "CreateServiceParams (campos adicionais)"
+      file: "src/lib/services/interfaces/finance-service.ts"
+      action: "ADD_FIELDS"
+      new_fields: |
+        agentInstructions?: string
+
+    # --- UpdateServiceParams: adicionar agentInstructions ---
+    - name: "UpdateServiceParams (campos adicionais)"
+      file: "src/lib/services/interfaces/finance-service.ts"
+      action: "ADD_FIELDS"
+      new_fields: |
+        agentInstructions?: string | null
+
+    # --- CreateProductParams: adicionar agentInstructions ---
+    - name: "CreateProductParams (campos adicionais)"
+      file: "src/lib/services/interfaces/finance-service.ts"
+      action: "ADD_FIELDS"
+      new_fields: |
+        agentInstructions?: string
+
+    # --- UpdateProductParams: adicionar agentInstructions ---
+    - name: "UpdateProductParams (campos adicionais)"
+      file: "src/lib/services/interfaces/finance-service.ts"
+      action: "ADD_FIELDS"
+      new_fields: |
+        agentInstructions?: string | null
+
+    # --- Nova interface: AgentConfig ---
+    - name: "AgentConfig"
+      file: "src/lib/services/interfaces/agent-config-service.ts"
+      action: "CREATE"
+      definition: |
+        export interface AgentConfig {
+          name: string
+          voiceTone: 'friendly' | 'formal' | 'casual'
+          generalInstructions: string | null
+          updatedAt: string
+        }
+
+    # --- Nova interface: UpdateAgentConfigParams ---
+    - name: "UpdateAgentConfigParams"
+      file: "src/lib/services/interfaces/agent-config-service.ts"
+      action: "CREATE"
+      definition: |
+        export interface UpdateAgentConfigParams {
+          name?: string
+          voiceTone?: 'friendly' | 'formal' | 'casual'
+          generalInstructions?: string | null
+        }
+
+    # --- Nova interface: IAgentConfigService ---
+    - name: "IAgentConfigService"
+      file: "src/lib/services/interfaces/agent-config-service.ts"
+      action: "CREATE"
+      definition: |
+        export interface IAgentConfigService {
+          get(): Promise<AgentConfig>
+          update(params: UpdateAgentConfigParams): Promise<AgentConfig>
+        }
+
+  # ──────────────────────────────────────────────
+  # 2B. NOVO SERVICE: AgentConfigService
+  # ──────────────────────────────────────────────
+
+  functions:
+    - name: "AgentConfigService.get"
+      file: "src/lib/services/agent-config-service.ts"
+      action: "CREATE"
+      params: []
+      returns: "Promise<AgentConfig>"
+      throws:
+        - type: "Error('NOT_AUTHENTICATED')"
+          when: "Token ausente ou inválido (propagado por authFetch)"
+        - type: "Error(body.message)"
+          when: "Backend retorna erro"
+      implementation_notes: |
+        - GET /agent/config via authFetch
+        - Padrão idêntico a calendarConfigService.get()
+
+    - name: "AgentConfigService.update"
+      file: "src/lib/services/agent-config-service.ts"
+      action: "CREATE"
+      params:
+        - name: "params"
+          type: "UpdateAgentConfigParams"
+      returns: "Promise<AgentConfig>"
+      throws:
+        - type: "Error('NOT_AUTHENTICATED')"
+          when: "Token ausente ou inválido"
+        - type: "Error(body.message)"
+          when: "Backend retorna erro"
+      implementation_notes: |
+        - PUT /agent/config via authFetch
+        - Content-Type: application/json
+        - body: JSON.stringify(params)
+
+    # --- Mudança em FinanceService: createService / updateService ---
+    - name: "FinanceService.createService (MUDANÇA)"
+      file: "src/lib/services/finance-service.ts"
+      action: "MODIFY"
+      current_signature: "async createService(params: CreateServiceParams): Promise<Service>"
+      new_signature: "async createService(formData: FormData): Promise<Service>"
+      implementation_notes: |
+        - REMOVER o header 'Content-Type': 'application/json' (fetch auto-detecta multipart boundary)
+        - REMOVER JSON.stringify — body recebe FormData diretamente
+        - Padrão idêntico ao usado em AdminUserService.create():
+            const res = await authFetch('/services', {
+              method: 'POST',
+              body: formData,
+            })
+        - A interface IFinanceService.createService também precisa mudar de
+          params: CreateServiceParams para formData: FormData
+
+    - name: "FinanceService.updateService (MUDANÇA)"
+      file: "src/lib/services/finance-service.ts"
+      action: "MODIFY"
+      current_signature: "async updateService(id: string, params: UpdateServiceParams): Promise<Service>"
+      new_signature: "async updateService(id: string, formData: FormData): Promise<Service>"
+      implementation_notes: |
+        - PATCH /services/:id com body FormData
+        - REMOVER header Content-Type — fetch auto-detecta multipart boundary
+        - REMOVER JSON.stringify
+        - A interface IFinanceService.updateService também precisa mudar
+
+    - name: "FinanceService.createProduct (MUDANÇA)"
+      file: "src/lib/services/finance-service.ts"
+      action: "MODIFY"
+      current_signature: "async createProduct(params: CreateProductParams): Promise<Product>"
+      new_signature: "async createProduct(formData: FormData): Promise<Product>"
+      implementation_notes: |
+        - Mesma mudança que createService, para /products
+        - Interface IFinanceService.createProduct também muda
+
+    - name: "FinanceService.updateProduct (MUDANÇA)"
+      file: "src/lib/services/finance-service.ts"
+      action: "MODIFY"
+      current_signature: "async updateProduct(id: string, params: UpdateProductParams): Promise<Product>"
+      new_signature: "async updateProduct(id: string, formData: FormData): Promise<Product>"
+      implementation_notes: |
+        - Mesma mudança que updateService, para /products/:id
+        - Interface IFinanceService.updateProduct também muda
+
+  # ──────────────────────────────────────────────
+  # 2C. MUDANÇAS EM SERVER ACTIONS
+  # ──────────────────────────────────────────────
+
+  server_actions:
+    - name: "createService (MUDANÇA)"
+      file: "src/app/(authenticated)/catalogo/actions.ts"
+      action: "MODIFY"
+      current_signature: "async function createService(data: unknown)"
+      new_signature: "async function createService(data: FormData)"
+      changes: |
+        - Recebe FormData em vez de objeto plain
+        - Extrai campos de texto: data.get('name'), data.get('description'), etc.
+        - Extrai arquivo: data.get('image') as File | null
+        - Valida campos de texto com Zod (CreateServiceSchema existente + agentInstructions)
+        - Valida imagem separadamente:
+          * Se presente: tipo deve ser jpeg|png|webp, tamanho <= 5MB
+        - Monta novo FormData para enviar ao service:
+          * Todos os campos de texto como form fields
+          * Arquivo de imagem como 'image' se presente
+        - Chama financeService.createService(formData)
+
+    - name: "updateService (MUDANÇA)"
+      file: "src/app/(authenticated)/catalogo/actions.ts"
+      action: "MODIFY"
+      current_signature: "async function updateService(id: string, data: unknown)"
+      new_signature: "async function updateService(id: string, data: FormData)"
+      changes: |
+        - Mesma lógica que createService mas com UpdateServiceSchema
+        - Campo 'active' extraído de FormData
+        - Image é opcional no update
+
+    - name: "createProduct (MUDANÇA)"
+      file: "src/app/(authenticated)/catalogo/actions.ts"
+      action: "MODIFY"
+      changes: |
+        - Mesma lógica que createService, para produtos
+
+    - name: "updateProduct (MUDANÇA)"
+      file: "src/app/(authenticated)/catalogo/actions.ts"
+      action: "MODIFY"
+      changes: |
+        - Mesma lógica que updateService, para produtos
+
+    - name: "getAgentConfig (NOVO)"
+      file: "src/app/(authenticated)/configuracoes/actions.ts"
+      action: "CREATE"
+      signature: "async function getAgentConfig(): Promise<{ success: boolean; data?: AgentConfig; error?: string }>"
+      implementation: |
+        - Chama agentConfigService.get()
+        - Retorna { success: true, data } ou { success: false, error }
+
+    - name: "updateAgentConfig (NOVO)"
+      file: "src/app/(authenticated)/configuracoes/actions.ts"
+      action: "CREATE"
+      signature: "async function updateAgentConfig(data: unknown): Promise<{ success: boolean; error?: string }>"
+      implementation: |
+        - Valida com UpdateAgentConfigSchema (Zod):
+          z.object({
+            name: z.string().min(1).max(100).trim().optional(),
+            voiceTone: z.enum(['friendly', 'formal', 'casual']).optional(),
+            generalInstructions: z.string().max(2000).nullable().optional(),
+          })
+        - Chama agentConfigService.update(parsed.data)
+        - revalidatePath('/configuracoes')
+
+  # ──────────────────────────────────────────────
+  # 2D. ZOD SCHEMAS (mudanças e novos)
+  # ──────────────────────────────────────────────
+
+  validation:
+    - name: "CreateServiceSchema (EXTENSÃO)"
+      file: "src/app/(authenticated)/catalogo/actions.ts"
+      changes: |
+        Adicionar ao schema existente:
+          agentInstructions: z.string().max(2000, 'Instruções máx. 2000 caracteres.').optional()
+
+    - name: "UpdateServiceSchema (EXTENSÃO)"
+      file: "src/app/(authenticated)/catalogo/actions.ts"
+      changes: |
+        Adicionar ao schema existente:
+          agentInstructions: z.string().max(2000, 'Instruções máx. 2000 caracteres.').nullable().optional()
+
+    - name: "ImageValidation (NOVO — inline na action)"
+      file: "src/app/(authenticated)/catalogo/actions.ts"
+      definition: |
+        Validação manual (não Zod — File não é serializable):
+          const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+          const MAX_IMAGE_SIZE = 5 * 1024 * 1024  // 5MB
+
+          function validateImage(file: unknown): { valid: boolean; error?: string } {
+            if (!file || !(file instanceof File) || file.size === 0) {
+              return { valid: true }  // imagem é opcional
+            }
+            if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+              return { valid: false, error: 'Formato de imagem inválido. Use JPEG, PNG ou WebP.' }
+            }
+            if (file.size > MAX_IMAGE_SIZE) {
+              return { valid: false, error: 'Imagem deve ter no máximo 5MB.' }
+            }
+            return { valid: true }
+          }
+
+    - name: "UpdateAgentConfigSchema (NOVO)"
+      file: "src/app/(authenticated)/configuracoes/actions.ts"
+      definition: |
+        const UpdateAgentConfigSchema = z.object({
+          name: z.string().min(1, 'Nome é obrigatório.').max(100, 'Nome máx. 100 caracteres.').trim().optional(),
+          voiceTone: z.enum(['friendly', 'formal', 'casual'], { message: 'Tom inválido.' }).optional(),
+          generalInstructions: z.string().max(2000, 'Instruções máx. 2000 caracteres.').nullable().optional(),
+        })
+
+  # ──────────────────────────────────────────────
+  # 2E. COMPONENTES (mudanças e novos)
+  # ──────────────────────────────────────────────
+
+  components:
+    # --- ServicesTable: mudanças no modal e card ---
+    - name: "ServicesTable (MUDANÇA)"
+      file: "src/app/(authenticated)/catalogo/_components/services-table.tsx"
+      changes:
+        modal_form:
+          - description: "Adicionar campo de upload de imagem"
+            details: |
+              - Novo state: formImage (File | null), formImagePreview (string | null)
+              - Input type="file" accept="image/jpeg,image/png,image/webp" name="image"
+              - Ao selecionar arquivo: criar Object URL para preview, atualizar formImage
+              - Preview: se formImagePreview, mostrar <img> com aspect-ratio, botão X para remover
+              - No openEdit: se service.imageUrl existir, setar formImagePreview com imageUrl
+              - No openCreate: resetar formImage=null, formImagePreview=null
+              - Cleanup: revokeObjectURL no useEffect cleanup
+              - Posição: logo após seção "Informações" (nome + descrição), antes de "Preço e descontos"
+
+          - description: "Adicionar campo agentInstructions"
+            details: |
+              - Novo state: formAgentInstructions (string)
+              - Textarea com label "Instruções para o agente IA", placeholder "Ex: Sempre oferecer este serviço quando o cliente perguntar sobre..."
+              - maxLength={2000}, optional
+              - Posição: após campo de upload de imagem, antes de "Preço e descontos"
+              - No openEdit: setar com service.agentInstructions ?? ''
+              - No openCreate: resetar para ''
+
+          - description: "Mudança no handleSave — montar FormData"
+            details: |
+              - Em vez de passar objeto plain para createService/updateService:
+              - Montar FormData:
+                  const fd = new FormData()
+                  fd.append('name', name)
+                  if (formDescription.trim()) fd.append('description', formDescription.trim())
+                  fd.append('price', String(Math.round(price * 100) / 100))
+                  fd.append('pixDiscountPercent', String(Math.round(pixDiscount * 100) / 100))
+                  fd.append('cardDiscountPercent', String(Math.round(cardDiscount * 100) / 100))
+                  // ... demais campos
+                  if (formAgentInstructions.trim()) fd.append('agentInstructions', formAgentInstructions.trim())
+                  if (formImage) fd.append('image', formImage)
+              - Chamar createService(fd) ou updateService(id, fd)
+
+        card_grid:
+          - description: "Exibir thumbnail da imageUrl no card"
+            details: |
+              - Se service.imageUrl !== null:
+                Exibir <img> acima do nome, dentro do card, após o gold accent bar
+                Classes: w-full h-32 object-cover (ou aspect-video object-cover)
+                alt={service.name}
+                loading="lazy"
+              - Se service.imageUrl === null: não exibir nada (manter layout atual)
+              - NÃO usar next/image pois a URL é externa e o domínio pode variar
+                (API retorna URL absoluta de storage). Usar <img> com loading="lazy"
+              - NOTA: se futuramente for configurado o domínio em next.config.ts,
+                pode migrar para <Image>
+
+    # --- ProductsTable: mudanças no modal e card ---
+    - name: "ProductsTable (MUDANÇA)"
+      file: "src/app/(authenticated)/catalogo/_components/products-table.tsx"
+      changes:
+        modal_form:
+          - description: "Mesmas mudanças que ServicesTable"
+            details: |
+              - Campo de upload de imagem (mesma spec)
+              - Campo agentInstructions (mesma spec)
+              - handleSave com FormData (mesma spec)
+              - Apenas trocar referências de service → product
+
+        card_grid:
+          - description: "Exibir thumbnail da imageUrl no card"
+            details: |
+              - Mesma spec que ServicesTable card
+
+    # --- SettingsHub: nova tab "Agente" ---
+    - name: "SettingsHub (MUDANÇA)"
+      file: "src/app/(authenticated)/configuracoes/_components/settings-hub.tsx"
+      changes:
+        - description: "Adicionar nova seção SECTIONS"
+          details: |
+            Adicionar ao array SECTIONS (antes de 'pagamentos' ou após):
+            {
+              id: 'agente',
+              label: 'Agente IA',
+              description: 'Nome, tom e instruções',
+              icon: Bot,
+            }
+            - Import Bot de lucide-react (já importado no arquivo)
+
+        - description: "Renderizar conteúdo da tab 'agente'"
+          details: |
+            Quando activeTab === 'agente', renderizar seção com:
+            1. Input "Nome do Agente" (text, max 100, default "Assistente")
+            2. Select "Tom de voz" com opções:
+               - friendly: "Amigável"
+               - formal: "Formal"
+               - casual: "Casual"
+            3. Textarea "Instruções gerais" (max 2000 chars)
+            4. Botão "Salvar" (accent, com loading state)
+            - Carregar dados via getAgentConfig() no mount
+            - Salvar via updateAgentConfig(data)
+            - Toast de sucesso/erro via sonner (padrão do projeto)
+            - Seguir design system: input styles iguais aos de CalendarConfig
+
+    # --- ConfiguracoesPage: passar agentConfig como prop ---
+    - name: "ConfiguracoesPage (MUDANÇA)"
+      file: "src/app/(authenticated)/configuracoes/page.tsx"
+      changes: |
+        - Import agentConfigService de '@/lib/services'
+        - No Promise.all, adicionar:
+            agentConfigService.get().catch(() => null)
+        - Passar como prop para SettingsHub:
+            agentConfig={agentConfig}
+        - SettingsHub recebe agentConfig: AgentConfig | null
+
+  # ──────────────────────────────────────────────
+  # 2F. INFRAESTRUTURA
+  # ──────────────────────────────────────────────
+
+  infrastructure:
+    - name: "agentConfigService singleton"
+      file: "src/lib/services/index.ts"
+      action: "ADD"
+      changes: |
+        import { AgentConfigService } from './agent-config-service'
+        export const agentConfigService = new AgentConfigService()
+
+    - name: "IFinanceService interface (MUDANÇA)"
+      file: "src/lib/services/interfaces/finance-service.ts"
+      action: "MODIFY"
+      changes: |
+        Mudar assinaturas no IFinanceService:
+          createService(formData: FormData): Promise<Service>
+          updateService(id: string, formData: FormData): Promise<Service>
+          createProduct(formData: FormData): Promise<Product>
+          updateProduct(id: string, formData: FormData): Promise<Product>
+
+    - name: "next.config.ts — remotePatterns (OPCIONAL)"
+      file: "next.config.ts"
+      action: "MODIFY_IF_USING_NEXT_IMAGE"
+      notes: |
+        Se decidir usar <Image> de next/image para thumbnails:
+        Adicionar images.remotePatterns com o hostname do storage do backend.
+        Se usar <img> nativo, não precisa desta mudança.
+        DECISÃO: usar <img> nativo por agora (domínio do storage pode variar).
+
+# ============================================================
+# 3. REGRAS DE NEGOCIO INVIOLAVEIS
+# ============================================================
+invariants:
+  - id: "INV-001"
+    rule: "Upload de imagem aceita apenas JPEG, PNG ou WebP, max 5MB"
+    violation_consequence: "Arquivo inválido pode causar erro no backend ou exibição quebrada"
+
+  - id: "INV-002"
+    rule: "agentInstructions max 2000 caracteres — validado no frontend E na server action"
+    violation_consequence: "Texto truncado ou rejeitado pelo backend"
+
+  - id: "INV-003"
+    rule: "FormData enviado sem header Content-Type manual — fetch auto-detecta multipart boundary"
+    violation_consequence: "Se Content-Type for setado manualmente, o boundary será perdido e o backend rejeitará"
+
+  - id: "INV-004"
+    rule: "authFetch propaga Authorization header mesmo com body FormData"
+    violation_consequence: "Request não autenticado — 401"
+
+  - id: "INV-005"
+    rule: "Campos opcionais (image, agentInstructions) devem funcionar quando ausentes"
+    violation_consequence: "Criar/editar sem imagem deve funcionar como antes"
+
+  - id: "INV-006"
+    rule: "AgentConfig nome default 'Assistente' — nunca vazio"
+    violation_consequence: "Agente sem nome quebra experiência do chat"
+
+  - id: "INV-007"
+    rule: "voiceTone restritos a 'friendly' | 'formal' | 'casual' — enum validado com Zod"
+    violation_consequence: "Valor inválido rejeitado pelo backend"
+
+  - id: "INV-008"
+    rule: "Todas as chamadas de API passam por authFetch com Bearer JWT"
+    violation_consequence: "Falha de autenticação"
+
+  - id: "INV-009"
+    rule: "Object URLs criados para preview devem ser revogados (URL.revokeObjectURL) ao desmontar ou trocar imagem"
+    violation_consequence: "Memory leak no browser"
+
+# ============================================================
+# 4. SEGURANCA
+# ============================================================
+security:
+  authentication:
+    method: "Bearer JWT (via authFetch — cookies httpOnly)"
+    required: true
+    token_source: "Cookie access_token (server-side)"
+
+  authorization:
+    model: "Implícito — tenant extraído do JWT pelo backend"
+    notes: "Não há roles específicas neste módulo; qualquer usuário autenticado pode gerenciar seu catálogo e agente"
+
+  input_validation:
+    framework: "Zod (na server action — borda)"
+    image_validation: "Manual — tipo MIME e tamanho"
+    client_side: "Validação preliminar no componente (UX) + validação definitiva na server action"
+    sanitization:
+      - "name: trim()"
+      - "description: trim()"
+      - "agentInstructions: trim()"
+      - "generalInstructions: trim()"
+      - "voiceTone: enum validation (no freeform)"
+
+  file_upload:
+    allowed_types: ["image/jpeg", "image/png", "image/webp"]
+    max_size: "5MB (5 * 1024 * 1024 bytes)"
+    validation_location: "Server action (src/app/(authenticated)/catalogo/actions.ts)"
+    notes: |
+      - O backend é responsável por sanitizar o conteúdo do arquivo (virus scan, re-encode)
+      - O frontend valida tipo MIME e tamanho como first line of defense
+      - O file input usa accept attribute para filtrar no file picker
+
+  xss_prevention:
+    notes: |
+      - React auto-escapa strings em JSX — imageUrl não é injetável via src={url}
+      - agentInstructions é renderizado como texto (não dangerouslySetInnerHTML)
+      - generalInstructions idem
+
+  data_classification:
+    pii_fields: []
+    sensitive_fields: []
+    notes: "Nenhum campo PII nesta feature. Imagens são de catálogo (público)."
+
+# ============================================================
+# 5. DEPENDENCIAS
+# ============================================================
+dependencies:
+  internal:
+    existing:
+      - path: "src/lib/services/auth-fetch.ts"
+        usage: "authFetch para todas as chamadas API — já suporta FormData (não seta Content-Type se não passado em init.headers)"
+      - path: "src/lib/services/finance-service.ts"
+        usage: "Service class para CRUD de serviços e produtos"
+      - path: "src/lib/services/interfaces/finance-service.ts"
+        usage: "Interfaces Service, Product, CreateServiceParams, etc."
+      - path: "src/lib/services/index.ts"
+        usage: "Singletons dos services"
+      - path: "src/app/(authenticated)/catalogo/actions.ts"
+        usage: "Server actions para CRUD de catálogo"
+      - path: "src/app/(authenticated)/configuracoes/actions.ts"
+        usage: "Server actions para configurações"
+      - path: "src/app/(authenticated)/configuracoes/_components/settings-hub.tsx"
+        usage: "Hub de configurações com tabs"
+      - path: "src/app/(authenticated)/configuracoes/page.tsx"
+        usage: "Server component da página de configurações"
+      - path: "src/app/(authenticated)/catalogo/_components/services-table.tsx"
+        usage: "Componente de listagem e modal de serviços"
+      - path: "src/app/(authenticated)/catalogo/_components/products-table.tsx"
+        usage: "Componente de listagem e modal de produtos"
+      - path: "src/lib/services/admin-user-service.ts"
+        usage: "Referência de padrão — já usa FormData com authFetch"
+      - path: "src/components/ui/button.tsx"
+        usage: "Button component do design system"
+
+    new:
+      - path: "src/lib/services/interfaces/agent-config-service.ts"
+        usage: "Interfaces AgentConfig, UpdateAgentConfigParams, IAgentConfigService"
+      - path: "src/lib/services/agent-config-service.ts"
+        usage: "AgentConfigService class — GET/PUT /agent/config"
+
+  external:
+    existing:
+      - name: "zod"
+        version: "^4.3.6"
+        usage: "Validação de input nas server actions"
+      - name: "@base-ui/react"
+        version: "^1.3.0"
+        usage: "Dialog component para modais"
+      - name: "lucide-react"
+        version: "^1.7.0"
+        usage: "Icons (Bot, ImagePlus, Upload, etc.)"
+      - name: "motion"
+        version: "^12.38.0"
+        usage: "Animações dos cards e modais"
+      - name: "sonner"
+        version: "^2.0.7"
+        usage: "Toast notifications"
+
+    new: []
+      # Nenhuma dependência externa nova necessária
+
+# ============================================================
+# 6. CRITERIOS DE ACEITE
+# ============================================================
+acceptance_criteria:
+  functional:
+    # --- Imagem em Serviço ---
+    - id: "AC-001"
+      given: "Modal de criar serviço aberto"
+      when: "Usuário seleciona uma imagem JPEG de 2MB"
+      then: "Preview da imagem aparece no formulário; ao salvar, FormData inclui campo 'image'"
+
+    - id: "AC-002"
+      given: "Modal de criar serviço aberto"
+      when: "Usuário seleciona arquivo PDF"
+      then: "Input rejeita (accept filter) ou server action retorna erro 'Formato de imagem inválido'"
+
+    - id: "AC-003"
+      given: "Modal de criar serviço aberto"
+      when: "Usuário seleciona imagem PNG de 8MB"
+      then: "Server action retorna erro 'Imagem deve ter no máximo 5MB'"
+
+    - id: "AC-004"
+      given: "Modal de criar serviço aberto"
+      when: "Usuário NÃO seleciona imagem e preenche nome e preço"
+      then: "Serviço é criado normalmente (imagem é opcional)"
+
+    - id: "AC-005"
+      given: "Modal de editar serviço com imageUrl existente"
+      when: "Modal abre"
+      then: "Preview mostra a imagem atual (imageUrl do serviço)"
+
+    - id: "AC-006"
+      given: "Modal de editar serviço com imageUrl existente"
+      when: "Usuário clica no X para remover a imagem e salva"
+      then: "FormData não inclui campo 'image'; serviço é atualizado sem alterar imagem"
+
+    # --- agentInstructions ---
+    - id: "AC-007"
+      given: "Modal de criar serviço aberto"
+      when: "Usuário preenche 'Instruções para o agente IA' com texto de 500 chars"
+      then: "Campo salvo com sucesso; visível ao reabrir modal de edição"
+
+    - id: "AC-008"
+      given: "Modal de criar serviço aberto"
+      when: "Usuário tenta digitar mais de 2000 caracteres"
+      then: "maxLength impede no input; se bypass, server action retorna erro"
+
+    - id: "AC-009"
+      given: "Modal de editar serviço com agentInstructions existente"
+      when: "Modal abre"
+      then: "Textarea mostra as instruções atuais"
+
+    # --- Imagem na listagem ---
+    - id: "AC-010"
+      given: "Serviço com imageUrl preenchida"
+      when: "Card é renderizado na listagem"
+      then: "Thumbnail da imagem aparece no card acima do nome"
+
+    - id: "AC-011"
+      given: "Serviço sem imageUrl (null)"
+      when: "Card é renderizado na listagem"
+      then: "Card renderiza normalmente sem área de imagem (layout idêntico ao atual)"
+
+    # --- Produto (espelho dos AC de serviço) ---
+    - id: "AC-012"
+      given: "Modal de criar/editar produto"
+      when: "Mesmos cenários de AC-001 a AC-009"
+      then: "Mesmos resultados (funcionalidade espelhada)"
+
+    - id: "AC-013"
+      given: "Card de produto na listagem"
+      when: "Mesmos cenários de AC-010 e AC-011"
+      then: "Mesmos resultados"
+
+    # --- Agent Config ---
+    - id: "AC-014"
+      given: "Usuário navega para /configuracoes e clica na tab 'Agente IA'"
+      when: "Tab é carregada"
+      then: "Formulário exibe dados atuais do agente (nome, tom, instruções)"
+
+    - id: "AC-015"
+      given: "Tab 'Agente IA' aberta"
+      when: "Usuário muda nome para 'Atendente Virtual' e clica Salvar"
+      then: "PUT /agent/config é chamado; toast de sucesso aparece; campo reflete novo valor"
+
+    - id: "AC-016"
+      given: "Tab 'Agente IA' aberta"
+      when: "Usuário seleciona tom 'Formal' e salva"
+      then: "voiceTone salvo como 'formal'"
+
+    - id: "AC-017"
+      given: "Tab 'Agente IA' aberta"
+      when: "Usuário preenche instruções gerais com 2000 chars e salva"
+      then: "Salvo com sucesso"
+
+    - id: "AC-018"
+      given: "Tab 'Agente IA' aberta"
+      when: "Usuário tenta salvar nome vazio"
+      then: "Erro de validação: 'Nome é obrigatório'"
+
+    - id: "AC-019"
+      given: "Backend /agent/config retorna erro 500"
+      when: "Tab 'Agente IA' carrega"
+      then: "Formulário mostra defaults (nome 'Assistente', tom 'friendly', instruções vazio) ou mensagem de erro"
+
+    # --- FormData / authFetch ---
+    - id: "AC-020"
+      given: "Criação de serviço com imagem"
+      when: "Request é enviado ao backend"
+      then: "Content-Type é multipart/form-data com boundary auto-gerado; Authorization header presente"
+
+    - id: "AC-021"
+      given: "Sessão expirada (access_token inválido)"
+      when: "Qualquer operação é tentada"
+      then: "authFetch tenta refresh; se falha, redireciona para login"
+
+  security:
+    - id: "SEC-001"
+      test: "Upload de arquivo com tipo MIME spoofado (ex: renomear .exe para .jpg) é validado no server action pelo header do arquivo, não pela extensão"
+      notes: "Server action valida file.type do File object; backend deve fazer validação adicional"
+
+    - id: "SEC-002"
+      test: "agentInstructions/generalInstructions com tags HTML/script são exibidos como texto (React escapa por default)"
+
+    - id: "SEC-003"
+      test: "imageUrl em <img src> não executa JavaScript mesmo se URL contiver javascript: protocol"
+      notes: "Browsers modernos bloqueiam javascript: em src; considerar sanitizar URL se necessário"
+
+  performance:
+    - id: "PERF-001"
+      test: "Upload de imagem de 5MB completa em < 5s em conexão 4G"
+      notes: "Depende do backend/storage; frontend deve mostrar loading state"
+
+    - id: "PERF-002"
+      test: "Thumbnails na listagem usam loading='lazy' para não bloquear rendering"
+
+    - id: "PERF-003"
+      test: "Object URLs de preview são revogados ao fechar modal ou trocar imagem"
+
+# ============================================================
+# 7. FORA DO ESCOPO
+# ============================================================
+out_of_scope:
+  - "Crop/resize de imagem no frontend (backend faz isso se necessário)"
+  - "Drag and drop para upload de imagem (apenas input file)"
+  - "Múltiplas imagens por serviço/produto (apenas 1 imagem)"
+  - "Galeria de imagens / lightbox"
+  - "Compressão de imagem no frontend"
+  - "Internacionalização (i18n) — labels em português fixo"
+  - "Testes E2E para upload (apenas unitários/integração)"
+  - "Migração de dados existentes (serviços sem imagem continuam funcionando)"
+  - "Alteração de rotas da sidebar (Agent Config fica dentro de /configuracoes como tab)"
+  - "Configuração de múltiplos agentes (apenas 1 agente por tenant)"
+  - "Uso de next/image para thumbnails externas (usar <img> nativo por ora)"
+
+# ============================================================
+# 8. NOTAS E DECISOES
+# ============================================================
+notes:
+  - decision: "FormData em vez de JSON"
+    rationale: >
+      O backend já aceita multipart/form-data. Para enviar arquivos binários
+      junto com campos de texto, FormData é o padrão correto. O projeto já
+      usa esse padrão em AdminUserService.create() (src/lib/services/admin-user-service.ts:40-45).
+
+  - decision: "Server action recebe FormData, não raw File"
+    rationale: >
+      Next.js server actions suportam FormData nativamente como argumento.
+      É mais seguro que serializar File objects. A validação Zod ocorre
+      sobre os campos extraídos do FormData.
+
+  - decision: "Usar <img> nativo em vez de next/image para thumbnails"
+    rationale: >
+      A URL da imagem vem do backend (storage externo). O domínio pode
+      variar e não está configurado em next.config.ts remotePatterns.
+      Usar <img> com loading="lazy" evita configuração e funciona
+      universalmente. Pode migrar para <Image> futuramente.
+
+  - decision: "Agent Config como tab em /configuracoes, não rota separada"
+    rationale: >
+      O SettingsHub já tem pattern de tabs (agenda, canais, pagamentos).
+      Adicionar tab 'agente' é consistente com o design existente.
+      Evita criar nova rota na sidebar e mantém configurações centralizadas.
+
+  - decision: "agentInstructions no modal, não na listagem"
+    rationale: >
+      Instruções são conteúdo longo e técnico, não faz sentido no card
+      compacto da listagem. Só aparecem ao abrir modal de edição.
+
+  - decision: "Validação de imagem dupla (client + server action)"
+    rationale: >
+      O accept no input file filtra no file picker (UX).
+      A server action valida tipo e tamanho como defesa real.
+      O backend faz a validação final (segurança).
+
+  - decision: "IFinanceService muda para aceitar FormData nos métodos de create/update"
+    rationale: >
+      A interface precisa refletir a mudança de JSON para multipart.
+      Como o backend agora aceita multipart, a interface deve seguir.
+      CreateServiceParams/UpdateServiceParams continuam existindo para
+      tipar os campos de texto, mas o transporte é FormData.
+
+# ============================================================
+# 9. ITEMS A VERIFICAR
+# ============================================================
+to_verify:
+  - item: "Confirmar endpoints exatos do backend para agent config"
+    detail: "A spec assume GET /agent/config e PUT /agent/config — confirmar com equipe backend"
+
+  - item: "Confirmar campo de retorno do backend para imageUrl"
+    detail: "A spec assume que após upload, o backend retorna o campo 'imageUrl' na resposta de Service/Product"
+
+  - item: "Confirmar se o backend aceita PATCH com multipart/form-data"
+    detail: "createService usa POST e updateService usa PATCH — ambos devem aceitar FormData"
+
+  - item: "Confirmar domínio do storage para imageUrl"
+    detail: "Se as URLs de imagem vêm de um domínio fixo (ex: storage.googleapis.com), pode-se configurar next/image"
+
+  - item: "Confirmar se o backend retorna defaults para GET /agent/config quando nunca foi configurado"
+    detail: "A spec assume que retorna defaults (name='Assistente', voiceTone='friendly', generalInstructions=null) ou 404"
+
+  - item: "Confirmar se o backend precisa de campo explícito para remover imagem (ex: removeImage: true)"
+    detail: "A spec atual assume que não enviar o campo 'image' no FormData simplesmente mantém a imagem atual"
+
+# ============================================================
+# 10. LISTA DE ARQUIVOS A CRIAR/MODIFICAR
+# ============================================================
+file_manifest:
+  create:
+    - "src/lib/services/interfaces/agent-config-service.ts"
+    - "src/lib/services/agent-config-service.ts"
+
+  modify:
+    - "src/lib/services/interfaces/finance-service.ts"
+    - "src/lib/services/finance-service.ts"
+    - "src/lib/services/index.ts"
+    - "src/app/(authenticated)/catalogo/actions.ts"
+    - "src/app/(authenticated)/catalogo/_components/services-table.tsx"
+    - "src/app/(authenticated)/catalogo/_components/products-table.tsx"
+    - "src/app/(authenticated)/configuracoes/page.tsx"
+    - "src/app/(authenticated)/configuracoes/actions.ts"
+    - "src/app/(authenticated)/configuracoes/_components/settings-hub.tsx"
+
+  no_change:
+    - "src/lib/services/auth-fetch.ts"  # já suporta FormData (não seta Content-Type quando não passado)
+    - "next.config.ts"  # não usando next/image para thumbnails externas
+    - "src/components/sidebar.tsx"  # Agent Config fica dentro de /configuracoes como tab

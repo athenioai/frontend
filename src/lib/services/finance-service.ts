@@ -25,6 +25,33 @@ import type {
 } from './interfaces/finance-service'
 import { authFetch } from './auth-fetch'
 
+function buildCatalogFormData(
+  params: CreateServiceParams | UpdateServiceParams | CreateProductParams | UpdateProductParams,
+): FormData {
+  const formData = new FormData()
+  const entries = Object.entries(params) as [string, unknown][]
+
+  for (const [key, value] of entries) {
+    if (key === 'image') {
+      if (value instanceof File) {
+        formData.append('image', value)
+      }
+      continue
+    }
+
+    if (value === undefined) continue
+
+    if (value === null) {
+      formData.append(key, '')
+      continue
+    }
+
+    formData.append(key, String(value))
+  }
+
+  return formData
+}
+
 export class FinanceService implements IFinanceService {
   // ── Services ──
 
@@ -46,10 +73,10 @@ export class FinanceService implements IFinanceService {
   }
 
   async createService(params: CreateServiceParams): Promise<Service> {
+    const formData = buildCatalogFormData(params)
     const res = await authFetch('/services', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
+      body: formData,
     })
 
     if (!res.ok) {
@@ -57,14 +84,14 @@ export class FinanceService implements IFinanceService {
       throw new Error(body.message ?? 'Failed to create service')
     }
 
-    return res.json()
+    return res.json().catch(() => ({}) as Service)
   }
 
   async updateService(id: string, params: UpdateServiceParams): Promise<Service> {
+    const formData = buildCatalogFormData(params)
     const res = await authFetch(`/services/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
+      body: formData,
     })
 
     if (!res.ok) {
@@ -73,7 +100,7 @@ export class FinanceService implements IFinanceService {
       throw new Error(body.message ?? 'Failed to update service')
     }
 
-    return res.json()
+    return res.json().catch(() => ({}) as Service)
   }
 
   async deleteService(id: string): Promise<void> {
@@ -106,10 +133,10 @@ export class FinanceService implements IFinanceService {
   }
 
   async createProduct(params: CreateProductParams): Promise<Product> {
+    const formData = buildCatalogFormData(params)
     const res = await authFetch('/products', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
+      body: formData,
     })
 
     if (!res.ok) {
@@ -117,14 +144,14 @@ export class FinanceService implements IFinanceService {
       throw new Error(body.message ?? 'Failed to create product')
     }
 
-    return res.json()
+    return res.json().catch(() => ({}) as Product)
   }
 
   async updateProduct(id: string, params: UpdateProductParams): Promise<Product> {
+    const formData = buildCatalogFormData(params)
     const res = await authFetch(`/products/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
+      body: formData,
     })
 
     if (!res.ok) {
@@ -133,7 +160,7 @@ export class FinanceService implements IFinanceService {
       throw new Error(body.message ?? 'Failed to update product')
     }
 
-    return res.json()
+    return res.json().catch(() => ({}) as Product)
   }
 
   async deleteProduct(id: string): Promise<void> {
@@ -181,7 +208,7 @@ export class FinanceService implements IFinanceService {
       throw new Error(body.message ?? 'Failed to create invoice')
     }
 
-    return res.json()
+    return res.json().catch(() => ({}) as Invoice)
   }
 
   async markInvoicePaid(id: string): Promise<Invoice> {
@@ -193,7 +220,7 @@ export class FinanceService implements IFinanceService {
       throw new Error(body.message ?? 'Failed to mark invoice as paid')
     }
 
-    return res.json()
+    return res.json().catch(() => ({}) as Invoice)
   }
 
   async cancelInvoice(id: string): Promise<Invoice> {
@@ -205,7 +232,7 @@ export class FinanceService implements IFinanceService {
       throw new Error(body.message ?? 'Failed to cancel invoice')
     }
 
-    return res.json()
+    return res.json().catch(() => ({}) as Invoice)
   }
 
   async getFinanceDashboard(): Promise<FinanceDashboard> {

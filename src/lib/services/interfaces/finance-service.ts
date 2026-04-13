@@ -10,6 +10,8 @@ export interface Service {
   specialDiscountPercent: number
   specialDiscountStartsAt: string | null
   specialDiscountEndsAt: string | null
+  imageUrl: string | null
+  agentInstructions: string | null
   active: boolean
   createdAt: string
   updatedAt: string
@@ -27,6 +29,8 @@ export interface Product {
   specialDiscountPercent: number
   specialDiscountStartsAt: string | null
   specialDiscountEndsAt: string | null
+  imageUrl: string | null
+  agentInstructions: string | null
   active: boolean
   createdAt: string
   updatedAt: string
@@ -172,6 +176,8 @@ export interface CreateServiceParams {
   specialDiscountPercent?: number
   specialDiscountStartsAt?: string | null
   specialDiscountEndsAt?: string | null
+  agentInstructions?: string
+  image?: File
 }
 
 export interface UpdateServiceParams {
@@ -184,7 +190,9 @@ export interface UpdateServiceParams {
   specialDiscountPercent?: number | null
   specialDiscountStartsAt?: string | null
   specialDiscountEndsAt?: string | null
+  agentInstructions?: string
   active?: boolean
+  image?: File
 }
 
 export interface CreateProductParams {
@@ -197,6 +205,8 @@ export interface CreateProductParams {
   specialDiscountPercent?: number
   specialDiscountStartsAt?: string | null
   specialDiscountEndsAt?: string | null
+  agentInstructions?: string
+  image?: File
 }
 
 export interface UpdateProductParams {
@@ -209,7 +219,9 @@ export interface UpdateProductParams {
   specialDiscountPercent?: number | null
   specialDiscountStartsAt?: string | null
   specialDiscountEndsAt?: string | null
+  agentInstructions?: string
   active?: boolean
+  image?: File
 }
 
 export interface CreateInvoiceParams {

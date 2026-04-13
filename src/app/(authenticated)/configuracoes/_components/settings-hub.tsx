@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button'
 import { MOTION } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { updateCalendarConfig, connectChannel, disconnectChannel, togglePrepayment } from '../actions'
+import { updateAgentConfig } from '../agent-actions'
 import { Dialog } from '@base-ui/react/dialog'
 import type {
   CalendarConfig,
@@ -35,6 +36,7 @@ import type {
   ChannelAccount,
   SupportedChannel,
 } from '@/lib/services/interfaces/channel-account-service'
+import type { AgentConfig } from '@/lib/services/interfaces/agent-config-service'
 
 // ── Channel config ──
 
@@ -214,6 +216,12 @@ const SECTIONS = [
     description: 'Configure formas de pagamento',
     icon: CreditCard,
   },
+  {
+    id: 'agente',
+    label: 'Agente IA',
+    description: 'Personalidade do bot',
+    icon: Bot,
+  },
 ]
 
 // ── Calendar constants ──
@@ -262,6 +270,7 @@ interface SettingsHubProps {
   calendarConfig: CalendarConfig | null
   channelAccounts: ChannelAccount[]
   prepaymentEnabled: boolean
+  agentConfig: AgentConfig | null
 }
 
 export function SettingsHub({
@@ -269,6 +278,7 @@ export function SettingsHub({
   calendarConfig,
   channelAccounts,
   prepaymentEnabled,
+  agentConfig,
 }: SettingsHubProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState(initialTab)
@@ -381,6 +391,17 @@ export function SettingsHub({
                 transition={{ duration: 0.2 }}
               >
                 <PagamentosTab prepaymentEnabled={prepaymentEnabled} />
+              </motion.div>
+            )}
+            {activeTab === 'agente' && (
+              <motion.div
+                key="agente"
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.2 }}
+              >
+                <AgenteTab config={agentConfig} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -589,6 +610,168 @@ function PagamentosTab({ prepaymentEnabled }: { prepaymentEnabled: boolean }) {
             </div>
           </motion.div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Agente Tab ──
+
+const TONE_OPTIONS: { value: AgentConfig['tone']; label: string; description: string }[] = [
+  { value: 'friendly', label: 'Amigável', description: 'Tom acolhedor e próximo' },
+  { value: 'formal', label: 'Formal', description: 'Tom profissional e respeitoso' },
+  { value: 'casual', label: 'Casual', description: 'Tom descontraído e leve' },
+]
+
+function AgenteTab({ config }: { config: AgentConfig | null }) {
+  const router = useRouter()
+  const [agentName, setAgentName] = useState(config?.agentName ?? '')
+  const [tone, setTone] = useState<AgentConfig['tone']>(config?.tone ?? 'friendly')
+  const [customInstructions, setCustomInstructions] = useState(config?.customInstructions ?? '')
+  const [isSaving, startSave] = useTransition()
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
+
+  function handleSave() {
+    setSaveError(null)
+    setSaved(false)
+    startSave(async () => {
+      const result = await updateAgentConfig({
+        agentName: agentName.trim(),
+        tone,
+        customInstructions: customInstructions.trim() || null,
+      })
+      if (result.success) {
+        setSaved(true)
+        router.refresh()
+        setTimeout(() => setSaved(false), 2000)
+      } else {
+        setSaveError(result.error ?? 'Erro ao salvar.')
+      }
+    })
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="font-title text-base font-semibold text-text-primary">
+          Agente IA
+        </h2>
+        <p className="mt-1 text-sm text-text-muted">
+          Personalize o comportamento do agente de atendimento
+        </p>
+      </div>
+
+      <div className="space-y-5">
+        {/* Nome do Agente */}
+        <div className="card-surface p-5">
+          <div className="space-y-3.5">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-text-muted">
+                Nome do Agente
+              </label>
+              <input
+                type="text"
+                value={agentName}
+                onChange={(e) => setAgentName(e.target.value)}
+                placeholder="Ex: Atena, Luna, Assistente..."
+                maxLength={100}
+                className="h-10 w-full rounded-xl border border-border-default bg-surface-2 px-3 text-sm text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
+              />
+              <p className="text-[11px] text-text-subtle">
+                O nome que o agente usará para se identificar nas conversas
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tom de voz */}
+        <div className="card-surface p-5">
+          <div className="space-y-3.5">
+            <label className="text-xs font-medium text-text-muted">
+              Tom de voz
+            </label>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {TONE_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setTone(option.value)}
+                  className={cn(
+                    'rounded-xl border px-4 py-3 text-left transition-all duration-200',
+                    tone === option.value
+                      ? 'border-accent/40 bg-accent/[0.06] ring-1 ring-accent/20'
+                      : 'border-border-default bg-surface-2 hover:border-border-hover',
+                  )}
+                >
+                  <p
+                    className={cn(
+                      'text-sm font-semibold',
+                      tone === option.value ? 'text-accent' : 'text-text-primary',
+                    )}
+                  >
+                    {option.label}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-text-subtle">
+                    {option.description}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Instruções gerais */}
+        <div className="card-surface p-5">
+          <div className="space-y-3.5">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-text-muted">
+                Instruções gerais <span className="text-text-subtle">(opcional)</span>
+              </label>
+              <textarea
+                value={customInstructions}
+                onChange={(e) => setCustomInstructions(e.target.value)}
+                placeholder="Ex: Sempre cumprimente o cliente pelo nome. Ofereça desconto PIX quando possível. Não mencione concorrentes..."
+                maxLength={2000}
+                rows={5}
+                className="w-full resize-none rounded-xl border border-border-default bg-surface-2 px-3 py-2.5 text-sm text-text-primary outline-none placeholder:text-text-subtle transition-colors focus:border-accent/40 focus:ring-1 focus:ring-accent/15"
+              />
+              <p className="text-[11px] text-text-subtle">
+                {customInstructions.length}/2000 caracteres. Instruções que o agente seguirá em todas as conversas.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Save button */}
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving || !agentName.trim()}
+            className="h-9 gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-primary-foreground shadow-[0_1px_8px_rgba(212,130,10,0.15)] transition-all hover:brightness-110 disabled:opacity-50"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Salvando...
+              </>
+            ) : saved ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                Salvo
+              </>
+            ) : (
+              <>
+                <Save className="h-3.5 w-3.5" />
+                Salvar configuração
+              </>
+            )}
+          </Button>
+
+          {saveError && (
+            <p className="text-sm text-danger">{saveError}</p>
+          )}
+        </div>
       </div>
     </div>
   )

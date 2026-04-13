@@ -222,7 +222,7 @@ export function CreateInvoiceForm({ leads, services, products }: CreateInvoiceFo
         type: form.type as 'service' | 'product' | 'manual',
         referenceId: form.referenceId || undefined,
         description: form.description,
-        amount: form.amount,
+        amount: finalAmount,
         paymentMethod: form.paymentMethod === 'none' ? undefined : form.paymentMethod,
         dueDate: form.dueDate,
         lateFeePercent: form.lateFeePercent,

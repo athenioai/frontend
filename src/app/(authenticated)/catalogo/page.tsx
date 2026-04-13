@@ -1,4 +1,4 @@
-import { financeService, authService } from '@/lib/services'
+import { financeService } from '@/lib/services'
 import { CatalogHub } from './_components/catalog-hub'
 import type { Service, Product, Pagination } from '@/lib/services/interfaces/finance-service'
 
@@ -11,47 +11,27 @@ export default async function CatalogoPage({
   const page = Number(params.page) || 1
   const search = params.search || undefined
 
-  let workType: 'services' | 'sales' | 'hybrid' = 'hybrid'
   let services: Service[] = []
   let servicesPagination: Pagination = { page: 1, limit: 20, total: 0 }
   let products: Product[] = []
   let productsPagination: Pagination = { page: 1, limit: 20, total: 0 }
 
   try {
-    const user = await authService.getSession()
-    if (user?.workType) {
-      workType = user.workType
-    }
-
-    const fetches: Promise<void>[] = []
-
-    if (workType === 'services' || workType === 'hybrid') {
-      fetches.push(
-        financeService.listServices({ page, search }).then((result) => {
-          services = result.data
-          servicesPagination = result.pagination
-        }),
-      )
-    }
-
-    if (workType === 'sales' || workType === 'hybrid') {
-      fetches.push(
-        financeService.listProducts({ page, search }).then((result) => {
-          products = result.data
-          productsPagination = result.pagination
-        }),
-      )
-    }
-
-    await Promise.all(fetches)
-  } catch {
-    // fallback to defaults
+    const [servicesResult, productsResult] = await Promise.all([
+      financeService.listServices({ page, search }),
+      financeService.listProducts({ page, search }),
+    ])
+    services = servicesResult.data
+    servicesPagination = servicesResult.pagination
+    products = productsResult.data
+    productsPagination = productsResult.pagination
+  } catch (error) {
+    console.error('[catalogo] Failed to fetch catalog data', error) // TODO: replace with project logger
   }
 
   return (
     <div className="mx-auto max-w-screen-2xl px-6 py-8 lg:py-10">
       <CatalogHub
-        workType={workType}
         services={services}
         servicesPagination={servicesPagination}
         products={products}

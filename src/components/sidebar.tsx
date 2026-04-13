@@ -21,6 +21,7 @@ import {
   Kanban,
   Receipt,
   ShoppingBag,
+  Wrench,
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { cn } from '@/lib/utils'
@@ -28,15 +29,32 @@ import { MOTION } from '@/lib/motion'
 import { logoutAction } from '@/app/(authenticated)/actions'
 import Link from 'next/link'
 
-const NAV_ITEMS = [
+type WorkType = 'services' | 'sales' | 'hybrid'
+
+const NAV_ITEMS_BEFORE = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/crm', label: 'CRM', icon: Kanban },
-  { href: '/cobrancas', label: 'Cobranças', icon: Receipt },
-  { href: '/catalogo', label: 'Catálogo', icon: ShoppingBag },
+]
+
+const SERVICE_ITEM = { href: '/servicos', label: 'Serviços', icon: Wrench }
+const PRODUCT_ITEM = { href: '/produtos', label: 'Produtos', icon: ShoppingBag }
+
+const NAV_ITEMS_AFTER = [
   { href: '/conversas', label: 'Conversas', icon: MessagesSquare },
   { href: '/agenda', label: 'Agenda', icon: CalendarDays },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
 ]
+
+function getNavItems(workType: WorkType) {
+  const catalogItems =
+    workType === 'services'
+      ? [SERVICE_ITEM]
+      : workType === 'sales'
+        ? [PRODUCT_ITEM]
+        : [SERVICE_ITEM, PRODUCT_ITEM]
+
+  return [...NAV_ITEMS_BEFORE, ...catalogItems, ...NAV_ITEMS_AFTER]
+}
 
 const ADMIN_ITEMS = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -49,9 +67,11 @@ const ADMIN_ITEMS = [
 interface SidebarProps {
   userName: string
   isAdmin?: boolean
+  workType?: WorkType
 }
 
-export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
+export function Sidebar({ userName, isAdmin = false, workType = 'hybrid' }: SidebarProps) {
+  const navItems = getNavItems(workType)
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
@@ -101,7 +121,7 @@ export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
         </>
       )}
 
-      {NAV_ITEMS.map((item) => (
+      {navItems.map((item) => (
         <NavLink
           key={item.href}
           item={item}
@@ -135,7 +155,7 @@ export function Sidebar({ userName, isAdmin = false }: SidebarProps) {
           </div>
         </>
       )}
-      {NAV_ITEMS.map((item) => (
+      {navItems.map((item) => (
         <NavLink
           key={item.href}
           item={item}

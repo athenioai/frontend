@@ -17,8 +17,8 @@ async function fetchFormData() {
     leads = leadsResult.data
     services = servicesResult.data
     products = productsResult.data
-  } catch {
-    // empty
+  } catch (error) {
+    console.error('[cobrancas/nova] Failed to fetch form data', error) // TODO: replace with project logger
   }
 
   return { leads, services, products }

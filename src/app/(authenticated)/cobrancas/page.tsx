@@ -10,8 +10,8 @@ async function fetchInvoices(page: number, status?: string, type?: string) {
     const result = await financeService.listInvoices({ page, status, type })
     invoices = result.data
     pagination = result.pagination
-  } catch {
-    // empty
+  } catch (error) {
+    console.error('[cobrancas] Failed to fetch invoices', error) // TODO: replace with project logger
   }
 
   return { invoices, pagination }

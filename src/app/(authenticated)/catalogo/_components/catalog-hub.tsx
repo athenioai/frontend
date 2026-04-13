@@ -3,16 +3,12 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { Wrench, Package } from 'lucide-react'
-import { MOTION, fadeInUp, staggerContainer } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { ServicesTable } from './services-table'
 import { ProductsTable } from './products-table'
 import type { Service, Product, Pagination } from '@/lib/services/interfaces/finance-service'
 
-type WorkType = 'services' | 'sales' | 'hybrid'
-
 interface CatalogHubProps {
-  workType: WorkType
   services: Service[]
   servicesPagination: Pagination
   products: Product[]
@@ -26,7 +22,6 @@ const TABS = [
 ]
 
 export function CatalogHub({
-  workType,
   services,
   servicesPagination,
   products,
@@ -35,47 +30,16 @@ export function CatalogHub({
 }: CatalogHubProps) {
   const [activeTab, setActiveTab] = useState<'services' | 'products'>('services')
 
-  // Single-mode: show table directly without tabs
-  if (workType === 'services') {
-    return (
-      <ServicesTable
-        services={services}
-        pagination={servicesPagination}
-        currentSearch={currentSearch}
-      />
-    )
-  }
-
-  if (workType === 'sales') {
-    return (
-      <ProductsTable
-        products={products}
-        pagination={productsPagination}
-        currentSearch={currentSearch}
-      />
-    )
-  }
-
-  // Hybrid mode: show tab switcher
   return (
-    <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-      <motion.div
-        variants={fadeInUp}
-        transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-      >
-        <h1 className="font-title text-2xl font-bold text-text-primary">
-          Catálogo
-        </h1>
-        <p className="mt-1 text-sm text-text-muted">
-          Gerencie seus serviços e produtos
-        </p>
-      </motion.div>
+    <div>
+      <h1 className="font-title text-2xl font-bold text-text-primary">
+        Catálogo
+      </h1>
+      <p className="mt-1 text-sm text-text-muted">
+        Gerencie seus serviços e produtos
+      </p>
 
-      <motion.div
-        variants={fadeInUp}
-        transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
-        className="mt-6 flex gap-1 rounded-xl bg-surface-2 p-1"
-      >
+      <div className="mt-6 flex gap-1 rounded-xl bg-surface-2 p-1">
         {TABS.map((tab) => {
           const active = activeTab === tab.id
           const Icon = tab.icon
@@ -102,7 +66,7 @@ export function CatalogHub({
             </button>
           )
         })}
-      </motion.div>
+      </div>
 
       <div className="mt-6">
         <AnimatePresence mode="wait">
@@ -138,6 +102,6 @@ export function CatalogHub({
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </div>
   )
 }
